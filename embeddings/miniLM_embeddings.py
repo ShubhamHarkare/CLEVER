@@ -1,6 +1,5 @@
 # This file is responsible for embedding text using the miniLM model.
 import numpy as np
-from numpy.random.mtrand import normal
 from sentence_transformers import SentenceTransformer
 from datasets import load_from_disk
 from typing import List
