@@ -9,6 +9,7 @@ import os
 # TODO: Using this model
 DATA_PATH = '../data/processed/'
 OUTPUT_PATH = '../data/embeddings/'
+BATCH_SIZE = 512
 class GetEmbeddings():
     '''
     This class is responsible for embedding text using the miniLM model.
@@ -38,7 +39,10 @@ class GetEmbeddings():
         '''
         This function will process the conversation list and return a string
         '''
-        return ' '.join([f'{msg['role']}: {msg['content']}' for msg in conversation_list])
+        for message in conversation_list:
+            if message['role'] == 'user':
+                return message['content']
+        return "" # Failsafe if there are no content from the user.
 
     def embedData(self) -> None:
         '''
@@ -53,7 +57,7 @@ class GetEmbeddings():
         print(f'Total converstions : {len(self.texts)}')
         embeddings = self.model.encode(
             self.texts,
-            batch_size=32,
+            batch_size=BATCH_SIZE,
             show_progress_bar=True,
             convert_to_numpy = True,
             normalize_embeddings = True
@@ -72,4 +76,8 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"DEVICE IN USE: {device}")
     embeddings = GetEmbeddings(data_location='train_data', model_name='all-MiniLM-L6-v2', device=device)
+    embeddings.embedData()
+    embeddings = GetEmbeddings(data_location='test_data', model_name='all-MiniLM-L6-v2', device=device)
+    embeddings.embedData()
+    embeddings = GetEmbeddings(data_location='val_data', model_name='all-MiniLM-L6-v2', device=device)
     embeddings.embedData()
