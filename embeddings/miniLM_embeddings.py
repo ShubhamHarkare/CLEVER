@@ -73,7 +73,7 @@ class GetEmbeddings():
             
 
 if __name__ == '__main__':
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'mps'
     print(f"DEVICE IN USE: {device}")
     print("="*60)
     print("Embedding the training data")
