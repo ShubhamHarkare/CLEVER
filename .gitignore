@@ -2,3 +2,4 @@
 data/
 .env
 great_lakes.sh
+slurm
