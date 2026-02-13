@@ -73,8 +73,16 @@ python scripts/02_generate_embeddings.py \
     --batch-size 512 \
     --sizes 10k,50k,100k,500k,full
 
+# --- Step 3: Generate Visualizations ---
+echo ""
+echo "=== Step 3: Generate Visualizations ==="
+python scripts/04_visualize_data.py \
+    --data-dir data/ \
+    --embed-dir results/embeddings/ \
+    --output results/figures/
+
 echo ""
 echo "=========================================="
-echo "  Embedding generation complete!"
+echo "  Pipeline complete! (embed + visualize)"
 echo "  Time: $(date)"
 echo "=========================================="

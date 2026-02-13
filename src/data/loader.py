@@ -55,7 +55,7 @@ def extract_first_user_queries(dataset, max_rows: Optional[int] = None) -> pd.Da
         max_rows: Optional limit on number of rows to process (for dev/debugging).
 
     Returns:
-        DataFrame with columns: [query_id, query_text, original_index]
+        DataFrame with columns: [query_id, query_text, original_index, model, language, num_turns]
     """
     logger.info("Extracting first user queries from conversations...")
 
@@ -82,6 +82,10 @@ def extract_first_user_queries(dataset, max_rows: Optional[int] = None) -> pd.Da
                 "query_id": idx,
                 "query_text": first_user_msg,
                 "original_index": idx,
+                "model": row.get("model", "unknown"),
+                "language": row.get("language", "unknown"),
+                "num_turns": row.get("turn", 0),
+                "conversation_id": row.get("conversation_id", ""),
             })
 
     df = pd.DataFrame(records)
