@@ -1,0 +1,51 @@
+# Index Benchmark Configuration
+# Used by scripts/03_run_index_benchmark.py (Phase 2)
+
+dataset:
+  embedding_dim: 384
+  sizes: [10000, 50000, 100000, 500000]
+  query_count: 1000        # Number of held-out queries per experiment
+  warmup_queries: 100      # Dummy queries before timing
+  repeat: 3                # Number of repetitions for each measurement
+
+indexes:
+  flat:
+    # No parameters — brute-force exact search (ground truth)
+    params: [{}]
+
+  hnsw:
+    params:
+      - { M: 16, efConstruction: 64,  efSearch: 32 }
+      - { M: 16, efConstruction: 128, efSearch: 64 }
+      - { M: 32, efConstruction: 128, efSearch: 64 }
+      - { M: 32, efConstruction: 128, efSearch: 128 }
+      - { M: 32, efConstruction: 256, efSearch: 128 }
+      - { M: 32, efConstruction: 256, efSearch: 256 }
+      - { M: 64, efConstruction: 128, efSearch: 128 }
+      - { M: 64, efConstruction: 256, efSearch: 256 }
+
+  ivf:
+    params:
+      - { nlist: 64,   nprobe: 1 }
+      - { nlist: 64,   nprobe: 4 }
+      - { nlist: 256,  nprobe: 4 }
+      - { nlist: 256,  nprobe: 16 }
+      - { nlist: 1024, nprobe: 16 }
+      - { nlist: 1024, nprobe: 64 }
+      - { nlist: 1024, nprobe: 128 }
+      - { nlist: 4096, nprobe: 16 }
+      - { nlist: 4096, nprobe: 64 }
+      - { nlist: 4096, nprobe: 128 }
+
+  lsh:
+    params:
+      - { nbits: 384 }
+      - { nbits: 768 }
+      - { nbits: 1536 }
+
+workloads:
+  - uniform       # Random query selection (baseline)
+  - clustered     # 80/20 Zipf over topic clusters
+  - bursty        # Temporal locality with sliding window
+
+recall_k_values: [1, 5, 10]
