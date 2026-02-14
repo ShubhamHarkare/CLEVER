@@ -24,8 +24,9 @@ echo "=========================================="
 # --- Environment Setup ---
 module load python/3.11 cuda/12.1
 
-# Navigate to project root
-cd $SLURM_SUBMIT_DIR/..
+# Navigate to project root (works regardless of where sbatch is submitted from)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/.."
 
 source ${PWD}/venv/bin/activate
 
