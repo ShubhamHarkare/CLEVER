@@ -1,3 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.venv/
+
+# Environment
+.env
+
+# Data & results (large files)
+data/*.parquet
+data/*.csv
+results/embeddings/*.npy
+results/benchmarks/*.json
+results/figures/*.png
+results/figures/*.pdf
+results/tables/*.tex
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.ipynb
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# HPC logs
+logs/
+slurm-*.out
 .venv
 data/
 .env

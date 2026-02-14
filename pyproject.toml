@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "clever"
+version = "0.1.0"
+description = "CLEVER: Cluster-Level Eviction for Vector Embedding Retrieval — Semantic Cache Benchmarking"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Yash Kulkarni"},
+    {name = "Shubham Harkare"},
+    {name = "Arvind Suresh"},
+]
+
+dependencies = [
+    "faiss-cpu>=1.7.4",
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "sentence-transformers>=2.2",
+    "torch>=2.0",
+    "transformers>=4.30",
+    "datasets>=2.14",
+    "psutil>=5.9",
+    "memory-profiler>=0.61",
+    "tqdm>=4.65",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+    "pyyaml>=6.0",
+    "click>=8.1",
+    "python-dotenv>=1.0",
+    "pyarrow>=14.0",
+]
+
+[project.optional-dependencies]
+gpu = ["faiss-gpu>=1.7.4"]
+judge = ["openai>=1.0"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1"]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
