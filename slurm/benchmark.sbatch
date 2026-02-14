@@ -33,8 +33,15 @@ echo ""
 echo "Python: $(python --version)"
 echo ""
 
-# --- Run Benchmarks at Each Scale ---
+# --- Step 1: Run Benchmarks at Each Scale (skip if done) ---
 for SIZE in 10k 50k 100k 500k; do
+    RESULT_FILE="results/benchmarks/index_benchmark_${SIZE}.json"
+
+    if [ -f "$RESULT_FILE" ]; then
+        echo "=== Skipping ${SIZE}: ${RESULT_FILE} already exists ==="
+        continue
+    fi
+
     echo ""
     echo "=========================================="
     echo "  Benchmarking: ${SIZE}"
@@ -50,6 +57,17 @@ for SIZE in 10k 50k 100k 500k; do
     echo "  ${SIZE} complete!"
 done
 
+# --- Step 2: Generate Visualizations ---
+echo ""
+echo "=========================================="
+echo "  Generating Benchmark Visualizations"
+echo "  Time: $(date)"
+echo "=========================================="
+
+python scripts/05_visualize_benchmarks.py \
+    --results-dir results/benchmarks/ \
+    --output results/figures/
+
 echo ""
 echo "=========================================="
 echo "  All benchmarks complete!"
@@ -58,3 +76,6 @@ echo "=========================================="
 echo ""
 echo "Results:"
 ls -lh results/benchmarks/
+echo ""
+echo "Figures:"
+ls -lh results/figures/
