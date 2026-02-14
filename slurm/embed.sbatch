@@ -5,27 +5,11 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=02:00:00
-#SBATCH --account=cse584w25_class
 #SBATCH --output=logs/embed_%j.log
 #SBATCH --error=logs/embed_%j.err
-
-# ============================================================
-#  CLEVER — Embedding Generation on Great Lakes (GPU)
-#
-#  This job:
-#    1. Downloads LMSYS-Chat-1M (if not already cached)
-#    2. Preprocesses queries
-#    3. Generates embeddings on GPU with all-MiniLM-L6-v2
-#    4. Creates all scale subsets (10K–1M)
-#
-#  Submit with:
-#    mkdir -p logs
-#    sbatch slurm/embed.sbatch
-#
-#  NOTE: Confirm your SLURM account name with:
-#    sacctmgr show assoc user=$USER
-#    Update --account above if different.
-# ============================================================
+#SBATCH --account=stats_dept2
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=yashkulk@umich.edu
 
 set -e
 
@@ -40,12 +24,10 @@ echo "=========================================="
 # --- Environment Setup ---
 module load python/3.11 cuda/12.1
 
-# Activate virtual environment
-# Update this path to match your Great Lakes setup
-source ~/cse584-venv/bin/activate
-
 # Navigate to project root
 cd $SLURM_SUBMIT_DIR/..
+
+source ${PWD}/venv/bin/activate
 
 echo ""
 echo "Python: $(python --version)"
