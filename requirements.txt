@@ -30,6 +30,7 @@ numpy==2.4.2
 packaging==26.0
 pandas==3.0.0
 propcache==0.4.1
+psutil==7.0.0
 pyarrow==23.0.0
 python-dateutil==2.9.0.post0
 PyYAML==6.0.3
