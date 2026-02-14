@@ -3,21 +3,12 @@
 #SBATCH --partition=standard
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=04:00:00
-#SBATCH --account=cse584w25_class
+#SBATCH --time=06:00:00
 #SBATCH --output=logs/bench_%j.log
 #SBATCH --error=logs/bench_%j.err
-
-# ============================================================
-#  CLEVER — Index Benchmark on Great Lakes (CPU)
-#
-#  Placeholder for Phase 2 benchmarks.
-#  This will run all index comparisons at scale (100K–1M).
-#
-#  Submit with:
-#    mkdir -p logs
-#    sbatch slurm/benchmark.sbatch
-# ============================================================
+#SBATCH --account=stats_dept2
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=yashkulk@umich.edu
 
 set -e
 
@@ -26,26 +17,44 @@ echo "  CLEVER Index Benchmark — CPU Job"
 echo "  Job ID: $SLURM_JOB_ID"
 echo "  Node:   $SLURMD_NODENAME"
 echo "  CPUs:   $SLURM_CPUS_PER_TASK"
+echo "  Memory: $SLURM_MEM_PER_NODE MB"
 echo "  Time:   $(date)"
 echo "=========================================="
 
+# --- Environment Setup ---
 module load python/3.11
-source ~/cse584-venv/bin/activate
+
+# Navigate to project root
 cd $SLURM_SUBMIT_DIR/..
 
+source ${PWD}/venv/bin/activate
+
 echo ""
-echo "=== Phase 2: Index Benchmarks ==="
-echo "TODO: Implement in Phase 2"
+echo "Python: $(python --version)"
 echo ""
 
-# Placeholder command:
-# python scripts/03_run_index_benchmark.py \
-#     --config configs/index_benchmark.yaml \
-#     --embeddings-dir results/embeddings/ \
-#     --output results/benchmarks/ \
-#     --sizes 100k,500k,full
+# --- Run Benchmarks at Each Scale ---
+for SIZE in 10k 50k 100k 500k; do
+    echo ""
+    echo "=========================================="
+    echo "  Benchmarking: ${SIZE}"
+    echo "  Time: $(date)"
+    echo "=========================================="
 
+    python scripts/03_run_index_benchmark.py \
+        --embed-dir results/embeddings/ \
+        --size ${SIZE} \
+        --output results/benchmarks/ \
+        --config configs/index_benchmark.yaml
+
+    echo "  ${SIZE} complete!"
+done
+
+echo ""
 echo "=========================================="
-echo "  Benchmark complete!"
+echo "  All benchmarks complete!"
 echo "  Time: $(date)"
 echo "=========================================="
+echo ""
+echo "Results:"
+ls -lh results/benchmarks/
