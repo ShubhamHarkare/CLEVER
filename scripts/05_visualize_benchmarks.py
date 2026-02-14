@@ -10,14 +10,14 @@ Usage:
         --output results/figures/
 
 Figures generated:
-    11_recall_vs_latency.png     — Recall@10 vs P50 latency tradeoff
-    12_build_time.png            — Build time comparison
-    13_memory_usage.png          — Memory footprint comparison
-    14_throughput_qps.png        — Query throughput comparison
-    15_latency_distribution.png  — P50/P95/P99 latency breakdown
-    16_parameter_sensitivity.png — HNSW efSearch & IVF nprobe sweeps
-    17_scalability.png           — Metrics across dataset scales
-    18_benchmark_summary.png     — Summary dashboard
+    11_recall_vs_latency.png     — Recall@10 vs P50 latency tradeoff + Pareto frontier
+    12_build_time.png            — Build time comparison at 500K scale
+    13_memory_usage.png          — Memory footprint comparison at 500K scale
+    14_throughput_qps.png        — Query throughput comparison at 500K scale
+    15_latency_distribution.png  — P50/P95/P99 latency breakdown at 500K scale
+    16_parameter_sensitivity.png — HNSW efSearch & IVF nprobe sweeps at 500K scale
+    17_scalability.png           — Metrics across dataset scales (10K→500K)
+    18_benchmark_summary.png     — Summary dashboard at 500K scale
 """
 
 import json
@@ -82,6 +82,48 @@ def load_results(results_dir: Path) -> dict[str, list[dict]]:
     return results
 
 
+def _get_largest_scale(results: dict) -> str:
+    """Return the scale label with the largest dataset_size."""
+    best_label = None
+    best_size = -1
+    for label, data in results.items():
+        if data:
+            size = data[0].get("dataset_size", 0)
+            if size > best_size:
+                best_size = size
+                best_label = label
+    return best_label
+
+
+def _scale_sort_key(label: str) -> int:
+    """Convert scale label to numeric value for sorting."""
+    label_lower = label.lower().strip()
+    if label_lower == "full":
+        return 0  # Put 'full' first if it's the smallest
+    multipliers = {"k": 1_000, "m": 1_000_000}
+    for suffix, mult in multipliers.items():
+        if label_lower.endswith(suffix):
+            try:
+                return int(label_lower[:-len(suffix)]) * mult
+            except ValueError:
+                pass
+    try:
+        return int(label_lower)
+    except ValueError:
+        return 0
+
+
+def _get_ordered_scales(results: dict) -> list[tuple[int, str]]:
+    """Return (dataset_size, label) pairs sorted by actual dataset size."""
+    scale_order = []
+    for label, data in results.items():
+        if data:
+            size = data[0].get("dataset_size", 0)
+            scale_order.append((size, label))
+    scale_order.sort()
+    return scale_order
+
+
 def _param_label(r: dict) -> str:
     """Short parameter label for legends."""
     p = r.get("params", {})
@@ -97,16 +139,45 @@ def _param_label(r: dict) -> str:
     return str(p)
 
 
+def _format_size(n: int) -> str:
+    """Format dataset size as human-readable string."""
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.0f}M"
+    elif n >= 1_000:
+        return f"{n / 1_000:.0f}K"
+    return str(n)
+
+
+def _compute_pareto_frontier(latencies, recalls):
+    """Find indices on the Pareto frontier (minimize latency, maximize recall)."""
+    points = list(zip(latencies, recalls, range(len(latencies))))
+    # Sort by latency ascending
+    points.sort(key=lambda x: x[0])
+    frontier = []
+    max_recall = -1
+    for lat, rec, idx in points:
+        if rec > max_recall:
+            frontier.append(idx)
+            max_recall = rec
+    return frontier
+
+
 # ────────────────────────────────────────────────────────
 # Figure 11: Recall vs Latency Tradeoff
 # ────────────────────────────────────────────────────────
 def plot_recall_vs_latency(results: dict, output_dir: Path):
-    """Scatter plot: recall@10 vs P50 latency for each index config."""
+    """Scatter plot: recall@10 vs P50 latency with Pareto frontier."""
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    # Use the largest available scale
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
+
+    # Collect all points for Pareto frontier
+    all_latencies = []
+    all_recalls = []
+    all_colors = []
+    all_labels = []
 
     for idx_type in ["flat", "hnsw", "ivf", "lsh"]:
         entries = [r for r in data if r["index_type"] == idx_type]
@@ -123,6 +194,11 @@ def plot_recall_vs_latency(results: dict, output_dir: Path):
             zorder=5
         )
 
+        all_latencies.extend(latencies)
+        all_recalls.extend(recalls)
+        all_colors.extend([idx_type] * len(entries))
+        all_labels.extend([_param_label(r) for r in entries])
+
         # Annotate best recall point
         best_idx = int(np.argmax(recalls))
         ax.annotate(
@@ -132,9 +208,17 @@ def plot_recall_vs_latency(results: dict, output_dir: Path):
             xytext=(5, 5), textcoords="offset points",
         )
 
+    # Draw Pareto frontier
+    frontier_indices = _compute_pareto_frontier(all_latencies, all_recalls)
+    if len(frontier_indices) >= 2:
+        frontier_lats = [all_latencies[i] for i in frontier_indices]
+        frontier_recs = [all_recalls[i] for i in frontier_indices]
+        ax.plot(frontier_lats, frontier_recs, '--', color='#f472b6', linewidth=2,
+                alpha=0.7, label="Pareto Frontier", zorder=4)
+
     ax.set_xlabel("P50 Latency (ms)")
     ax.set_ylabel("Recall@10")
-    ax.set_title(f"Recall vs Latency Tradeoff — {scale} scale")
+    ax.set_title(f"Recall vs Latency Tradeoff — {_format_size(ds_size)} vectors")
     ax.legend(loc="lower right", framealpha=0.8)
     ax.grid(True, alpha=0.3)
     ax.set_ylim(0.4, 1.05)
@@ -152,8 +236,9 @@ def plot_build_time(results: dict, output_dir: Path):
     """Bar chart: build time for best config of each index type."""
     fig, ax = plt.subplots(figsize=(9, 6))
 
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
     idx_types = []
     build_times = []
@@ -163,7 +248,6 @@ def plot_build_time(results: dict, output_dir: Path):
         entries = [r for r in data if r["index_type"] == idx_type]
         if not entries:
             continue
-        # Pick config with best recall
         best = max(entries, key=lambda r: r.get("recall_at_10", 0))
         idx_types.append(f"{INDEX_LABELS[idx_type]}\n{_param_label(best)}")
         build_times.append(best["build_time_s"])
@@ -173,12 +257,13 @@ def plot_build_time(results: dict, output_dir: Path):
                   edgecolor="white", linewidth=0.5)
 
     for bar, t in zip(bars, build_times):
+        label = f"{t:.1f}s" if t >= 1 else f"{t:.3f}s"
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
-                f"{t:.3f}s", ha="center", va="bottom", fontsize=10,
+                label, ha="center", va="bottom", fontsize=10,
                 fontweight="bold", color="#e2e8f0")
 
     ax.set_ylabel("Build Time (seconds)")
-    ax.set_title(f"Index Build Time — {scale} scale (best recall config)")
+    ax.set_title(f"Index Build Time — {_format_size(ds_size)} vectors (best recall config)")
     ax.grid(True, axis="y", alpha=0.3)
 
     fig.tight_layout()
@@ -194,8 +279,9 @@ def plot_memory_usage(results: dict, output_dir: Path):
     """Bar chart: memory usage for best config of each index type."""
     fig, ax = plt.subplots(figsize=(9, 6))
 
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
     idx_types = []
     memory_mbs = []
@@ -214,12 +300,13 @@ def plot_memory_usage(results: dict, output_dir: Path):
                   edgecolor="white", linewidth=0.5)
 
     for bar, m in zip(bars, memory_mbs):
+        label = f"{m:.0f} MB" if m >= 100 else f"{m:.1f} MB"
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
-                f"{m:.1f} MB", ha="center", va="bottom", fontsize=10,
+                label, ha="center", va="bottom", fontsize=10,
                 fontweight="bold", color="#e2e8f0")
 
     ax.set_ylabel("Memory (MB)")
-    ax.set_title(f"Index Memory Usage — {scale} scale (best recall config)")
+    ax.set_title(f"Index Memory Usage — {_format_size(ds_size)} vectors (best recall config)")
     ax.grid(True, axis="y", alpha=0.3)
 
     fig.tight_layout()
@@ -235,8 +322,9 @@ def plot_throughput(results: dict, output_dir: Path):
     """Bar chart: throughput (QPS) for all configs grouped by index type."""
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
     labels = []
     qps_values = []
@@ -259,10 +347,9 @@ def plot_throughput(results: dict, output_dir: Path):
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=7, rotation=45, ha="right")
     ax.set_ylabel("Throughput (queries/sec)")
-    ax.set_title(f"Search Throughput — {scale} scale")
+    ax.set_title(f"Search Throughput — {_format_size(ds_size)} vectors")
     ax.grid(True, axis="y", alpha=0.3)
 
-    # Add legend
     from matplotlib.patches import Patch
     legend_elements = [Patch(facecolor=COLORS[t], label=INDEX_LABELS[t])
                        for t in ["flat", "hnsw", "ivf", "lsh"]]
@@ -281,12 +368,12 @@ def plot_latency_distribution(results: dict, output_dir: Path):
     """Grouped bar chart: P50, P95, P99 latency for best config per index."""
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
     idx_types = []
     p50s, p95s, p99s = [], [], []
-    colors_list = []
 
     for idx_type in ["flat", "hnsw", "ivf", "lsh"]:
         entries = [r for r in data if r["index_type"] == idx_type]
@@ -298,19 +385,18 @@ def plot_latency_distribution(results: dict, output_dir: Path):
         p50s.append(lat["p50"])
         p95s.append(lat["p95"])
         p99s.append(lat["p99"])
-        colors_list.append(COLORS[idx_type])
 
     x = np.arange(len(idx_types))
     width = 0.25
 
-    b1 = ax.bar(x - width, p50s, width, label="P50", color="#6366f1", alpha=0.85)
-    b2 = ax.bar(x, p95s, width, label="P95", color="#f59e0b", alpha=0.85)
-    b3 = ax.bar(x + width, p99s, width, label="P99", color="#ef4444", alpha=0.85)
+    ax.bar(x - width, p50s, width, label="P50", color="#6366f1", alpha=0.85)
+    ax.bar(x, p95s, width, label="P95", color="#f59e0b", alpha=0.85)
+    ax.bar(x + width, p99s, width, label="P99", color="#ef4444", alpha=0.85)
 
     ax.set_xticks(x)
     ax.set_xticklabels(idx_types, fontsize=9)
     ax.set_ylabel("Latency (ms)")
-    ax.set_title(f"Search Latency Distribution — {scale} scale (best recall config)")
+    ax.set_title(f"Search Latency Distribution — {_format_size(ds_size)} vectors (best recall config)")
     ax.legend(framealpha=0.8)
     ax.grid(True, axis="y", alpha=0.3)
 
@@ -325,8 +411,9 @@ def plot_latency_distribution(results: dict, output_dir: Path):
 # ────────────────────────────────────────────────────────
 def plot_parameter_sensitivity(results: dict, output_dir: Path):
     """Line plots: HNSW efSearch sweep and IVF nprobe sweep."""
-    scale = list(results.keys())[-1]
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
@@ -334,7 +421,6 @@ def plot_parameter_sensitivity(results: dict, output_dir: Path):
     ax = axes[0]
     hnsw_entries = [r for r in data if r["index_type"] == "hnsw"]
 
-    # Group by M
     m_groups = {}
     for r in hnsw_entries:
         m = r["params"]["M"]
@@ -347,7 +433,6 @@ def plot_parameter_sensitivity(results: dict, output_dir: Path):
         entries_sorted = sorted(entries, key=lambda r: r["params"]["efSearch"])
         ef_vals = [r["params"]["efSearch"] for r in entries_sorted]
         recalls = [r.get("recall_at_10", 0) for r in entries_sorted]
-        latencies = [r["search_latency_ms"]["p50"] for r in entries_sorted]
 
         color = m_colors.get(m, "#94a3b8")
         ax.plot(ef_vals, recalls, "o-", color=color, label=f"M={m}",
@@ -358,7 +443,6 @@ def plot_parameter_sensitivity(results: dict, output_dir: Path):
     ax.set_title("HNSW: efSearch vs Recall@10")
     ax.legend(framealpha=0.8)
     ax.grid(True, alpha=0.3)
-    ax.set_ylim(0.9, 1.005)
 
     # --- IVF: nprobe vs recall (fixed nlist) ---
     ax = axes[1]
@@ -387,7 +471,7 @@ def plot_parameter_sensitivity(results: dict, output_dir: Path):
     ax.legend(framealpha=0.8)
     ax.grid(True, alpha=0.3)
 
-    fig.suptitle(f"Parameter Sensitivity — {scale} scale", fontsize=14,
+    fig.suptitle(f"Parameter Sensitivity — {_format_size(ds_size)} vectors", fontsize=14,
                  fontweight="bold", y=1.02)
     fig.tight_layout()
     fig.savefig(output_dir / "16_parameter_sensitivity.png", dpi=150,
@@ -407,26 +491,22 @@ def plot_scalability(results: dict, output_dir: Path):
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    # For each index type, pick best-recall config and track across scales
-    scale_order = []
-    scale_sizes = {}
-    for label, data in results.items():
-        if data:
-            size = data[0].get("dataset_size", 0)
-            scale_order.append((size, label))
-            scale_sizes[label] = size
-    scale_order.sort()
+    # Sort by actual dataset size
+    scale_order = _get_ordered_scales(results)
     ordered_labels = [s[1] for s in scale_order]
     ordered_sizes = [s[0] for s in scale_order]
 
+    # Build label→size mapping
+    scale_sizes = {label: size for size, label in scale_order}
+
     metrics = [
-        (axes[0, 0], "search_latency_ms", "P50 Latency (ms)", lambda r: r["search_latency_ms"]["p50"]),
-        (axes[0, 1], "recall_at_10", "Recall@10", lambda r: r.get("recall_at_10", 0)),
-        (axes[1, 0], "build_time_s", "Build Time (s)", lambda r: r["build_time_s"]),
-        (axes[1, 1], "memory_mb", "Memory (MB)", lambda r: r["memory_mb"]),
+        (axes[0, 0], "P50 Latency (ms)", lambda r: r["search_latency_ms"]["p50"]),
+        (axes[0, 1], "Recall@10", lambda r: r.get("recall_at_10", 0)),
+        (axes[1, 0], "Build Time (s)", lambda r: r["build_time_s"]),
+        (axes[1, 1], "Memory (MB)", lambda r: r["memory_mb"]),
     ]
 
-    for ax, metric_key, ylabel, extractor in metrics:
+    for ax, ylabel, extractor in metrics:
         for idx_type in ["flat", "hnsw", "ivf", "lsh"]:
             values = []
             valid_sizes = []
@@ -435,7 +515,6 @@ def plot_scalability(results: dict, output_dir: Path):
                 entries = [r for r in results[label] if r["index_type"] == idx_type]
                 if not entries:
                     continue
-                # Pick best recall config
                 best = max(entries, key=lambda r: r.get("recall_at_10", 0))
                 values.append(extractor(best))
                 valid_sizes.append(scale_sizes[label])
@@ -452,6 +531,16 @@ def plot_scalability(results: dict, output_dir: Path):
         ax.grid(True, alpha=0.3)
         ax.set_xscale("log")
 
+        # Nicer x-axis labels
+        ax.set_xticks(ordered_sizes)
+        ax.set_xticklabels([_format_size(s) for s in ordered_sizes])
+
+    # Add crossover annotation on latency plot
+    ax_latency = axes[0, 0]
+    ax_latency.axhline(y=10, color='#f472b6', linestyle='--', alpha=0.5, linewidth=1)
+    ax_latency.text(ordered_sizes[0], 10.5, "10ms SLA", fontsize=8,
+                    color='#f472b6', alpha=0.7)
+
     fig.suptitle("Scalability Analysis — Best Config per Index", fontsize=14,
                  fontweight="bold")
     fig.tight_layout()
@@ -464,14 +553,14 @@ def plot_scalability(results: dict, output_dir: Path):
 # Figure 18: Summary Dashboard
 # ────────────────────────────────────────────────────────
 def plot_summary_dashboard(results: dict, output_dir: Path):
-    """Summary dashboard with key metrics in a table-like layout."""
-    scale = list(results.keys())[-1]
+    """Summary dashboard with key metrics at the largest scale."""
+    scale = _get_largest_scale(results)
     data = results[scale]
+    ds_size = data[0].get("dataset_size", 0)
 
-    fig, ax = plt.subplots(figsize=(12, 5))
+    fig, ax = plt.subplots(figsize=(14, 5))
     ax.axis("off")
 
-    # Build summary table
     headers = ["Index", "Config", "Build (s)", "Mem (MB)", "P50 (ms)",
                "P99 (ms)", "QPS", "R@1", "R@5", "R@10"]
     rows = []
@@ -484,10 +573,10 @@ def plot_summary_dashboard(results: dict, output_dir: Path):
         rows.append([
             INDEX_LABELS[idx_type],
             _param_label(best),
-            f"{best['build_time_s']:.3f}",
-            f"{best['memory_mb']:.1f}",
-            f"{best['search_latency_ms']['p50']:.3f}",
-            f"{best['search_latency_ms']['p99']:.3f}",
+            f"{best['build_time_s']:.1f}" if best['build_time_s'] >= 1 else f"{best['build_time_s']:.3f}",
+            f"{best['memory_mb']:.0f}" if best['memory_mb'] >= 100 else f"{best['memory_mb']:.1f}",
+            f"{best['search_latency_ms']['p50']:.2f}",
+            f"{best['search_latency_ms']['p99']:.2f}",
             f"{best['throughput_qps']:.0f}",
             f"{best.get('recall_at_1', 0):.4f}",
             f"{best.get('recall_at_5', 0):.4f}",
@@ -510,10 +599,8 @@ def plot_summary_dashboard(results: dict, output_dir: Path):
         cell.set_facecolor("#6366f1")
         cell.set_text_props(color="white", fontweight="bold")
 
-    # Style rows with index-specific colors
+    # Style data rows
     for i, row in enumerate(rows):
-        idx_name = row[0].lower().replace(" (exact)", "")
-        color = COLORS.get(idx_name, "#94a3b8")
         for j in range(len(headers)):
             cell = table[i + 1, j]
             cell.set_facecolor("#1e293b")
@@ -521,7 +608,7 @@ def plot_summary_dashboard(results: dict, output_dir: Path):
             cell.set_edgecolor("#475569")
 
     ax.set_title(
-        f"  Phase 2 Benchmark Summary — {scale} scale  ",
+        f"  Phase 2 Benchmark Summary — {_format_size(ds_size)} vectors  ",
         fontsize=14, fontweight="bold", pad=20,
     )
 
@@ -547,15 +634,14 @@ def main(results_dir, output):
     output_dir = Path(output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load all results
     results = load_results(results_dir)
     if not results:
         logger.error("No benchmark results found!")
         sys.exit(1)
 
-    logger.info(f"Scales available: {list(results.keys())}")
+    largest = _get_largest_scale(results)
+    logger.info(f"Scales available: {list(results.keys())} (using {largest} for main plots)")
 
-    # Generate all plots
     plot_recall_vs_latency(results, output_dir)
     plot_build_time(results, output_dir)
     plot_memory_usage(results, output_dir)
