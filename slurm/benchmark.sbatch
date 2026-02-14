@@ -24,9 +24,8 @@ echo "=========================================="
 # --- Environment Setup ---
 module load python/3.11
 
-# Navigate to project root (works regardless of where sbatch is submitted from)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "${SCRIPT_DIR}/.."
+# Navigate to project root (submit sbatch from CLEVER/ directory)
+cd $SLURM_SUBMIT_DIR
 
 source ${PWD}/venv/bin/activate
 
