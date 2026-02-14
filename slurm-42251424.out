@@ -1,0 +1,286 @@
+Job started on gl1022.arc-ts.umich.edu
+Running in directory: /home/sharkare/scratch/sharkare
+/var/spool/slurmd.spool/job42251424/slurm_script: line 53: venv/bin/activate: No such file or directory
+Installing packages...
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: pip in /home/sharkare/.local/lib/python3.13/site-packages (25.3)
+Collecting pip
+  Downloading pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)
+Downloading pip-26.0.1-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 24.2 MB/s  0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 25.3
+    Uninstalling pip-25.3:
+      Successfully uninstalled pip-25.3
+Successfully installed pip-26.0.1
+Defaulting to user installation because normal site-packages is not writeable
+Collecting aiohappyeyeballs==2.6.1 (from -r requirements.txt (line 1))
+  Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl.metadata (5.9 kB)
+Collecting aiohttp==3.13.3 (from -r requirements.txt (line 2))
+  Downloading aiohttp-3.13.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.1 kB)
+Collecting aiosignal==1.4.0 (from -r requirements.txt (line 3))
+  Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting anyio==4.12.1 (from -r requirements.txt (line 4))
+  Downloading anyio-4.12.1-py3-none-any.whl.metadata (4.3 kB)
+Collecting attrs==25.4.0 (from -r requirements.txt (line 5))
+  Downloading attrs-25.4.0-py3-none-any.whl.metadata (10 kB)
+Collecting certifi==2026.1.4 (from -r requirements.txt (line 6))
+  Downloading certifi-2026.1.4-py3-none-any.whl.metadata (2.5 kB)
+Collecting charset-normalizer==3.4.4 (from -r requirements.txt (line 7))
+  Downloading charset_normalizer-3.4.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (37 kB)
+Collecting click==8.3.1 (from -r requirements.txt (line 8))
+  Downloading click-8.3.1-py3-none-any.whl.metadata (2.6 kB)
+Collecting datasets==4.5.0 (from -r requirements.txt (line 9))
+  Downloading datasets-4.5.0-py3-none-any.whl.metadata (19 kB)
+Collecting dill==0.4.0 (from -r requirements.txt (line 10))
+  Downloading dill-0.4.0-py3-none-any.whl.metadata (10 kB)
+Collecting faiss-cpu==1.13.2 (from -r requirements.txt (line 11))
+  Downloading faiss_cpu-1.13.2-cp310-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (7.6 kB)
+Collecting filelock==3.20.3 (from -r requirements.txt (line 12))
+  Downloading filelock-3.20.3-py3-none-any.whl.metadata (2.1 kB)
+Collecting frozenlist==1.8.0 (from -r requirements.txt (line 13))
+  Downloading frozenlist-1.8.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+Requirement already satisfied: fsspec==2025.10.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 14)) (2025.10.0)
+Collecting h11==0.16.0 (from -r requirements.txt (line 15))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting hf-xet==1.2.0 (from -r requirements.txt (line 16))
+  Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting httpcore==1.0.9 (from -r requirements.txt (line 17))
+  Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+Collecting httpx==0.28.1 (from -r requirements.txt (line 18))
+  Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+Collecting huggingface_hub==1.4.0 (from -r requirements.txt (line 19))
+  Downloading huggingface_hub-1.4.0-py3-none-any.whl.metadata (13 kB)
+Collecting idna==3.11 (from -r requirements.txt (line 20))
+  Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+Requirement already satisfied: Jinja2==3.1.6 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 21)) (3.1.6)
+Collecting joblib==1.5.3 (from -r requirements.txt (line 22))
+  Downloading joblib-1.5.3-py3-none-any.whl.metadata (5.5 kB)
+Requirement already satisfied: MarkupSafe==3.0.3 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 23)) (3.0.3)
+Requirement already satisfied: mpmath==1.3.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 24)) (1.3.0)
+Collecting multidict==6.7.1 (from -r requirements.txt (line 25))
+  Downloading multidict-6.7.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Collecting multiprocess==0.70.18 (from -r requirements.txt (line 26))
+  Downloading multiprocess-0.70.18-py313-none-any.whl.metadata (7.2 kB)
+Collecting networkx==3.6.1 (from -r requirements.txt (line 27))
+  Downloading networkx-3.6.1-py3-none-any.whl.metadata (6.8 kB)
+Collecting numpy==2.4.2 (from -r requirements.txt (line 28))
+  Downloading numpy-2.4.2-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting packaging==26.0 (from -r requirements.txt (line 29))
+  Downloading packaging-26.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting pandas==3.0.0 (from -r requirements.txt (line 30))
+  Downloading pandas-3.0.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting propcache==0.4.1 (from -r requirements.txt (line 31))
+  Downloading propcache-0.4.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+Collecting pyarrow==23.0.0 (from -r requirements.txt (line 32))
+  Downloading pyarrow-23.0.0-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Requirement already satisfied: python-dateutil==2.9.0.post0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 33)) (2.9.0.post0)
+Collecting PyYAML==6.0.3 (from -r requirements.txt (line 34))
+  Downloading pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting regex==2026.1.15 (from -r requirements.txt (line 35))
+  Downloading regex-2026.1.15-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting requests==2.32.5 (from -r requirements.txt (line 36))
+  Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+Collecting safetensors==0.7.0 (from -r requirements.txt (line 37))
+  Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting scikit-learn==1.8.0 (from -r requirements.txt (line 38))
+  Downloading scikit_learn-1.8.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)
+Collecting scipy==1.17.0 (from -r requirements.txt (line 39))
+  Downloading scipy-1.17.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting sentence-transformers==5.2.2 (from -r requirements.txt (line 40))
+  Downloading sentence_transformers-5.2.2-py3-none-any.whl.metadata (16 kB)
+Collecting setuptools==80.10.2 (from -r requirements.txt (line 41))
+  Downloading setuptools-80.10.2-py3-none-any.whl.metadata (6.6 kB)
+Collecting shellingham==1.5.4 (from -r requirements.txt (line 42))
+  Downloading shellingham-1.5.4-py2.py3-none-any.whl.metadata (3.5 kB)
+Requirement already satisfied: six==1.17.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 43)) (1.17.0)
+Requirement already satisfied: sympy==1.14.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 44)) (1.14.0)
+Requirement already satisfied: threadpoolctl==3.6.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 45)) (3.6.0)
+Collecting tokenizers==0.22.2 (from -r requirements.txt (line 46))
+  Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting torch==2.10.0 (from -r requirements.txt (line 47))
+  Downloading torch-2.10.0-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (31 kB)
+Collecting tqdm==4.67.3 (from -r requirements.txt (line 48))
+  Downloading tqdm-4.67.3-py3-none-any.whl.metadata (57 kB)
+Collecting transformers==5.1.0 (from -r requirements.txt (line 49))
+  Downloading transformers-5.1.0-py3-none-any.whl.metadata (31 kB)
+Collecting typer-slim==0.21.1 (from -r requirements.txt (line 50))
+  Downloading typer_slim-0.21.1-py3-none-any.whl.metadata (16 kB)
+Requirement already satisfied: typing_extensions==4.15.0 in /home/sharkare/.local/lib/python3.13/site-packages (from -r requirements.txt (line 51)) (4.15.0)
+Collecting urllib3==2.6.3 (from -r requirements.txt (line 52))
+  Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting xxhash==3.6.0 (from -r requirements.txt (line 53))
+  Downloading xxhash-3.6.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+Collecting yarl==1.22.0 (from -r requirements.txt (line 54))
+  Downloading yarl-1.22.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (75 kB)
+Collecting cuda-bindings==12.9.4 (from torch==2.10.0->-r requirements.txt (line 47))
+  Downloading cuda_bindings-12.9.4-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (2.6 kB)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.90)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.90)
+Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (9.10.2.21)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (11.3.3.83)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.5.8.93)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.27.5 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (2.27.5)
+Collecting nvidia-nvshmem-cu12==3.4.5 (from torch==2.10.0->-r requirements.txt (line 47))
+  Downloading nvidia_nvshmem_cu12-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.90)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (12.8.93)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3 in /home/sharkare/.local/lib/python3.13/site-packages (from torch==2.10.0->-r requirements.txt (line 47)) (1.13.1.3)
+Collecting triton==3.6.0 (from torch==2.10.0->-r requirements.txt (line 47))
+  Downloading triton-3.6.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (1.7 kB)
+Collecting cuda-pathfinder~=1.1 (from cuda-bindings==12.9.4->torch==2.10.0->-r requirements.txt (line 47))
+  Downloading cuda_pathfinder-1.3.3-py3-none-any.whl.metadata (1.9 kB)
+Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl (15 kB)
+Downloading aiohttp-3.13.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 36.1 MB/s  0:00:00
+Downloading multidict-6.7.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (254 kB)
+Downloading yarl-1.22.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (377 kB)
+Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+Downloading anyio-4.12.1-py3-none-any.whl (113 kB)
+Downloading attrs-25.4.0-py3-none-any.whl (67 kB)
+Downloading certifi-2026.1.4-py3-none-any.whl (152 kB)
+Downloading charset_normalizer-3.4.4-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (153 kB)
+Downloading click-8.3.1-py3-none-any.whl (108 kB)
+Downloading datasets-4.5.0-py3-none-any.whl (515 kB)
+Downloading dill-0.4.0-py3-none-any.whl (119 kB)
+Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+Downloading huggingface_hub-1.4.0-py3-none-any.whl (553 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 553.2/553.2 kB 11.4 MB/s  0:00:00
+Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 54.8 MB/s  0:00:00
+Downloading multiprocess-0.70.18-py313-none-any.whl (151 kB)
+Downloading faiss_cpu-1.13.2-cp310-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (23.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 23.8/23.8 MB 68.5 MB/s  0:00:00
+Downloading numpy-2.4.2-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.6/16.6 MB 70.6 MB/s  0:00:00
+Downloading filelock-3.20.3-py3-none-any.whl (16 kB)
+Downloading frozenlist-1.8.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (234 kB)
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading idna-3.11-py3-none-any.whl (71 kB)
+Downloading joblib-1.5.3-py3-none-any.whl (309 kB)
+Downloading networkx-3.6.1-py3-none-any.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 48.9 MB/s  0:00:00
+Downloading packaging-26.0-py3-none-any.whl (74 kB)
+Downloading pandas-3.0.0-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (10.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.9/10.9 MB 67.2 MB/s  0:00:00
+Downloading propcache-0.4.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (204 kB)
+Downloading pyarrow-23.0.0-cp313-cp313-manylinux_2_28_x86_64.whl (47.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.6/47.6 MB 70.7 MB/s  0:00:00
+Downloading pyyaml-6.0.3-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (801 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 801.6/801.6 kB 22.7 MB/s  0:00:00
+Downloading regex-2026.1.15-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (803 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 803.6/803.6 kB 18.8 MB/s  0:00:00
+Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (507 kB)
+Downloading scikit_learn-1.8.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (8.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.9/8.9 MB 66.5 MB/s  0:00:00
+Downloading scipy-1.17.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.0/35.0 MB 69.1 MB/s  0:00:00
+Downloading sentence_transformers-5.2.2-py3-none-any.whl (494 kB)
+Downloading transformers-5.1.0-py3-none-any.whl (10.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.3/10.3 MB 62.6 MB/s  0:00:00
+Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 43.2 MB/s  0:00:00
+Downloading setuptools-80.10.2-py3-none-any.whl (1.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 29.3 MB/s  0:00:00
+Downloading shellingham-1.5.4-py2.py3-none-any.whl (9.8 kB)
+Downloading torch-2.10.0-cp313-cp313-manylinux_2_28_x86_64.whl (915.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 915.7/915.7 MB 44.2 MB/s  0:00:11
+Downloading tqdm-4.67.3-py3-none-any.whl (78 kB)
+Downloading typer_slim-0.21.1-py3-none-any.whl (47 kB)
+Downloading xxhash-3.6.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (193 kB)
+Downloading cuda_bindings-12.9.4-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.9/11.9 MB 64.6 MB/s  0:00:00
+Downloading nvidia_nvshmem_cu12-3.4.5-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (139.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 139.1/139.1 MB 77.6 MB/s  0:00:01
+Downloading triton-3.6.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (188.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 188.3/188.3 MB 77.9 MB/s  0:00:02
+Downloading cuda_pathfinder-1.3.3-py3-none-any.whl (27 kB)
+Installing collected packages: xxhash, urllib3, triton, tqdm, shellingham, setuptools, safetensors, regex, PyYAML, pyarrow, propcache, packaging, nvidia-nvshmem-cu12, numpy, networkx, multidict, joblib, idna, hf-xet, h11, frozenlist, filelock, dill, cuda-pathfinder, click, charset-normalizer, certifi, attrs, aiohappyeyeballs, yarl, typer-slim, scipy, requests, pandas, multiprocess, httpcore, faiss-cpu, cuda-bindings, anyio, aiosignal, torch, scikit-learn, httpx, aiohttp, huggingface_hub, tokenizers, datasets, transformers, sentence-transformers
+  Attempting uninstall: triton
+    Found existing installation: triton 3.5.1
+    Uninstalling triton-3.5.1:
+      Successfully uninstalled triton-3.5.1
+  Attempting uninstall: tqdm
+    Found existing installation: tqdm 4.67.1
+    Uninstalling tqdm-4.67.1:
+      Successfully uninstalled tqdm-4.67.1
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 80.9.0
+    Uninstalling setuptools-80.9.0:
+      Successfully uninstalled setuptools-80.9.0
+  Attempting uninstall: pyarrow
+    Found existing installation: pyarrow 22.0.0
+    Uninstalling pyarrow-22.0.0:
+      Successfully uninstalled pyarrow-22.0.0
+  Attempting uninstall: nvidia-nvshmem-cu12
+    Found existing installation: nvidia-nvshmem-cu12 3.3.20
+    Uninstalling nvidia-nvshmem-cu12-3.3.20:
+      Successfully uninstalled nvidia-nvshmem-cu12-3.3.20
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.3.5
+    Uninstalling numpy-2.3.5:
+      Successfully uninstalled numpy-2.3.5
+  Attempting uninstall: networkx
+    Found existing installation: networkx 3.5
+    Uninstalling networkx-3.5:
+      Successfully uninstalled networkx-3.5
+  Attempting uninstall: joblib
+    Found existing installation: joblib 1.5.2
+    Uninstalling joblib-1.5.2:
+      Successfully uninstalled joblib-1.5.2
+  Attempting uninstall: scipy
+    Found existing installation: scipy 1.16.3
+    Uninstalling scipy-1.16.3:
+      Successfully uninstalled scipy-1.16.3
+  Attempting uninstall: pandas
+    Found existing installation: pandas 2.3.3
+    Uninstalling pandas-2.3.3:
+      Successfully uninstalled pandas-2.3.3
+  Attempting uninstall: torch
+    Found existing installation: torch 2.9.1
+    Uninstalling torch-2.9.1:
+      Successfully uninstalled torch-2.9.1
+  Attempting uninstall: scikit-learn
+    Found existing installation: scikit-learn 1.7.2
+    Uninstalling scikit-learn-1.7.2:
+      Successfully uninstalled scikit-learn-1.7.2
+
+Successfully installed PyYAML-6.0.3 aiohappyeyeballs-2.6.1 aiohttp-3.13.3 aiosignal-1.4.0 anyio-4.12.1 attrs-25.4.0 certifi-2026.1.4 charset-normalizer-3.4.4 click-8.3.1 cuda-bindings-12.9.4 cuda-pathfinder-1.3.3 datasets-4.5.0 dill-0.4.0 faiss-cpu-1.13.2 filelock-3.20.3 frozenlist-1.8.0 h11-0.16.0 hf-xet-1.2.0 httpcore-1.0.9 httpx-0.28.1 huggingface_hub-1.4.0 idna-3.11 joblib-1.5.3 multidict-6.7.1 multiprocess-0.70.18 networkx-3.6.1 numpy-2.4.2 nvidia-nvshmem-cu12-3.4.5 packaging-26.0 pandas-3.0.0 propcache-0.4.1 pyarrow-23.0.0 regex-2026.1.15 requests-2.32.5 safetensors-0.7.0 scikit-learn-1.8.0 scipy-1.17.0 sentence-transformers-5.2.2 setuptools-80.10.2 shellingham-1.5.4 tokenizers-0.22.2 torch-2.10.0 tqdm-4.67.3 transformers-5.1.0 triton-3.6.0 typer-slim-0.21.1 urllib3-2.6.3 xxhash-3.6.0 yarl-1.22.0
+Starting Python script...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+DEVICE IN USE: cuda
+============================================================
+Embedding the training data
+Loading the model all-MiniLM-L6-v2 on cuda
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights:   1%|          | 1/103 [00:00<00:00, 16578.28it/s, Materializing param=embeddings.LayerNorm.bias]Loading weights:   1%|          | 1/103 [00:00<00:00, 7025.63it/s, Materializing param=embeddings.LayerNorm.bias] Loading weights:   2%|▏         | 2/103 [00:00<00:00, 6754.11it/s, Materializing param=embeddings.LayerNorm.weight]Loading weights:   2%|▏         | 2/103 [00:00<00:00, 2657.15it/s, Materializing param=embeddings.LayerNorm.weight]Loading weights:   3%|▎         | 3/103 [00:00<00:00, 3375.24it/s, Materializing param=embeddings.position_embeddings.weight]Loading weights:   3%|▎         | 3/103 [00:00<00:00, 3149.67it/s, Materializing param=embeddings.position_embeddings.weight]Loading weights:   4%|▍         | 4/103 [00:00<00:00, 950.44it/s, Materializing param=embeddings.token_type_embeddings.weight]Loading weights:   4%|▍         | 4/103 [00:00<00:00, 935.29it/s, Materializing param=embeddings.token_type_embeddings.weight]Loading weights:   5%|▍         | 5/103 [00:00<00:00, 1137.84it/s, Materializing param=embeddings.word_embeddings.weight]     Loading weights:   5%|▍         | 5/103 [00:00<00:00, 1122.55it/s, Materializing param=embeddings.word_embeddings.weight]Loading weights:   6%|▌         | 6/103 [00:00<00:00, 1314.76it/s, Materializing param=encoder.layer.0.attention.output.LayerNorm.bias]Loading weights:   6%|▌         | 6/103 [00:00<00:00, 1297.41it/s, Materializing param=encoder.layer.0.attention.output.LayerNorm.bias]Loading weights:   7%|▋         | 7/103 [00:00<00:00, 1475.83it/s, Materializing param=encoder.layer.0.attention.output.LayerNorm.weight]Loading weights:   7%|▋         | 7/103 [00:00<00:00, 1457.73it/s, Materializing param=encoder.layer.0.attention.output.LayerNorm.weight]Loading weights:   8%|▊         | 8/103 [00:00<00:00, 1627.91it/s, Materializing param=encoder.layer.0.attention.output.dense.bias]      Loading weights:   8%|▊         | 8/103 [00:00<00:00, 1591.24it/s, Materializing param=encoder.layer.0.attention.output.dense.bias]Loading weights:   9%|▊         | 9/103 [00:00<00:00, 1160.21it/s, Materializing param=encoder.layer.0.attention.output.dense.weight]Loading weights:   9%|▊         | 9/103 [00:00<00:00, 1150.17it/s, Materializing param=encoder.layer.0.attention.output.dense.weight]Loading weights:  10%|▉         | 10/103 [00:00<00:00, 1259.13it/s, Materializing param=encoder.layer.0.attention.self.key.bias]     Loading weights:  10%|▉         | 10/103 [00:00<00:00, 1250.13it/s, Materializing param=encoder.layer.0.attention.self.key.bias]Loading weights:  11%|█         | 11/103 [00:00<00:00, 1356.22it/s, Materializing param=encoder.layer.0.attention.self.key.weight]Loading weights:  11%|█         | 11/103 [00:00<00:00, 1346.96it/s, Materializing param=encoder.layer.0.attention.self.key.weight]Loading weights:  12%|█▏        | 12/103 [00:00<00:00, 1450.02it/s, Materializing param=encoder.layer.0.attention.self.query.bias]Loading weights:  12%|█▏        | 12/103 [00:00<00:00, 1440.43it/s, Materializing param=encoder.layer.0.attention.self.query.bias]Loading weights:  13%|█▎        | 13/103 [00:00<00:00, 1538.54it/s, Materializing param=encoder.layer.0.attention.self.query.weight]Loading weights:  13%|█▎        | 13/103 [00:00<00:00, 1528.15it/s, Materializing param=encoder.layer.0.attention.self.query.weight]Loading weights:  14%|█▎        | 14/103 [00:00<00:00, 1175.44it/s, Materializing param=encoder.layer.0.attention.self.value.bias]  Loading weights:  14%|█▎        | 14/103 [00:00<00:00, 1169.31it/s, Materializing param=encoder.layer.0.attention.self.value.bias]Loading weights:  15%|█▍        | 15/103 [00:00<00:00, 1240.92it/s, Materializing param=encoder.layer.0.attention.self.value.weight]Loading weights:  15%|█▍        | 15/103 [00:00<00:00, 1235.07it/s, Materializing param=encoder.layer.0.attention.self.value.weight]Loading weights:  16%|█▌        | 16/103 [00:00<00:00, 1305.62it/s, Materializing param=encoder.layer.0.intermediate.dense.bias]    Loading weights:  16%|█▌        | 16/103 [00:00<00:00, 1299.75it/s, Materializing param=encoder.layer.0.intermediate.dense.bias]Loading weights:  17%|█▋        | 17/103 [00:00<00:00, 1063.05it/s, Materializing param=encoder.layer.0.intermediate.dense.weight]Loading weights:  17%|█▋        | 17/103 [00:00<00:00, 1057.80it/s, Materializing param=encoder.layer.0.intermediate.dense.weight]Loading weights:  17%|█▋        | 18/103 [00:00<00:00, 1110.18it/s, Materializing param=encoder.layer.0.output.LayerNorm.bias]    Loading weights:  17%|█▋        | 18/103 [00:00<00:00, 1105.22it/s, Materializing param=encoder.layer.0.output.LayerNorm.bias]Loading weights:  18%|█▊        | 19/103 [00:00<00:00, 1156.04it/s, Materializing param=encoder.layer.0.output.LayerNorm.weight]Loading weights:  18%|█▊        | 19/103 [00:00<00:00, 1150.88it/s, Materializing param=encoder.layer.0.output.LayerNorm.weight]Loading weights:  19%|█▉        | 20/103 [00:00<00:00, 1201.07it/s, Materializing param=encoder.layer.0.output.dense.bias]      Loading weights:  19%|█▉        | 20/103 [00:00<00:00, 1195.67it/s, Materializing param=encoder.layer.0.output.dense.bias]Loading weights:  20%|██        | 21/103 [00:00<00:00, 1245.06it/s, Materializing param=encoder.layer.0.output.dense.weight]Loading weights:  20%|██        | 21/103 [00:00<00:00, 1239.73it/s, Materializing param=encoder.layer.0.output.dense.weight]Loading weights:  21%|██▏       | 22/103 [00:00<00:00, 1288.18it/s, Materializing param=encoder.layer.1.attention.output.LayerNorm.bias]Loading weights:  21%|██▏       | 22/103 [00:00<00:00, 1282.54it/s, Materializing param=encoder.layer.1.attention.output.LayerNorm.bias]Loading weights:  22%|██▏       | 23/103 [00:00<00:00, 1329.67it/s, Materializing param=encoder.layer.1.attention.output.LayerNorm.weight]Loading weights:  22%|██▏       | 23/103 [00:00<00:00, 1323.94it/s, Materializing param=encoder.layer.1.attention.output.LayerNorm.weight]Loading weights:  23%|██▎       | 24/103 [00:00<00:00, 1368.10it/s, Materializing param=encoder.layer.1.attention.output.dense.bias]      Loading weights:  23%|██▎       | 24/103 [00:00<00:00, 1362.23it/s, Materializing param=encoder.layer.1.attention.output.dense.bias]Loading weights:  24%|██▍       | 25/103 [00:00<00:00, 1407.73it/s, Materializing param=encoder.layer.1.attention.output.dense.weight]Loading weights:  24%|██▍       | 25/103 [00:00<00:00, 1401.93it/s, Materializing param=encoder.layer.1.attention.output.dense.weight]Loading weights:  25%|██▌       | 26/103 [00:00<00:00, 1446.64it/s, Materializing param=encoder.layer.1.attention.self.key.bias]      Loading weights:  25%|██▌       | 26/103 [00:00<00:00, 1440.81it/s, Materializing param=encoder.layer.1.attention.self.key.bias]Loading weights:  26%|██▌       | 27/103 [00:00<00:00, 1484.61it/s, Materializing param=encoder.layer.1.attention.self.key.weight]Loading weights:  26%|██▌       | 27/103 [00:00<00:00, 1478.78it/s, Materializing param=encoder.layer.1.attention.self.key.weight]Loading weights:  27%|██▋       | 28/103 [00:00<00:00, 1437.04it/s, Materializing param=encoder.layer.1.attention.self.query.bias]Loading weights:  27%|██▋       | 28/103 [00:00<00:00, 1431.29it/s, Materializing param=encoder.layer.1.attention.self.query.bias]Loading weights:  28%|██▊       | 29/103 [00:00<00:00, 1376.13it/s, Materializing param=encoder.layer.1.attention.self.query.weight]Loading weights:  28%|██▊       | 29/103 [00:00<00:00, 1370.83it/s, Materializing param=encoder.layer.1.attention.self.query.weight]Loading weights:  29%|██▉       | 30/103 [00:00<00:00, 1408.24it/s, Materializing param=encoder.layer.1.attention.self.value.bias]  Loading weights:  29%|██▉       | 30/103 [00:00<00:00, 1403.36it/s, Materializing param=encoder.layer.1.attention.self.value.bias]Loading weights:  30%|███       | 31/103 [00:00<00:00, 1411.67it/s, Materializing param=encoder.layer.1.attention.self.value.weight]Loading weights:  30%|███       | 31/103 [00:00<00:00, 1406.65it/s, Materializing param=encoder.layer.1.attention.self.value.weight]Loading weights:  31%|███       | 32/103 [00:00<00:00, 1442.57it/s, Materializing param=encoder.layer.1.intermediate.dense.bias]    Loading weights:  31%|███       | 32/103 [00:00<00:00, 1437.81it/s, Materializing param=encoder.layer.1.intermediate.dense.bias]Loading weights:  32%|███▏      | 33/103 [00:00<00:00, 1473.02it/s, Materializing param=encoder.layer.1.intermediate.dense.weight]Loading weights:  32%|███▏      | 33/103 [00:00<00:00, 1468.16it/s, Materializing param=encoder.layer.1.intermediate.dense.weight]Loading weights:  33%|███▎      | 34/103 [00:00<00:00, 1502.91it/s, Materializing param=encoder.layer.1.output.LayerNorm.bias]    Loading weights:  33%|███▎      | 34/103 [00:00<00:00, 1498.04it/s, Materializing param=encoder.layer.1.output.LayerNorm.bias]Loading weights:  34%|███▍      | 35/103 [00:00<00:00, 1439.09it/s, Materializing param=encoder.layer.1.output.LayerNorm.weight]Loading weights:  34%|███▍      | 35/103 [00:00<00:00, 1434.24it/s, Materializing param=encoder.layer.1.output.LayerNorm.weight]Loading weights:  35%|███▍      | 36/103 [00:00<00:00, 1466.88it/s, Materializing param=encoder.layer.1.output.dense.bias]      Loading weights:  35%|███▍      | 36/103 [00:00<00:00, 1462.75it/s, Materializing param=encoder.layer.1.output.dense.bias]Loading weights:  36%|███▌      | 37/103 [00:00<00:00, 1495.32it/s, Materializing param=encoder.layer.1.output.dense.weight]Loading weights:  36%|███▌      | 37/103 [00:00<00:00, 1491.16it/s, Materializing param=encoder.layer.1.output.dense.weight]Loading weights:  37%|███▋      | 38/103 [00:00<00:00, 1523.41it/s, Materializing param=encoder.layer.2.attention.output.LayerNorm.bias]Loading weights:  37%|███▋      | 38/103 [00:00<00:00, 1462.92it/s, Materializing param=encoder.layer.2.attention.output.LayerNorm.bias]Loading weights:  38%|███▊      | 39/103 [00:00<00:00, 1180.98it/s, Materializing param=encoder.layer.2.attention.output.LayerNorm.weight]Loading weights:  38%|███▊      | 39/103 [00:00<00:00, 1178.22it/s, Materializing param=encoder.layer.2.attention.output.LayerNorm.weight]Loading weights:  39%|███▉      | 40/103 [00:00<00:00, 1203.35it/s, Materializing param=encoder.layer.2.attention.output.dense.bias]      Loading weights:  39%|███▉      | 40/103 [00:00<00:00, 1200.82it/s, Materializing param=encoder.layer.2.attention.output.dense.bias]Loading weights:  40%|███▉      | 41/103 [00:00<00:00, 1225.59it/s, Materializing param=encoder.layer.2.attention.output.dense.weight]Loading weights:  40%|███▉      | 41/103 [00:00<00:00, 1222.97it/s, Materializing param=encoder.layer.2.attention.output.dense.weight]Loading weights:  41%|████      | 42/103 [00:00<00:00, 1247.76it/s, Materializing param=encoder.layer.2.attention.self.key.bias]      Loading weights:  41%|████      | 42/103 [00:00<00:00, 1245.15it/s, Materializing param=encoder.layer.2.attention.self.key.bias]Loading weights:  42%|████▏     | 43/103 [00:00<00:00, 1268.90it/s, Materializing param=encoder.layer.2.attention.self.key.weight]Loading weights:  42%|████▏     | 43/103 [00:00<00:00, 1265.26it/s, Materializing param=encoder.layer.2.attention.self.key.weight]Loading weights:  43%|████▎     | 44/103 [00:00<00:00, 1287.76it/s, Materializing param=encoder.layer.2.attention.self.query.bias]Loading weights:  43%|████▎     | 44/103 [00:00<00:00, 1284.18it/s, Materializing param=encoder.layer.2.attention.self.query.bias]Loading weights:  44%|████▎     | 45/103 [00:00<00:00, 1305.99it/s, Materializing param=encoder.layer.2.attention.self.query.weight]Loading weights:  44%|████▎     | 45/103 [00:00<00:00, 1302.23it/s, Materializing param=encoder.layer.2.attention.self.query.weight]Loading weights:  45%|████▍     | 46/103 [00:00<00:00, 1324.11it/s, Materializing param=encoder.layer.2.attention.self.value.bias]  Loading weights:  45%|████▍     | 46/103 [00:00<00:00, 1320.44it/s, Materializing param=encoder.layer.2.attention.self.value.bias]Loading weights:  46%|████▌     | 47/103 [00:00<00:00, 1342.03it/s, Materializing param=encoder.layer.2.attention.self.value.weight]Loading weights:  46%|████▌     | 47/103 [00:00<00:00, 1338.33it/s, Materializing param=encoder.layer.2.attention.self.value.weight]Loading weights:  47%|████▋     | 48/103 [00:00<00:00, 1359.47it/s, Materializing param=encoder.layer.2.intermediate.dense.bias]    Loading weights:  47%|████▋     | 48/103 [00:00<00:00, 1355.41it/s, Materializing param=encoder.layer.2.intermediate.dense.bias]Loading weights:  48%|████▊     | 49/103 [00:00<00:00, 1376.53it/s, Materializing param=encoder.layer.2.intermediate.dense.weight]Loading weights:  48%|████▊     | 49/103 [00:00<00:00, 1372.78it/s, Materializing param=encoder.layer.2.intermediate.dense.weight]Loading weights:  49%|████▊     | 50/103 [00:00<00:00, 1393.67it/s, Materializing param=encoder.layer.2.output.LayerNorm.bias]    Loading weights:  49%|████▊     | 50/103 [00:00<00:00, 1389.97it/s, Materializing param=encoder.layer.2.output.LayerNorm.bias]Loading weights:  50%|████▉     | 51/103 [00:00<00:00, 1398.39it/s, Materializing param=encoder.layer.2.output.LayerNorm.weight]Loading weights:  50%|████▉     | 51/103 [00:00<00:00, 1394.46it/s, Materializing param=encoder.layer.2.output.LayerNorm.weight]Loading weights:  50%|█████     | 52/103 [00:00<00:00, 1406.53it/s, Materializing param=encoder.layer.2.output.dense.bias]      Loading weights:  50%|█████     | 52/103 [00:00<00:00, 1402.78it/s, Materializing param=encoder.layer.2.output.dense.bias]Loading weights:  51%|█████▏    | 53/103 [00:00<00:00, 1420.87it/s, Materializing param=encoder.layer.2.output.dense.weight]Loading weights:  51%|█████▏    | 53/103 [00:00<00:00, 1416.90it/s, Materializing param=encoder.layer.2.output.dense.weight]Loading weights:  52%|█████▏    | 54/103 [00:00<00:00, 1436.55it/s, Materializing param=encoder.layer.3.attention.output.LayerNorm.bias]Loading weights:  52%|█████▏    | 54/103 [00:00<00:00, 1432.76it/s, Materializing param=encoder.layer.3.attention.output.LayerNorm.bias]Loading weights:  53%|█████▎    | 55/103 [00:00<00:00, 1363.97it/s, Materializing param=encoder.layer.3.attention.output.LayerNorm.weight]Loading weights:  53%|█████▎    | 55/103 [00:00<00:00, 1360.21it/s, Materializing param=encoder.layer.3.attention.output.LayerNorm.weight]Loading weights:  54%|█████▍    | 56/103 [00:00<00:00, 1378.36it/s, Materializing param=encoder.layer.3.attention.output.dense.bias]      Loading weights:  54%|█████▍    | 56/103 [00:00<00:00, 1375.01it/s, Materializing param=encoder.layer.3.attention.output.dense.bias]Loading weights:  55%|█████▌    | 57/103 [00:00<00:00, 1353.13it/s, Materializing param=encoder.layer.3.attention.output.dense.weight]Loading weights:  55%|█████▌    | 57/103 [00:00<00:00, 1349.79it/s, Materializing param=encoder.layer.3.attention.output.dense.weight]Loading weights:  56%|█████▋    | 58/103 [00:00<00:00, 1366.93it/s, Materializing param=encoder.layer.3.attention.self.key.bias]      Loading weights:  56%|█████▋    | 58/103 [00:00<00:00, 1363.74it/s, Materializing param=encoder.layer.3.attention.self.key.bias]Loading weights:  57%|█████▋    | 59/103 [00:00<00:00, 1381.17it/s, Materializing param=encoder.layer.3.attention.self.key.weight]Loading weights:  57%|█████▋    | 59/103 [00:00<00:00, 1378.05it/s, Materializing param=encoder.layer.3.attention.self.key.weight]Loading weights:  58%|█████▊    | 60/103 [00:00<00:00, 1395.40it/s, Materializing param=encoder.layer.3.attention.self.query.bias]Loading weights:  58%|█████▊    | 60/103 [00:00<00:00, 1392.23it/s, Materializing param=encoder.layer.3.attention.self.query.bias]Loading weights:  59%|█████▉    | 61/103 [00:00<00:00, 1317.43it/s, Materializing param=encoder.layer.3.attention.self.query.weight]Loading weights:  59%|█████▉    | 61/103 [00:00<00:00, 1315.07it/s, Materializing param=encoder.layer.3.attention.self.query.weight]Loading weights:  60%|██████    | 62/103 [00:00<00:00, 1332.39it/s, Materializing param=encoder.layer.3.attention.self.value.bias]  Loading weights:  60%|██████    | 62/103 [00:00<00:00, 1330.33it/s, Materializing param=encoder.layer.3.attention.self.value.bias]Loading weights:  61%|██████    | 63/103 [00:00<00:00, 1347.85it/s, Materializing param=encoder.layer.3.attention.self.value.weight]Loading weights:  61%|██████    | 63/103 [00:00<00:00, 1345.82it/s, Materializing param=encoder.layer.3.attention.self.value.weight]Loading weights:  62%|██████▏   | 64/103 [00:00<00:00, 1363.18it/s, Materializing param=encoder.layer.3.intermediate.dense.bias]    Loading weights:  62%|██████▏   | 64/103 [00:00<00:00, 1361.13it/s, Materializing param=encoder.layer.3.intermediate.dense.bias]Loading weights:  63%|██████▎   | 65/103 [00:00<00:00, 1378.48it/s, Materializing param=encoder.layer.3.intermediate.dense.weight]Loading weights:  63%|██████▎   | 65/103 [00:00<00:00, 1376.41it/s, Materializing param=encoder.layer.3.intermediate.dense.weight]Loading weights:  64%|██████▍   | 66/103 [00:00<00:00, 1393.67it/s, Materializing param=encoder.layer.3.output.LayerNorm.bias]    Loading weights:  64%|██████▍   | 66/103 [00:00<00:00, 1391.38it/s, Materializing param=encoder.layer.3.output.LayerNorm.bias]Loading weights:  65%|██████▌   | 67/103 [00:00<00:00, 1376.59it/s, Materializing param=encoder.layer.3.output.LayerNorm.weight]Loading weights:  65%|██████▌   | 67/103 [00:00<00:00, 1370.97it/s, Materializing param=encoder.layer.3.output.LayerNorm.weight]Loading weights:  66%|██████▌   | 68/103 [00:00<00:00, 1382.36it/s, Materializing param=encoder.layer.3.output.dense.bias]      Loading weights:  66%|██████▌   | 68/103 [00:00<00:00, 1380.29it/s, Materializing param=encoder.layer.3.output.dense.bias]Loading weights:  67%|██████▋   | 69/103 [00:00<00:00, 1331.30it/s, Materializing param=encoder.layer.3.output.dense.weight]Loading weights:  67%|██████▋   | 69/103 [00:00<00:00, 1329.37it/s, Materializing param=encoder.layer.3.output.dense.weight]Loading weights:  68%|██████▊   | 70/103 [00:00<00:00, 1345.10it/s, Materializing param=encoder.layer.4.attention.output.LayerNorm.bias]Loading weights:  68%|██████▊   | 70/103 [00:00<00:00, 1343.22it/s, Materializing param=encoder.layer.4.attention.output.LayerNorm.bias]Loading weights:  69%|██████▉   | 71/103 [00:00<00:00, 1324.63it/s, Materializing param=encoder.layer.4.attention.output.LayerNorm.weight]Loading weights:  69%|██████▉   | 71/103 [00:00<00:00, 1322.71it/s, Materializing param=encoder.layer.4.attention.output.LayerNorm.weight]Loading weights:  70%|██████▉   | 72/103 [00:00<00:00, 1337.77it/s, Materializing param=encoder.layer.4.attention.output.dense.bias]      Loading weights:  70%|██████▉   | 72/103 [00:00<00:00, 1335.97it/s, Materializing param=encoder.layer.4.attention.output.dense.bias]Loading weights:  71%|███████   | 73/103 [00:00<00:00, 1349.76it/s, Materializing param=encoder.layer.4.attention.output.dense.weight]Loading weights:  71%|███████   | 73/103 [00:00<00:00, 1347.24it/s, Materializing param=encoder.layer.4.attention.output.dense.weight]Loading weights:  72%|███████▏  | 74/103 [00:00<00:00, 1360.96it/s, Materializing param=encoder.layer.4.attention.self.key.bias]      Loading weights:  72%|███████▏  | 74/103 [00:00<00:00, 1358.29it/s, Materializing param=encoder.layer.4.attention.self.key.bias]Loading weights:  73%|███████▎  | 75/103 [00:00<00:00, 1371.95it/s, Materializing param=encoder.layer.4.attention.self.key.weight]Loading weights:  73%|███████▎  | 75/103 [00:00<00:00, 1369.50it/s, Materializing param=encoder.layer.4.attention.self.key.weight]Loading weights:  74%|███████▍  | 76/103 [00:00<00:00, 1382.96it/s, Materializing param=encoder.layer.4.attention.self.query.bias]Loading weights:  74%|███████▍  | 76/103 [00:00<00:00, 1380.52it/s, Materializing param=encoder.layer.4.attention.self.query.bias]Loading weights:  75%|███████▍  | 77/103 [00:00<00:00, 1332.32it/s, Materializing param=encoder.layer.4.attention.self.query.weight]Loading weights:  75%|███████▍  | 77/103 [00:00<00:00, 1329.91it/s, Materializing param=encoder.layer.4.attention.self.query.weight]Loading weights:  76%|███████▌  | 78/103 [00:00<00:00, 1342.76it/s, Materializing param=encoder.layer.4.attention.self.value.bias]  Loading weights:  76%|███████▌  | 78/103 [00:00<00:00, 1340.48it/s, Materializing param=encoder.layer.4.attention.self.value.bias]Loading weights:  77%|███████▋  | 79/103 [00:00<00:00, 1353.32it/s, Materializing param=encoder.layer.4.attention.self.value.weight]Loading weights:  77%|███████▋  | 79/103 [00:00<00:00, 1350.83it/s, Materializing param=encoder.layer.4.attention.self.value.weight]Loading weights:  78%|███████▊  | 80/103 [00:00<00:00, 1358.03it/s, Materializing param=encoder.layer.4.intermediate.dense.bias]    Loading weights:  78%|███████▊  | 80/103 [00:00<00:00, 1355.61it/s, Materializing param=encoder.layer.4.intermediate.dense.bias]Loading weights:  79%|███████▊  | 81/103 [00:00<00:00, 1366.88it/s, Materializing param=encoder.layer.4.intermediate.dense.weight]Loading weights:  79%|███████▊  | 81/103 [00:00<00:00, 1364.51it/s, Materializing param=encoder.layer.4.intermediate.dense.weight]Loading weights:  80%|███████▉  | 82/103 [00:00<00:00, 1268.98it/s, Materializing param=encoder.layer.4.output.LayerNorm.bias]    Loading weights:  80%|███████▉  | 82/103 [00:00<00:00, 1266.49it/s, Materializing param=encoder.layer.4.output.LayerNorm.bias]Loading weights:  81%|████████  | 83/103 [00:00<00:00, 1274.04it/s, Materializing param=encoder.layer.4.output.LayerNorm.weight]Loading weights:  81%|████████  | 83/103 [00:00<00:00, 1271.67it/s, Materializing param=encoder.layer.4.output.LayerNorm.weight]Loading weights:  82%|████████▏ | 84/103 [00:00<00:00, 1282.29it/s, Materializing param=encoder.layer.4.output.dense.bias]      Loading weights:  82%|████████▏ | 84/103 [00:00<00:00, 1279.95it/s, Materializing param=encoder.layer.4.output.dense.bias]Loading weights:  83%|████████▎ | 85/103 [00:00<00:00, 1290.83it/s, Materializing param=encoder.layer.4.output.dense.weight]Loading weights:  83%|████████▎ | 85/103 [00:00<00:00, 1288.54it/s, Materializing param=encoder.layer.4.output.dense.weight]Loading weights:  83%|████████▎ | 86/103 [00:00<00:00, 1274.50it/s, Materializing param=encoder.layer.5.attention.output.LayerNorm.bias]Loading weights:  83%|████████▎ | 86/103 [00:00<00:00, 1272.13it/s, Materializing param=encoder.layer.5.attention.output.LayerNorm.bias]Loading weights:  84%|████████▍ | 87/103 [00:00<00:00, 1282.43it/s, Materializing param=encoder.layer.5.attention.output.LayerNorm.weight]Loading weights:  84%|████████▍ | 87/103 [00:00<00:00, 1280.16it/s, Materializing param=encoder.layer.5.attention.output.LayerNorm.weight]Loading weights:  85%|████████▌ | 88/103 [00:00<00:00, 1290.52it/s, Materializing param=encoder.layer.5.attention.output.dense.bias]      Loading weights:  85%|████████▌ | 88/103 [00:00<00:00, 1288.27it/s, Materializing param=encoder.layer.5.attention.output.dense.bias]Loading weights:  86%|████████▋ | 89/103 [00:00<00:00, 1298.41it/s, Materializing param=encoder.layer.5.attention.output.dense.weight]Loading weights:  86%|████████▋ | 89/103 [00:00<00:00, 1296.17it/s, Materializing param=encoder.layer.5.attention.output.dense.weight]Loading weights:  87%|████████▋ | 90/103 [00:00<00:00, 1306.33it/s, Materializing param=encoder.layer.5.attention.self.key.bias]      Loading weights:  87%|████████▋ | 90/103 [00:00<00:00, 1304.08it/s, Materializing param=encoder.layer.5.attention.self.key.bias]Loading weights:  88%|████████▊ | 91/103 [00:00<00:00, 1314.26it/s, Materializing param=encoder.layer.5.attention.self.key.weight]Loading weights:  88%|████████▊ | 91/103 [00:00<00:00, 1312.06it/s, Materializing param=encoder.layer.5.attention.self.key.weight]Loading weights:  89%|████████▉ | 92/103 [00:00<00:00, 1322.01it/s, Materializing param=encoder.layer.5.attention.self.query.bias]Loading weights:  89%|████████▉ | 92/103 [00:00<00:00, 1319.80it/s, Materializing param=encoder.layer.5.attention.self.query.bias]Loading weights:  90%|█████████ | 93/103 [00:00<00:00, 1303.02it/s, Materializing param=encoder.layer.5.attention.self.query.weight]Loading weights:  90%|█████████ | 93/103 [00:00<00:00, 1299.82it/s, Materializing param=encoder.layer.5.attention.self.query.weight]Loading weights:  91%|█████████▏| 94/103 [00:00<00:00, 1309.52it/s, Materializing param=encoder.layer.5.attention.self.value.bias]  Loading weights:  91%|█████████▏| 94/103 [00:00<00:00, 1307.38it/s, Materializing param=encoder.layer.5.attention.self.value.bias]Loading weights:  92%|█████████▏| 95/103 [00:00<00:00, 1315.31it/s, Materializing param=encoder.layer.5.attention.self.value.weight]Loading weights:  92%|█████████▏| 95/103 [00:00<00:00, 1313.05it/s, Materializing param=encoder.layer.5.attention.self.value.weight]Loading weights:  93%|█████████▎| 96/103 [00:00<00:00, 1322.52it/s, Materializing param=encoder.layer.5.intermediate.dense.bias]    Loading weights:  93%|█████████▎| 96/103 [00:00<00:00, 1320.35it/s, Materializing param=encoder.layer.5.intermediate.dense.bias]Loading weights:  94%|█████████▍| 97/103 [00:00<00:00, 1294.04it/s, Materializing param=encoder.layer.5.intermediate.dense.weight]Loading weights:  94%|█████████▍| 97/103 [00:00<00:00, 1292.53it/s, Materializing param=encoder.layer.5.intermediate.dense.weight]Loading weights:  95%|█████████▌| 98/103 [00:00<00:00, 1303.02it/s, Materializing param=encoder.layer.5.output.LayerNorm.bias]    Loading weights:  95%|█████████▌| 98/103 [00:00<00:00, 1301.58it/s, Materializing param=encoder.layer.5.output.LayerNorm.bias]Loading weights:  96%|█████████▌| 99/103 [00:00<00:00, 1307.32it/s, Materializing param=encoder.layer.5.output.LayerNorm.weight]Loading weights:  96%|█████████▌| 99/103 [00:00<00:00, 1305.81it/s, Materializing param=encoder.layer.5.output.LayerNorm.weight]Loading weights:  97%|█████████▋| 100/103 [00:00<00:00, 1316.22it/s, Materializing param=encoder.layer.5.output.dense.bias]     Loading weights:  97%|█████████▋| 100/103 [00:00<00:00, 1314.78it/s, Materializing param=encoder.layer.5.output.dense.bias]Loading weights:  98%|█████████▊| 101/103 [00:00<00:00, 1325.19it/s, Materializing param=encoder.layer.5.output.dense.weight]Loading weights:  98%|█████████▊| 101/103 [00:00<00:00, 1323.74it/s, Materializing param=encoder.layer.5.output.dense.weight]Loading weights:  99%|█████████▉| 102/103 [00:00<00:00, 1331.11it/s, Materializing param=pooler.dense.bias]                  Loading weights:  99%|█████████▉| 102/103 [00:00<00:00, 1329.66it/s, Materializing param=pooler.dense.bias]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1340.25it/s, Materializing param=pooler.dense.weight]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1338.80it/s, Materializing param=pooler.dense.weight]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1335.86it/s, Materializing param=pooler.dense.weight]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+Successfully loaded the model
+Error loading the data: Directory ../data/processed/train_data not found
+Traceback (most recent call last):
+  File "/home/sharkare/scratch/sharkare/embeddings/miniLM_embeddings.py", line 80, in <module>
+    embeddings = GetEmbeddings(data_location='train_data', model_name='all-MiniLM-L6-v2', device=device)
+  File "/home/sharkare/scratch/sharkare/embeddings/miniLM_embeddings.py", line 36, in __init__
+    raise e
+  File "/home/sharkare/scratch/sharkare/embeddings/miniLM_embeddings.py", line 32, in __init__
+    self.data = load_from_disk(full_path)
+                ~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/sharkare/.local/lib/python3.13/site-packages/datasets/load.py", line 1562, in load_from_disk
+    raise FileNotFoundError(f"Directory {dataset_path} not found")
+FileNotFoundError: Directory ../data/processed/train_data not found
+/var/spool/slurmd.spool/job42251424/slurm_script: line 65: deactivate: command not found
+Job finished.

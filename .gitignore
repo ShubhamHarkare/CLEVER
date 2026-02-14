@@ -34,3 +34,8 @@ notebooks/*.ipynb
 # HPC logs
 logs/
 slurm-*.out
+.venv
+data/
+.env
+great_lakes.sh
+slurm
