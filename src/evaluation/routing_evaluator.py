@@ -1,0 +1,366 @@
+"""
+Routing evaluation pipeline.
+
+Simulates a realistic query stream scenario:
+1. Seed the cache with a subset of queries (cache warmup)
+2. Route remaining queries through the router
+3. Measure cost savings, hit rates, and quality
+
+Supports multiple cache fill strategies and evaluates both
+fixed-threshold and adaptive routing.
+"""
+
+import json
+import logging
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+
+from src.cache.semantic_cache import SemanticCache
+from src.indexes.factory import create_index
+from src.router.adaptive_router import AdaptiveRouter
+from src.router.cost_model import CostModel
+from src.router.similarity_router import SimilarityRouter, RoutingDecision
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class EvalConfig:
+    """Configuration for routing evaluation."""
+
+    # Cache configuration
+    cache_fill_ratio: float = 0.5  # Fraction of data used to fill cache
+    index_type: str = "hnsw"
+    index_params: dict = field(default_factory=lambda: {
+        "M": 32, "efConstruction": 128, "efSearch": 128,
+    })
+
+    # Router configuration
+    thresholds: list[float] = field(
+        default_factory=lambda: [
+            0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5,
+            0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.5,
+        ]
+    )
+
+    # Adaptive router
+    min_quality: float = 0.8
+    calibration_ratio: float = 0.2  # fraction of eval set for calibration
+
+    # Cost model
+    llm_latency_ms: float = 500.0
+    llm_cost_usd: float = 0.01
+
+    # Fill strategies to evaluate
+    fill_strategies: list[str] = field(
+        default_factory=lambda: ["random", "frequency"]
+    )
+
+
+class RoutingEvaluator:
+    """Evaluates routing strategies on a query dataset.
+
+    Workflow:
+    1. Split data → cache pool + evaluation queries
+    2. Build the semantic cache from the cache pool
+    3. For each threshold, route eval queries and measure performance
+    4. Run adaptive routing to find optimal threshold
+    5. Compare routing across different index backends
+    """
+
+    def __init__(
+        self,
+        embeddings: np.ndarray,
+        texts: list[str],
+        config: EvalConfig,
+        metadata: Optional[list[dict]] = None,
+    ):
+        """
+        Args:
+            embeddings: All embeddings, shape (N, D).
+            texts: All query texts.
+            config: Evaluation configuration.
+            metadata: Optional per-query metadata.
+        """
+        self.embeddings = embeddings
+        self.texts = texts
+        self.config = config
+        self.metadata = metadata or [{}] * len(texts)
+        self.dim = embeddings.shape[1]
+        self.results: dict = {}
+
+    def run(self) -> dict:
+        """Run the full evaluation pipeline.
+
+        Returns:
+            Dict with all results including threshold sweep,
+            adaptive routing, and index comparison.
+        """
+        t_start = time.perf_counter()
+        logger.info("=" * 70)
+        logger.info(
+            f"ROUTING EVALUATION: {len(self.embeddings)} queries, "
+            f"dim={self.dim}"
+        )
+        logger.info("=" * 70)
+
+        all_results = {}
+
+        for strategy in self.config.fill_strategies:
+            logger.info(f"\n--- Fill strategy: {strategy} ---")
+            result = self._evaluate_strategy(strategy)
+            all_results[strategy] = result
+
+        total_time = time.perf_counter() - t_start
+        all_results["meta"] = {
+            "total_queries": len(self.embeddings),
+            "dim": self.dim,
+            "total_time_s": round(total_time, 2),
+            "config": {
+                "cache_fill_ratio": self.config.cache_fill_ratio,
+                "index_type": self.config.index_type,
+                "index_params": self.config.index_params,
+                "llm_latency_ms": self.config.llm_latency_ms,
+                "llm_cost_usd": self.config.llm_cost_usd,
+            },
+        }
+
+        self.results = all_results
+        return all_results
+
+    def _evaluate_strategy(self, strategy: str) -> dict:
+        """Evaluate a single cache fill strategy."""
+
+        # --- Split data ---
+        cache_emb, cache_texts, eval_emb, eval_texts = self._split_data(
+            strategy
+        )
+        logger.info(
+            f"Split: {len(cache_emb)} cache + {len(eval_emb)} eval queries"
+        )
+
+        # --- Build semantic cache ---
+        cache = SemanticCache(
+            dim=self.dim,
+            index_type=self.config.index_type,
+            index_params=self.config.index_params,
+        )
+        build_time = cache.build(cache_emb, cache_texts)
+        logger.info(f"Cache built in {build_time:.3f}s ({cache.size} entries)")
+
+        # --- Build ground truth index on cache entries ---
+        gt_index = create_index("flat", dim=self.dim)
+        gt_index.build(cache_emb.astype(np.float32))
+
+        # --- Batch search: eval queries against cache ---
+        cache_distances, cache_indices = cache.batch_lookup(eval_emb, k=10)
+
+        # --- Ground truth: eval queries against cache (exact) ---
+        gt_distances, gt_indices = gt_index.search(
+            eval_emb.astype(np.float32), k=10
+        )
+
+        # --- Cost model ---
+        cost_model = CostModel(
+            llm_latency_ms=self.config.llm_latency_ms,
+            llm_cost_usd=self.config.llm_cost_usd,
+            cache_latency_ms=0.5,  # Will be updated from actual lookup
+            index_type=self.config.index_type,
+            index_params=self.config.index_params,
+            cache_memory_mb=cache.memory_mb,
+            cache_build_time_s=build_time,
+        )
+
+        # --- Threshold sweep ---
+        threshold_results = self._threshold_sweep(
+            cache_distances, gt_distances, cost_model
+        )
+
+        # --- Adaptive routing ---
+        adaptive_result = self._adaptive_routing(
+            cache_distances, gt_distances, cost_model
+        )
+
+        # --- Per-query distance analysis ---
+        distance_analysis = self._distance_analysis(
+            cache_distances, eval_texts
+        )
+
+        return {
+            "cache_size": cache.size,
+            "eval_size": len(eval_emb),
+            "build_time_s": round(build_time, 3),
+            "cache_memory_mb": round(cache.memory_mb, 2),
+            "cost_model": cost_model.summary(),
+            "threshold_sweep": threshold_results,
+            "adaptive": adaptive_result,
+            "distance_analysis": distance_analysis,
+            "cache_stats": cache.stats,
+        }
+
+    def _split_data(
+        self, strategy: str
+    ) -> tuple[np.ndarray, list[str], np.ndarray, list[str]]:
+        """Split data into cache and evaluation sets.
+
+        Args:
+            strategy: "random", "frequency", or "chronological".
+
+        Returns:
+            (cache_emb, cache_texts, eval_emb, eval_texts)
+        """
+        n = len(self.embeddings)
+        n_cache = int(n * self.config.cache_fill_ratio)
+
+        if strategy == "frequency":
+            # Higher-frequency queries go to cache (more likely to be reused)
+            freqs = np.array([
+                m.get("frequency", 1) for m in self.metadata
+            ], dtype=float)
+            # Sort by frequency descending; top n_cache go to cache
+            sorted_idx = np.argsort(-freqs)
+            cache_idx = sorted_idx[:n_cache]
+            eval_idx = sorted_idx[n_cache:]
+        elif strategy == "chronological":
+            # First n_cache queries fill cache, rest are evaluation
+            cache_idx = np.arange(n_cache)
+            eval_idx = np.arange(n_cache, n)
+        else:
+            # Random split
+            rng = np.random.RandomState(42)
+            perm = rng.permutation(n)
+            cache_idx = perm[:n_cache]
+            eval_idx = perm[n_cache:]
+
+        cache_emb = self.embeddings[cache_idx]
+        cache_texts = [self.texts[i] for i in cache_idx]
+        eval_emb = self.embeddings[eval_idx]
+        eval_texts = [self.texts[i] for i in eval_idx]
+
+        return cache_emb, cache_texts, eval_emb, eval_texts
+
+    def _threshold_sweep(
+        self,
+        cache_distances: np.ndarray,
+        gt_distances: np.ndarray,
+        cost_model: CostModel,
+    ) -> list[dict]:
+        """Sweep thresholds and measure performance at each."""
+        nn_dist = cache_distances[:, 0]  # Nearest neighbor distances
+        gt_nn_dist = gt_distances[:, 0]
+        n = len(nn_dist)
+        results = []
+
+        for threshold in self.config.thresholds:
+            is_hit = nn_dist <= threshold
+            n_hits = int(is_hit.sum())
+            hit_rate = n_hits / n if n > 0 else 0
+
+            # Quality: For hits, measure if cache NN ≈ true NN
+            if n_hits > 0:
+                hit_dists = nn_dist[is_hit]
+                quality = float(np.mean(hit_dists <= gt_nn_dist[is_hit] * 2.0 + 0.01))
+            else:
+                quality = 1.0
+
+            savings = cost_model.cost_savings(hit_rate)
+
+            results.append({
+                "threshold": round(float(threshold), 4),
+                "hit_rate": round(hit_rate, 4),
+                "quality": round(quality, 4),
+                "n_hits": n_hits,
+                "n_misses": n - n_hits,
+                **savings,
+            })
+
+        return results
+
+    def _adaptive_routing(
+        self,
+        cache_distances: np.ndarray,
+        gt_distances: np.ndarray,
+        cost_model: CostModel,
+    ) -> dict:
+        """Run adaptive router calibration."""
+        # Split eval data into calibration + test
+        n = len(cache_distances)
+        n_cal = max(10, int(n * self.config.calibration_ratio))
+
+        rng = np.random.RandomState(123)
+        perm = rng.permutation(n)
+        cal_idx = perm[:n_cal]
+        test_idx = perm[n_cal:]
+
+        # Calibrate on calibration set
+        adaptive = AdaptiveRouter(
+            cost_model=cost_model,
+            min_quality=self.config.min_quality,
+        )
+        best_threshold = adaptive.calibrate(
+            cache_distances[cal_idx],
+            gt_distances[cal_idx],
+        )
+
+        # Evaluate on test set
+        test_nn_dist = cache_distances[test_idx, 0]
+        test_gt_dist = gt_distances[test_idx, 0]
+        is_hit = test_nn_dist <= best_threshold
+        n_hits = int(is_hit.sum())
+        n_test = len(test_idx)
+        hit_rate = n_hits / n_test if n_test > 0 else 0
+
+        if n_hits > 0:
+            quality = float(
+                np.mean(test_nn_dist[is_hit] <= test_gt_dist[is_hit] * 2.0 + 0.01)
+            )
+        else:
+            quality = 1.0
+
+        savings = cost_model.cost_savings(hit_rate)
+
+        return {
+            "best_threshold": round(best_threshold, 4),
+            "calibration_size": n_cal,
+            "test_size": n_test,
+            "test_hit_rate": round(hit_rate, 4),
+            "test_quality": round(quality, 4),
+            **savings,
+            "sweep": adaptive.sweep_summary(),
+        }
+
+    def _distance_analysis(
+        self,
+        cache_distances: np.ndarray,
+        eval_texts: list[str],
+    ) -> dict:
+        """Analyze the distribution of cache distances."""
+        nn_dist = cache_distances[:, 0]
+
+        return {
+            "mean": round(float(nn_dist.mean()), 4),
+            "std": round(float(nn_dist.std()), 4),
+            "median": round(float(np.median(nn_dist)), 4),
+            "min": round(float(nn_dist.min()), 4),
+            "max": round(float(nn_dist.max()), 4),
+            "p5": round(float(np.percentile(nn_dist, 5)), 4),
+            "p25": round(float(np.percentile(nn_dist, 25)), 4),
+            "p75": round(float(np.percentile(nn_dist, 75)), 4),
+            "p95": round(float(np.percentile(nn_dist, 95)), 4),
+            "histogram": {
+                "bins": [round(b, 2) for b in np.linspace(0, 2, 21).tolist()],
+                "counts": np.histogram(nn_dist, bins=np.linspace(0, 2, 21))[0].tolist(),
+            },
+        }
+
+    def save(self, output_path: str | Path):
+        """Save results to JSON."""
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            json.dump(self.results, f, indent=2, default=str)
+        logger.info(f"Results saved to {output_path}")
