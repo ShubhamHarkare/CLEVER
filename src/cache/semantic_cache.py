@@ -131,13 +131,17 @@ class SemanticCache:
         return build_time
 
     def lookup(
-        self, query_embedding: np.ndarray, k: int = 1
+        self, query_embedding: np.ndarray, k: int = 1,
+        threshold: Optional[float] = None,
     ) -> LookupResult:
         """Search the cache for the nearest entry to the query.
 
         Args:
             query_embedding: Query vector, shape (D,) or (1, D).
             k: Number of nearest neighbors to return.
+            threshold: Optional L2² distance threshold. When set, a
+                neighbor is only counted as a "hit" if its distance
+                is ≤ threshold.  When None, any valid neighbor is a hit.
 
         Returns:
             LookupResult with distances and nearest cache entry.
@@ -159,15 +163,20 @@ class SemanticCache:
         nearest_idx = int(indices[0, 0])
         nearest_dist = float(distances[0, 0])
 
-        # Check for valid result
+        # Check for valid result and optional threshold
         if nearest_idx >= 0 and nearest_idx < len(self._entries):
             entry = self._entries[nearest_idx]
-            hit = True
+            if threshold is None or nearest_dist <= threshold:
+                hit = True
+            else:
+                hit = False  # Neighbor found but too far away
         else:
             entry = None
             hit = False
 
         self._n_lookups += 1
+        if hit:
+            self._n_hits += 1
         self._total_lookup_time_ms += lookup_time_ms
 
         return LookupResult(

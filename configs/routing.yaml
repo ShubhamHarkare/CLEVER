@@ -50,3 +50,6 @@ index_comparison:
     params: { M: 32, efConstruction: 128, efSearch: 128 }
   - type: ivf
     params: { nlist: 256, nprobe: 16 }
+
+# Reproducibility
+seed: 42

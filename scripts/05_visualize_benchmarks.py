@@ -73,7 +73,9 @@ def load_results(results_dir: Path) -> dict[str, list[dict]]:
     for f in sorted(results_dir.glob("index_benchmark_*.json")):
         label = f.stem.replace("index_benchmark_", "")
         with open(f) as fh:
-            data = json.load(fh)
+            raw = json.load(fh)
+        # Support both old (flat list) and new ({manifest, results}) formats
+        data = raw["results"] if isinstance(raw, dict) and "results" in raw else raw
         # Filter out entries with errors
         data = [r for r in data if "error" not in r]
         if data:

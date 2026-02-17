@@ -98,7 +98,7 @@ class BenchmarkRunner:
         db_indices = all_indices[actual_query_count:]
 
         db_vectors = self.embeddings[db_indices].copy()
-        query_vectors = self.embeddings[query_indices].copy()
+        default_query_vectors = self.embeddings[query_indices].copy()
 
         logger.info(
             f"Split: {len(db_indices)} database + {len(query_indices)} queries"
@@ -108,61 +108,104 @@ class BenchmarkRunner:
         logger.info("Building ground truth (Flat L2)...")
         gt_index = create_index("flat", dim=self.dim)
         gt_index.build(db_vectors)
-        _, gt_ids = gt_index.search(query_vectors, MAX_K)
-        logger.info("Ground truth ready")
+
+        # --- Run benchmarks for each index type × workload ---
+        all_results = []
+        index_configs = self.config.get("indexes", {})
+
+        for workload_type in self.workloads:
+            logger.info(f"\n{'='*60}")
+            logger.info(f"WORKLOAD: {workload_type}")
+            logger.info(f"{'='*60}")
+
+            # Generate workload-specific query selection
+            if workload_type == "uniform":
+                query_vectors = default_query_vectors
+            else:
+                try:
+                    wl_indices = generate_workload(
+                        db_vectors, workload_type,
+                        n_queries=actual_query_count, seed=42,
+                    )
+                    query_vectors = db_vectors[wl_indices]
+                except Exception as e:
+                    logger.warning(
+                        f"Workload '{workload_type}' generation failed: {e}. "
+                        f"Falling back to uniform."
+                    )
+                    query_vectors = default_query_vectors
+
+            # Ground truth for this workload's queries
+            _, gt_ids = gt_index.search(query_vectors, MAX_K)
+
+            for index_type, idx_cfg in index_configs.items():
+                param_list = idx_cfg.get("params", [{}])
+
+                for params in param_list:
+                    logger.info("-" * 60)
+                    logger.info(
+                        f"INDEX: {index_type} | params={params} | "
+                        f"workload={workload_type}"
+                    )
+                    logger.info("-" * 60)
+
+                    # Check if this config is valid for the dataset size
+                    if index_type == "ivf" and params.get("nlist", 0) > len(db_vectors):
+                        logger.warning(
+                            f"Skipping IVF nlist={params['nlist']} > "
+                            f"N={len(db_vectors)}"
+                        )
+                        continue
+
+                    try:
+                        result = self._benchmark_single(
+                            index_type=index_type,
+                            params=params,
+                            db_vectors=db_vectors,
+                            query_vectors=query_vectors,
+                            gt_ids=gt_ids,
+                        )
+                        result["workload"] = workload_type
+                        all_results.append(result)
+                    except Exception as e:
+                        logger.error(
+                            f"FAILED: {index_type} params={params}: {e}",
+                            exc_info=True,
+                        )
+                        all_results.append({
+                            "index_type": index_type,
+                            "params": params,
+                            "dataset_size": len(db_vectors),
+                            "dataset_label": self.dataset_label,
+                            "workload": workload_type,
+                            "error": str(e),
+                        })
+
+                    gc.collect()
 
         # Free ground truth index memory
         del gt_index
         gc.collect()
 
-        # --- Run benchmarks for each index type ---
-        all_results = []
-        index_configs = self.config.get("indexes", {})
-
-        for index_type, idx_cfg in index_configs.items():
-            param_list = idx_cfg.get("params", [{}])
-
-            for params in param_list:
-                logger.info("-" * 60)
-                logger.info(f"INDEX: {index_type} | params={params}")
-                logger.info("-" * 60)
-
-                # Check if this config is valid for the dataset size
-                if index_type == "ivf" and params.get("nlist", 0) > len(db_vectors):
-                    logger.warning(
-                        f"Skipping IVF nlist={params['nlist']} > "
-                        f"N={len(db_vectors)}"
-                    )
-                    continue
-
-                try:
-                    result = self._benchmark_single(
-                        index_type=index_type,
-                        params=params,
-                        db_vectors=db_vectors,
-                        query_vectors=query_vectors,
-                        gt_ids=gt_ids,
-                    )
-                    all_results.append(result)
-                except Exception as e:
-                    logger.error(
-                        f"FAILED: {index_type} params={params}: {e}",
-                        exc_info=True,
-                    )
-                    all_results.append({
-                        "index_type": index_type,
-                        "params": params,
-                        "dataset_size": len(db_vectors),
-                        "dataset_label": self.dataset_label,
-                        "error": str(e),
-                    })
-
-                gc.collect()
+        # --- Add run manifest ---
+        manifest = {
+            "_manifest": {
+                "dataset_label": self.dataset_label,
+                "n_vectors": N,
+                "dim": self.dim,
+                "query_count": actual_query_count,
+                "warmup_queries": self.warmup_queries,
+                "n_repeats": self.n_repeats,
+                "workloads": self.workloads,
+                "seed": 42,
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            }
+        }
 
         # Save combined results
         output_path = self.output_dir / f"index_benchmark_{self.dataset_label}.json"
         with open(output_path, "w") as f:
-            json.dump(all_results, f, indent=2)
+            json.dump({"manifest": manifest, "results": all_results}, f, indent=2)
         logger.info(f"Results saved to {output_path}")
 
         return all_results

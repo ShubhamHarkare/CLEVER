@@ -110,6 +110,7 @@ def run_main_evaluation(
         llm_latency_ms=cost_cfg.get("llm_latency_ms", 500.0),
         llm_cost_usd=cost_cfg.get("llm_cost_usd", 0.01),
         fill_strategies=cache_cfg.get("fill_strategies", ["random"]),
+        seed=config.get("seed", 42),
     )
 
     evaluator = RoutingEvaluator(
@@ -160,6 +161,7 @@ def run_index_comparison(
             llm_latency_ms=cost_cfg.get("llm_latency_ms", 500.0),
             llm_cost_usd=cost_cfg.get("llm_cost_usd", 0.01),
             fill_strategies=["random"],  # Only random for comparison
+            seed=config.get("seed", 42),
         )
 
         evaluator = RoutingEvaluator(
@@ -211,7 +213,8 @@ def print_summary(results: dict):
             logger.info(f"  Best fixed threshold:")
             logger.info(f"    Threshold:      {best['threshold']}")
             logger.info(f"    Hit rate:       {best['hit_rate']:.2%}")
-            logger.info(f"    Quality:        {best['quality']:.2%}")
+            logger.info(f"    Cosine quality: {best.get('cosine_quality', 'N/A')}")
+            logger.info(f"    Recall@1:       {best.get('recall_at_1', 'N/A')}")
             logger.info(f"    Latency saving: {best['latency_saving_pct']:.1f}%")
             logger.info(f"    Cost saving:    {best['monetary_saving_pct']:.1f}%")
 
@@ -221,7 +224,8 @@ def print_summary(results: dict):
             logger.info(f"  Adaptive router:")
             logger.info(f"    Threshold:      {adaptive['best_threshold']}")
             logger.info(f"    Hit rate:       {adaptive['test_hit_rate']:.2%}")
-            logger.info(f"    Quality:        {adaptive['test_quality']:.2%}")
+            logger.info(f"    Cosine quality: {adaptive.get('cosine_quality', 'N/A')}")
+            logger.info(f"    Recall@1:       {adaptive.get('recall_at_1', 'N/A')}")
             logger.info(f"    Latency saving: {adaptive['latency_saving_pct']:.1f}%")
 
 

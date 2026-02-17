@@ -86,9 +86,10 @@ class CostModel:
             Dict with latency savings, monetary savings, and total savings.
         """
         baseline_latency = self.llm_latency_ms
+        # On a hit: only cache lookup. On a miss: cache lookup + LLM call.
         actual_latency = (
             hit_rate * self.cache_latency_ms
-            + (1 - hit_rate) * self.llm_latency_ms
+            + (1 - hit_rate) * (self.cache_latency_ms + self.llm_latency_ms)
         )
         latency_saving_pct = (
             (baseline_latency - actual_latency) / baseline_latency * 100
@@ -132,7 +133,9 @@ class CostModel:
         """
         benchmark_path = Path(benchmark_path)
         with open(benchmark_path) as f:
-            results = json.load(f)
+            raw = json.load(f)
+        # Support both old (flat list) and new ({manifest, results}) formats
+        results = raw["results"] if isinstance(raw, dict) and "results" in raw else raw
 
         # Filter to the requested index type
         entries = [r for r in results if r["index_type"] == index_type and "error" not in r]

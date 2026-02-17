@@ -60,6 +60,9 @@ class EvalConfig:
         default_factory=lambda: ["random", "frequency"]
     )
 
+    # Reproducibility
+    seed: int = 42
+
 
 class RoutingEvaluator:
     """Evaluates routing strategies on a query dataset.
@@ -120,6 +123,8 @@ class RoutingEvaluator:
             "total_queries": len(self.embeddings),
             "dim": self.dim,
             "total_time_s": round(total_time, 2),
+            "seed": self.config.seed,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "config": {
                 "cache_fill_ratio": self.config.cache_fill_ratio,
                 "index_type": self.config.index_type,
@@ -177,12 +182,14 @@ class RoutingEvaluator:
 
         # --- Threshold sweep ---
         threshold_results = self._threshold_sweep(
-            cache_distances, gt_distances, cost_model
+            cache_distances, gt_distances, cache_indices, gt_indices,
+            cost_model,
         )
 
         # --- Adaptive routing ---
         adaptive_result = self._adaptive_routing(
-            cache_distances, gt_distances, cost_model
+            cache_distances, gt_distances, cache_indices, gt_indices,
+            cost_model,
         )
 
         # --- Per-query distance analysis ---
@@ -231,7 +238,7 @@ class RoutingEvaluator:
             eval_idx = np.arange(n_cache, n)
         else:
             # Random split
-            rng = np.random.RandomState(42)
+            rng = np.random.RandomState(self.config.seed)
             perm = rng.permutation(n)
             cache_idx = perm[:n_cache]
             eval_idx = perm[n_cache:]
@@ -243,15 +250,61 @@ class RoutingEvaluator:
 
         return cache_emb, cache_texts, eval_emb, eval_texts
 
+    @staticmethod
+    def _compute_quality(
+        cache_nn_dist: np.ndarray,
+        gt_nn_dist: np.ndarray,
+        cache_nn_ids: np.ndarray,
+        gt_nn_ids: np.ndarray,
+        is_hit: np.ndarray,
+    ) -> dict:
+        """Compute multi-faceted quality metrics for cache hits.
+
+        Returns dict with:
+            cosine_quality:  mean exp(-α * dist) over hits; decays with distance.
+            recall_at_1:     fraction of hits where cache NN == ground-truth NN.
+            distance_quality: legacy binary proxy (dist <= 2 * gt + 0.01).
+        """
+        n_hits = int(is_hit.sum())
+        if n_hits == 0:
+            return {"cosine_quality": 1.0, "recall_at_1": 1.0, "distance_quality": 1.0}
+
+        hit_dists = cache_nn_dist[is_hit]
+        hit_gt_dists = gt_nn_dist[is_hit]
+
+        # 1) Cosine-similarity-based quality (exponential decay)
+        #    For normalized vectors: cosine_sim = 1 - L2²/2
+        #    quality = mean(cosine_sim) mapped to [0, 1]
+        cosine_sims = np.clip(1.0 - hit_dists / 2.0, 0.0, 1.0)
+        cosine_quality = float(np.mean(cosine_sims))
+
+        # 2) Recall@1: does the cache return the same NN as ground truth?
+        hit_cache_ids = cache_nn_ids[is_hit]
+        hit_gt_ids = gt_nn_ids[is_hit]
+        recall_at_1 = float(np.mean(hit_cache_ids == hit_gt_ids))
+
+        # 3) Legacy distance proxy (backward compat)
+        distance_quality = float(np.mean(hit_dists <= hit_gt_dists * 2.0 + 0.01))
+
+        return {
+            "cosine_quality": round(cosine_quality, 4),
+            "recall_at_1": round(recall_at_1, 4),
+            "distance_quality": round(distance_quality, 4),
+        }
+
     def _threshold_sweep(
         self,
         cache_distances: np.ndarray,
         gt_distances: np.ndarray,
+        cache_indices: np.ndarray,
+        gt_indices: np.ndarray,
         cost_model: CostModel,
     ) -> list[dict]:
         """Sweep thresholds and measure performance at each."""
-        nn_dist = cache_distances[:, 0]  # Nearest neighbor distances
+        nn_dist = cache_distances[:, 0]
         gt_nn_dist = gt_distances[:, 0]
+        cache_nn_ids = cache_indices[:, 0]
+        gt_nn_ids = gt_indices[:, 0]
         n = len(nn_dist)
         results = []
 
@@ -260,19 +313,16 @@ class RoutingEvaluator:
             n_hits = int(is_hit.sum())
             hit_rate = n_hits / n if n > 0 else 0
 
-            # Quality: For hits, measure if cache NN ≈ true NN
-            if n_hits > 0:
-                hit_dists = nn_dist[is_hit]
-                quality = float(np.mean(hit_dists <= gt_nn_dist[is_hit] * 2.0 + 0.01))
-            else:
-                quality = 1.0
+            quality = self._compute_quality(
+                nn_dist, gt_nn_dist, cache_nn_ids, gt_nn_ids, is_hit,
+            )
 
             savings = cost_model.cost_savings(hit_rate)
 
             results.append({
                 "threshold": round(float(threshold), 4),
                 "hit_rate": round(hit_rate, 4),
-                "quality": round(quality, 4),
+                **quality,
                 "n_hits": n_hits,
                 "n_misses": n - n_hits,
                 **savings,
@@ -284,6 +334,8 @@ class RoutingEvaluator:
         self,
         cache_distances: np.ndarray,
         gt_distances: np.ndarray,
+        cache_indices: np.ndarray,
+        gt_indices: np.ndarray,
         cost_model: CostModel,
     ) -> dict:
         """Run adaptive router calibration."""
@@ -291,7 +343,7 @@ class RoutingEvaluator:
         n = len(cache_distances)
         n_cal = max(10, int(n * self.config.calibration_ratio))
 
-        rng = np.random.RandomState(123)
+        rng = np.random.RandomState(self.config.seed + 1)
         perm = rng.permutation(n)
         cal_idx = perm[:n_cal]
         test_idx = perm[n_cal:]
@@ -309,17 +361,16 @@ class RoutingEvaluator:
         # Evaluate on test set
         test_nn_dist = cache_distances[test_idx, 0]
         test_gt_dist = gt_distances[test_idx, 0]
+        test_cache_ids = cache_indices[test_idx, 0]
+        test_gt_ids = gt_indices[test_idx, 0]
         is_hit = test_nn_dist <= best_threshold
         n_hits = int(is_hit.sum())
         n_test = len(test_idx)
         hit_rate = n_hits / n_test if n_test > 0 else 0
 
-        if n_hits > 0:
-            quality = float(
-                np.mean(test_nn_dist[is_hit] <= test_gt_dist[is_hit] * 2.0 + 0.01)
-            )
-        else:
-            quality = 1.0
+        quality = self._compute_quality(
+            test_nn_dist, test_gt_dist, test_cache_ids, test_gt_ids, is_hit,
+        )
 
         savings = cost_model.cost_savings(hit_rate)
 
@@ -328,7 +379,7 @@ class RoutingEvaluator:
             "calibration_size": n_cal,
             "test_size": n_test,
             "test_hit_rate": round(hit_rate, 4),
-            "test_quality": round(quality, 4),
+            **quality,
             **savings,
             "sweep": adaptive.sweep_summary(),
         }
