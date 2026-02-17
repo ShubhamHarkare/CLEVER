@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=clever-routing
-#SBATCH --account=eecs584w25_class
-#SBATCH --partition=standard
+#SBATCH --account=stats_dept2
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
@@ -9,6 +10,8 @@
 #SBATCH --time=02:00:00
 #SBATCH --output=logs/routing_%j.log
 #SBATCH --error=logs/routing_%j.err
+#SBATCH --mail-user=yashkulk@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
 
 # ──────────────────────────────────────────────────────────────
 # Phase 3: Cost-Based Query Routing Evaluation
