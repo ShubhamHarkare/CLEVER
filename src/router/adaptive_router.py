@@ -108,17 +108,13 @@ class AdaptiveRouter:
             n_total = len(cache_nn_dist)
             hit_rate = n_hits / n_total if n_total > 0 else 0
 
-            # Quality: For cache hits, how close is the cached result to
-            # the ground truth nearest neighbor?
-            # If cache_dist ≈ gt_dist, quality is high.
+            # Quality: cosine-similarity-based metric for cache hits.
+            # For normalized vectors: cosine_sim ≈ 1 - L2²/2,
+            # so quality = mean(clip(1 - dist/2, 0, 1)) over hits.
             if n_hits > 0:
                 hit_cache_dists = cache_nn_dist[is_hit]
-                hit_gt_dists = gt_nn_dist[is_hit]
-                # Quality proxy: fraction of hits where cache distance
-                # is within 2x of ground truth distance
-                quality = float(
-                    np.mean(hit_cache_dists <= hit_gt_dists * 2.0 + 0.01)
-                )
+                cosine_sims = np.clip(1.0 - hit_cache_dists / 2.0, 0.0, 1.0)
+                quality = float(np.mean(cosine_sims))
             else:
                 quality = 1.0  # No hits = no quality loss (but no savings)
 

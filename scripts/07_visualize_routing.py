@@ -546,6 +546,116 @@ def plot_summary_dashboard(routing: dict, output_dir: Path):
     logger.info("✓ 26_routing_summary.png")
 
 
+# ── Plot 27: Pareto Front ────────────────────────────────────────────
+
+def plot_pareto_front(routing: dict, output_dir: Path):
+    """Quality vs Latency Savings Pareto front, colored by threshold."""
+    fig, ax = plt.subplots(figsize=(10, 7))
+
+    strategies = {"random": ("o", "#06d6a0"), "frequency": ("s", "#ffa62f")}
+
+    for strategy, (marker, color) in strategies.items():
+        data = routing.get(strategy, {})
+        sweep = data.get("threshold_sweep", [])
+        if not sweep:
+            continue
+
+        thresholds = [s["threshold"] for s in sweep]
+        lat_savings = [s["latency_saving_pct"] for s in sweep]
+        quality_key = "cosine_quality" if "cosine_quality" in sweep[0] else "quality"
+        quality = [s.get(quality_key, 1.0) * 100 for s in sweep]
+
+        # Scatter colored by threshold
+        sc = ax.scatter(
+            lat_savings, quality,
+            c=thresholds, cmap="viridis", marker=marker,
+            s=80, edgecolors="white", linewidth=0.5, alpha=0.85,
+            label=f"{strategy} fill",
+            zorder=5,
+        )
+        ax.plot(lat_savings, quality, color=color, alpha=0.3, linewidth=1, zorder=3)
+
+        # Annotate key thresholds
+        for s in sweep:
+            t = s["threshold"]
+            if t in [0.1, 0.3, 0.5, 0.7, 0.9, 1.0, 1.5]:
+                ax.annotate(
+                    f"θ={t}",
+                    (s["latency_saving_pct"], s.get(quality_key, 1.0) * 100),
+                    fontsize=7, color="#aaaacc", ha="left",
+                    xytext=(5, 3), textcoords="offset points",
+                )
+
+        # Mark Pareto-optimal points (non-dominated)
+        pareto_idx = _pareto_front_indices(lat_savings, quality)
+        pareto_lat = [lat_savings[i] for i in pareto_idx]
+        pareto_q = [quality[i] for i in pareto_idx]
+        ax.scatter(
+            pareto_lat, pareto_q,
+            facecolors="none", edgecolors="#ef476f", linewidths=2,
+            s=150, zorder=6, label="Pareto optimal" if strategy == "random" else None,
+        )
+
+        # Mark adaptive operating point
+        adaptive = data.get("adaptive", {})
+        if adaptive:
+            adapt_lat = adaptive.get("latency_saving_pct", 0)
+            adapt_q = adaptive.get(quality_key, adaptive.get("quality", 0)) * 100
+            ax.plot(
+                adapt_lat, adapt_q, "*",
+                markersize=20, color="#ef476f", markeredgecolor="white",
+                markeredgewidth=1, zorder=7,
+                label=f"Adaptive (θ={adaptive.get('best_threshold', '?'):.2f})"
+                if strategy == "random" else None,
+            )
+
+    # Shade sweet spot region
+    ax.axhspan(80, 86, alpha=0.08, color="#06d6a0", zorder=1)
+    ax.annotate(
+        "Sweet spot\n(θ ∈ [0.7, 0.9])", xy=(75, 83),
+        fontsize=9, color="#06d6a0", style="italic", ha="center",
+    )
+
+    # 80% quality target line
+    ax.axhline(80, color=COLORS["quality"], linestyle=":", alpha=0.5, linewidth=1)
+    ax.annotate(
+        "80% quality target", xy=(5, 80.5),
+        fontsize=8, color=COLORS["quality"], alpha=0.6,
+    )
+
+    cb = fig.colorbar(sc, ax=ax, label="Threshold (L2²)", pad=0.02)
+    cb.ax.yaxis.label.set_color("#ccccdd")
+    cb.ax.tick_params(colors="#aaaacc")
+
+    ax.set_xlabel("Latency Savings (%)", fontsize=13)
+    ax.set_ylabel("Cosine Quality (%)", fontsize=13)
+    ax.set_title("Pareto Front — Quality vs Cost Savings", fontsize=15, fontweight="bold")
+    ax.legend(loc="lower left", fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(output_dir / "27_pareto_front.png", dpi=SAVE_DPI, bbox_inches="tight")
+    plt.close(fig)
+    logger.info("✓ 27_pareto_front.png")
+
+
+def _pareto_front_indices(x_vals, y_vals):
+    """Find Pareto-optimal indices (maximize both x and y)."""
+    n = len(x_vals)
+    pareto = []
+    for i in range(n):
+        dominated = False
+        for j in range(n):
+            if x_vals[j] >= x_vals[i] and y_vals[j] >= y_vals[i] and (
+                x_vals[j] > x_vals[i] or y_vals[j] > y_vals[i]
+            ):
+                dominated = True
+                break
+        if not dominated:
+            pareto.append(i)
+    return pareto
+
+
 # ── Main ─────────────────────────────────────────────────────────────
 
 def main():
@@ -578,6 +688,7 @@ def main():
     plot_quality_hitrate(routing, output_dir)
     plot_index_comparison(comparison, output_dir)
     plot_summary_dashboard(routing, output_dir)
+    plot_pareto_front(routing, output_dir)
 
     logger.info(f"\nAll figures saved to {output_dir}")
 

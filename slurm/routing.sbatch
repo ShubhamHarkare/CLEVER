@@ -7,20 +7,20 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --time=02:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=logs/routing_%j.log
 #SBATCH --error=logs/routing_%j.err
 #SBATCH --mail-user=yashkulk@umich.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 
 # ──────────────────────────────────────────────────────────────
-# Phase 3: Cost-Based Query Routing Evaluation
+# Phase 3: Cost-Based Query Routing Evaluation (Multi-Seed)
 # Runs the routing evaluation pipeline on Great Lakes.
 # ──────────────────────────────────────────────────────────────
 
 set -euo pipefail
 
-echo "=== CLEVER Phase 3: Routing Evaluation ==="
+echo "=== CLEVER Phase 3: Routing Evaluation (Multi-Seed) ==="
 echo "Job ID:   $SLURM_JOB_ID"
 echo "Node:     $(hostname)"
 echo "CPUs:     $SLURM_CPUS_PER_TASK"
@@ -37,13 +37,14 @@ source venv/bin/activate
 # Create log and output directories
 mkdir -p logs results/routing results/figures
 
-# ── Run routing evaluation ────────────────────────────────────
-echo ">>> Running routing evaluation..."
+# ── Run routing evaluation (multi-seed) ──────────────────────
+echo ">>> Running multi-seed routing evaluation..."
 python scripts/06_run_routing_eval.py \
     --embeddings results/embeddings/full_embeddings.npy \
     --queries data/full_queries.parquet \
     --config configs/routing.yaml \
-    --output results/routing/
+    --output results/routing/ \
+    --multi-seed
 
 echo ""
 echo ">>> Routing evaluation complete."

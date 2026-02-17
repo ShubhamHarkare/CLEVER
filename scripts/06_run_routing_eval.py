@@ -87,20 +87,13 @@ def load_config(config_path: str) -> dict:
         return yaml.safe_load(f)
 
 
-def run_main_evaluation(
-    embeddings: np.ndarray,
-    texts: list[str],
-    metadata: list[dict],
-    config: dict,
-    output_dir: Path,
-):
-    """Run the main routing evaluation."""
+def _build_eval_config(config: dict) -> EvalConfig:
+    """Build an EvalConfig from the YAML dict."""
     cache_cfg = config.get("cache", {})
     cost_cfg = config.get("cost_model", {})
     router_cfg = config.get("router", {})
     adaptive_cfg = router_cfg.get("adaptive", {})
-
-    eval_config = EvalConfig(
+    return EvalConfig(
         cache_fill_ratio=cache_cfg.get("fill_ratio", 0.5),
         index_type=cache_cfg.get("index_type", "hnsw"),
         index_params=cache_cfg.get("index_params", {}),
@@ -113,6 +106,17 @@ def run_main_evaluation(
         seed=config.get("seed", 42),
     )
 
+
+def run_main_evaluation(
+    embeddings: np.ndarray,
+    texts: list[str],
+    metadata: list[dict],
+    config: dict,
+    output_dir: Path,
+):
+    """Run the main routing evaluation (single seed)."""
+    eval_config = _build_eval_config(config)
+
     evaluator = RoutingEvaluator(
         embeddings=embeddings,
         texts=texts,
@@ -122,6 +126,35 @@ def run_main_evaluation(
 
     results = evaluator.run()
     evaluator.save(output_dir / "routing_eval.json")
+
+    return results
+
+
+def run_multi_seed_evaluation(
+    embeddings: np.ndarray,
+    texts: list[str],
+    metadata: list[dict],
+    config: dict,
+    output_dir: Path,
+):
+    """Run routing evaluation across multiple seeds and aggregate."""
+    eval_config = _build_eval_config(config)
+    seeds = config.get("seeds", [42, 123, 456, 789, 1024])
+
+    results = RoutingEvaluator.run_multi_seed(
+        embeddings=embeddings,
+        texts=texts,
+        config=eval_config,
+        seeds=seeds,
+        metadata=metadata,
+    )
+
+    # Save aggregated results
+    out_path = output_dir / "routing_eval_multi_seed.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(results, f, indent=2, default=str)
+    logger.info(f"Multi-seed results saved to {out_path}")
 
     return results
 
@@ -164,15 +197,19 @@ def run_index_comparison(
             seed=config.get("seed", 42),
         )
 
-        evaluator = RoutingEvaluator(
-            embeddings=embeddings,
-            texts=texts,
-            config=eval_config,
-            metadata=metadata,
-        )
+        try:
+            evaluator = RoutingEvaluator(
+                embeddings=embeddings,
+                texts=texts,
+                config=eval_config,
+                metadata=metadata,
+            )
 
-        results = evaluator.run()
-        comparison_results[label] = results
+            results = evaluator.run()
+            comparison_results[label] = results
+        except Exception as e:
+            logger.error(f"Index {label} failed: {e}")
+            comparison_results[label] = {"error": str(e)}
 
     # Save comparison
     out_path = output_dir / "index_comparison.json"
@@ -229,6 +266,21 @@ def print_summary(results: dict):
             logger.info(f"    Latency saving: {adaptive['latency_saving_pct']:.1f}%")
 
 
+def print_multi_seed_summary(results: dict):
+    """Print aggregated multi-seed results."""
+    logger.info("\n" + "=" * 70)
+    logger.info(f"MULTI-SEED SUMMARY  ({results['n_seeds']} seeds: {results['seeds']})")
+    logger.info("=" * 70)
+
+    for strategy, metrics in results.get("aggregated", {}).items():
+        logger.info(f"\n--- Strategy: {strategy} ---")
+        for key, stats in metrics.items():
+            logger.info(
+                f"  {key:25s}: {stats['mean']:.4f} ± {stats['std']:.4f}  "
+                f"[{stats['min']:.4f}, {stats['max']:.4f}]"
+            )
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Phase 3 — Cost-Based Query Routing Evaluation"
@@ -261,6 +313,10 @@ def main():
         "--skip-comparison", action="store_true",
         help="Skip index comparison evaluation",
     )
+    parser.add_argument(
+        "--multi-seed", action="store_true",
+        help="Run evaluation across multiple seeds and aggregate",
+    )
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -276,11 +332,18 @@ def main():
     if args.fill_ratio is not None:
         config.setdefault("cache", {})["fill_ratio"] = args.fill_ratio
 
-    # Run main evaluation
-    results = run_main_evaluation(
-        embeddings, texts, metadata, config, output_dir
-    )
-    print_summary(results)
+    if args.multi_seed:
+        # Multi-seed evaluation
+        results = run_multi_seed_evaluation(
+            embeddings, texts, metadata, config, output_dir
+        )
+        print_multi_seed_summary(results)
+    else:
+        # Single-seed evaluation (default)
+        results = run_main_evaluation(
+            embeddings, texts, metadata, config, output_dir
+        )
+        print_summary(results)
 
     # Run index comparison
     if not args.skip_comparison:
@@ -293,3 +356,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

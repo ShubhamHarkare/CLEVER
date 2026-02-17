@@ -415,3 +415,104 @@ class RoutingEvaluator:
         with open(output_path, "w") as f:
             json.dump(self.results, f, indent=2, default=str)
         logger.info(f"Results saved to {output_path}")
+
+    # ------------------------------------------------------------------
+    # Multi-seed aggregation
+    # ------------------------------------------------------------------
+
+    @classmethod
+    def run_multi_seed(
+        cls,
+        embeddings: np.ndarray,
+        texts: list[str],
+        config: EvalConfig,
+        seeds: list[int],
+        metadata: Optional[list[dict]] = None,
+    ) -> dict:
+        """Run the evaluation pipeline with multiple seeds and aggregate.
+
+        Args:
+            embeddings: All embeddings, shape (N, D).
+            texts: All query texts.
+            config: Base evaluation configuration.
+            seeds: List of random seeds to evaluate.
+            metadata: Optional per-query metadata.
+
+        Returns:
+            Dict with ``per_seed`` results and ``aggregated`` summary
+            (mean ± std for key metrics).
+        """
+        per_seed_results = {}
+
+        for i, seed in enumerate(seeds):
+            logger.info(f"\n{'=' * 70}")
+            logger.info(f"MULTI-SEED RUN {i+1}/{len(seeds)}  (seed={seed})")
+            logger.info(f"{'=' * 70}")
+
+            # Clone config with this seed
+            seed_config = EvalConfig(
+                cache_fill_ratio=config.cache_fill_ratio,
+                index_type=config.index_type,
+                index_params=config.index_params,
+                thresholds=config.thresholds,
+                min_quality=config.min_quality,
+                calibration_ratio=config.calibration_ratio,
+                llm_latency_ms=config.llm_latency_ms,
+                llm_cost_usd=config.llm_cost_usd,
+                fill_strategies=config.fill_strategies,
+                seed=seed,
+            )
+
+            evaluator = cls(embeddings, texts, seed_config, metadata)
+            result = evaluator.run()
+            per_seed_results[str(seed)] = result
+
+        # Aggregate across seeds
+        aggregated = cls._aggregate_seeds(per_seed_results, config.fill_strategies)
+
+        return {
+            "multi_seed": True,
+            "seeds": seeds,
+            "n_seeds": len(seeds),
+            "aggregated": aggregated,
+            "per_seed": per_seed_results,
+        }
+
+    @staticmethod
+    def _aggregate_seeds(
+        per_seed: dict, strategies: list[str]
+    ) -> dict:
+        """Compute mean ± std across seeds for key metrics."""
+        agg = {}
+        for strategy in strategies:
+            # Collect adaptive routing metrics from each seed
+            metrics_keys = [
+                "test_hit_rate", "cosine_quality", "recall_at_1",
+                "distance_quality", "best_threshold",
+                "latency_saving_pct", "monetary_saving_pct",
+            ]
+            seed_metrics = {k: [] for k in metrics_keys}
+
+            for seed_key, result in per_seed.items():
+                if strategy not in result:
+                    continue
+                adaptive = result[strategy].get("adaptive", {})
+                for k in metrics_keys:
+                    if k in adaptive:
+                        seed_metrics[k].append(adaptive[k])
+
+            # Compute mean ± std
+            summary = {}
+            for k, vals in seed_metrics.items():
+                if vals:
+                    arr = np.array(vals)
+                    summary[k] = {
+                        "mean": round(float(np.mean(arr)), 4),
+                        "std": round(float(np.std(arr)), 4),
+                        "min": round(float(np.min(arr)), 4),
+                        "max": round(float(np.max(arr)), 4),
+                    }
+            agg[strategy] = summary
+
+        return agg
+
