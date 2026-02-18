@@ -51,7 +51,7 @@ index_comparison:
   - type: ivf
     params: { nlist: 256, nprobe: 16 }
   - type: lsh
-    params: { n_bits: 512 }
+    params: { nbits: 512 }
 
 # Reproducibility
 seed: 42

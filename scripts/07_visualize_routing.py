@@ -72,6 +72,7 @@ SAVE_DPI = 180
 def load_results(results_dir: Path) -> tuple[dict, dict]:
     """Load routing and comparison results."""
     routing_path = results_dir / "routing_eval.json"
+    multi_seed_path = results_dir / "routing_eval_multi_seed.json"
     comparison_path = results_dir / "index_comparison.json"
 
     routing = {}
@@ -81,8 +82,22 @@ def load_results(results_dir: Path) -> tuple[dict, dict]:
         with open(routing_path) as f:
             routing = json.load(f)
         logger.info(f"Loaded routing results from {routing_path}")
+    elif multi_seed_path.exists():
+        # Fall back to multi-seed results: use the first per-seed run for plots
+        with open(multi_seed_path) as f:
+            multi = json.load(f)
+        per_seed = multi.get("per_seed", {})
+        if per_seed:
+            first_seed = next(iter(per_seed))
+            routing = per_seed[first_seed]
+            logger.info(
+                f"Loaded routing results from {multi_seed_path} "
+                f"(seed={first_seed})"
+            )
+        else:
+            logger.warning(f"No per-seed data in {multi_seed_path}")
     else:
-        logger.warning(f"No routing results at {routing_path}")
+        logger.warning(f"No routing results at {routing_path} or {multi_seed_path}")
 
     if comparison_path.exists():
         with open(comparison_path) as f:
