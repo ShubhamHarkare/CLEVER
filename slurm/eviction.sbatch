@@ -1,29 +1,44 @@
 #!/bin/bash
-#SBATCH --job-name=eviction_eval
-#SBATCH --partition=standard
+#SBATCH --job-name=clever-eviction
+#SBATCH --account=stats_dept2
+#SBATCH --partition=gpu-rtx6000
+#SBATCH --gres=gpu:1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=06:00:00
-#SBATCH --account=cse584w25_class
 #SBATCH --output=logs/eviction_%j.log
 #SBATCH --error=logs/eviction_%j.err
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=yashkulk@umich.edu
+#SBATCH --mail-type=BEGIN,END,FAIL
 
-# ── Environment ──────────────────────────────────────────────────
-module load python/3.11
-source ~/cse584-venv/bin/activate
+# ──────────────────────────────────────────────────────────────
+# Phase 4: Semantic-Aware Eviction Policy Evaluation (Multi-Seed)
+# Runs the eviction evaluation pipeline on Great Lakes.
+# ──────────────────────────────────────────────────────────────
 
-cd ~/CLEVER
+set -euo pipefail
 
-echo "═══════════════════════════════════════════════════════════"
-echo "Phase 4: Eviction Policy Evaluation"
-echo "Started: $(date)"
-echo "Node: $(hostname)"
-echo "═══════════════════════════════════════════════════════════"
+echo "=== CLEVER Phase 4: Eviction Policy Evaluation (Multi-Seed) ==="
+echo "Job ID:   $SLURM_JOB_ID"
+echo "Node:     $(hostname)"
+echo "CPUs:     $SLURM_CPUS_PER_TASK"
+echo "Memory:   $SLURM_MEM_PER_NODE MB"
+echo "Started:  $(date)"
+echo ""
 
-mkdir -p results/eviction results/figures logs
+# ── Setup ────────────────────────────────────────────────────
+cd ~/scratch/yashkulk/CSE584/CLEVER
 
-# ── Run eviction experiments (multi-seed) ────────────────────────
+# Activate virtual environment
+source venv/bin/activate
+
+# Create log and output directories
+mkdir -p logs results/eviction results/figures
+
+# ── Run eviction experiments (multi-seed) ────────────────────
+echo ">>> Running multi-seed eviction evaluation..."
 python scripts/08_run_eviction.py \
     --embeddings results/embeddings/full_embeddings.npy \
     --queries data/full_queries.parquet \
@@ -32,15 +47,16 @@ python scripts/08_run_eviction.py \
     --multi-seed
 
 echo ""
-echo "Eviction experiment completed: $(date)"
-echo ""
+echo ">>> Eviction evaluation complete."
 
-# ── Generate figures ─────────────────────────────────────────────
+# ── Generate visualizations ────────────────────────────────────
+echo ">>> Generating eviction visualizations..."
 python scripts/09_visualize_eviction.py \
     --results results/eviction/eviction_results_multi_seed.json \
     --output results/figures/
 
 echo ""
-echo "═══════════════════════════════════════════════════════════"
-echo "Phase 4 COMPLETE: $(date)"
-echo "═══════════════════════════════════════════════════════════"
+echo "=== Phase 4 Complete ==="
+echo "Finished: $(date)"
+echo "Results:  results/eviction/"
+echo "Figures:  results/figures/"
