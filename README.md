@@ -80,13 +80,14 @@ CLEVER/
 | Phase | Script | Description |
 |-------|--------|-------------|
 | 0 | `00_setup_environment.sh` | Verify environment |
-| 1 | `01_download_dataset.py` + `02_generate_embeddings.py` | Data pipeline |
+| 1a | `01_download_dataset.py` | Download + preprocess LMSYS-Chat-1M |
+| 1b | `01b_generate_synthetic_data.py` | Generate synthetic embeddings at scale |
+| 1c | `02_generate_embeddings.py` | Encode queries → 384-dim embeddings |
 | 2 | `03_run_index_benchmark.py` | Index comparison (HNSW, IVF, LSH, Flat) |
-| 3 | `04_run_cost_model.py` | Cost-based query routing |
-| 4 | `05_run_eviction.py` | Semantic-aware eviction |
-| 5 | `06_run_scalability.py` | Scalability analysis (10K–1M) |
-| 6 | `07_llm_judge.py` | Semantic validity check |
-| 7 | `08_generate_figures.py` | Plots and tables for paper |
+| — | `04_visualize_data.py` | Dataset EDA visualizations |
+| — | `05_visualize_benchmarks.py` | Benchmark result plots (8 figures) |
+| 3 | `06_run_routing_eval.py` | Cost-based query routing evaluation |
+| — | `07_visualize_routing.py` | Routing evaluation plots (6 figures) |
 
 ## Running Tests
 

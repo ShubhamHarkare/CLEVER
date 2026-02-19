@@ -24,8 +24,8 @@ echo "=========================================="
 # --- Environment Setup ---
 module load python/3.11 cuda/12.1
 
-# Navigate to project root
-cd $SLURM_SUBMIT_DIR/..
+# Navigate to project root (submit sbatch from CLEVER/ directory)
+cd $SLURM_SUBMIT_DIR
 
 source ${PWD}/venv/bin/activate
 

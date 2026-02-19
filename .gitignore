@@ -16,6 +16,7 @@ data/*.parquet
 data/*.csv
 results/embeddings/*.npy
 results/benchmarks/*.json
+results/routing/*.json
 results/figures/*.png
 results/figures/*.pdf
 results/tables/*.tex
