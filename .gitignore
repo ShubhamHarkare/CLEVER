@@ -11,15 +11,10 @@ venv/
 # Environment
 .env
 
-# Data & results (large files)
+# Data & results (large files only)
 data/*.parquet
 data/*.csv
 results/embeddings/*.npy
-results/benchmarks/*.json
-results/routing/*.json
-results/figures/*.png
-results/figures/*.pdf
-results/tables/*.tex
 
 # Jupyter
 .ipynb_checkpoints/

@@ -1,0 +1,488 @@
+[
+  {
+    "index_type": "flat",
+    "params": {},
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0005,
+    "memory_mb": 11.15,
+    "search_latency_ms": {
+      "mean": 0.18364429899999998,
+      "std": 0.01165664065799401,
+      "p50": 0.1819375,
+      "p95": 0.2030104,
+      "p99": 0.22054874999999996
+    },
+    "throughput_qps": 173261.4,
+    "recall_at_1": 1.0,
+    "recall_at_5": 1.0,
+    "recall_at_10": 1.0
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 16,
+      "efConstruction": 64,
+      "efSearch": 32
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0584,
+    "memory_mb": 14.23,
+    "search_latency_ms": {
+      "mean": 0.020780354000000004,
+      "std": 0.006903349533717962,
+      "p50": 0.0198125,
+      "p95": 0.032754149999999996,
+      "p99": 0.04492865999999999
+    },
+    "throughput_qps": 180023.4,
+    "recall_at_1": 0.971,
+    "recall_at_5": 0.9632,
+    "recall_at_10": 0.9519
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 16,
+      "efConstruction": 128,
+      "efSearch": 64
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.1184,
+    "memory_mb": 14.23,
+    "search_latency_ms": {
+      "mean": 0.037322834,
+      "std": 0.009733425742791898,
+      "p50": 0.036917,
+      "p95": 0.051460099999999995,
+      "p99": 0.07066990999999999
+    },
+    "throughput_qps": 139626.9,
+    "recall_at_1": 0.986,
+    "recall_at_5": 0.9896,
+    "recall_at_10": 0.9867
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 32,
+      "efConstruction": 128,
+      "efSearch": 64
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.1121,
+    "memory_mb": 16.27,
+    "search_latency_ms": {
+      "mean": 0.042143733999999995,
+      "std": 0.010546102636767956,
+      "p50": 0.042479,
+      "p95": 0.05700834999999999,
+      "p99": 0.07652374999999997
+    },
+    "throughput_qps": 103677.7,
+    "recall_at_1": 0.991,
+    "recall_at_5": 0.995,
+    "recall_at_10": 0.9911
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 32,
+      "efConstruction": 128,
+      "efSearch": 128
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.1103,
+    "memory_mb": 16.27,
+    "search_latency_ms": {
+      "mean": 0.07775845599999999,
+      "std": 0.022960023583787192,
+      "p50": 0.0773755,
+      "p95": 0.10596425,
+      "p99": 0.14404708999999993
+    },
+    "throughput_qps": 64926.4,
+    "recall_at_1": 0.999,
+    "recall_at_5": 0.9988,
+    "recall_at_10": 0.9977
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 32,
+      "efConstruction": 256,
+      "efSearch": 128
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.203,
+    "memory_mb": 16.27,
+    "search_latency_ms": {
+      "mean": 0.115234782,
+      "std": 0.10037597174149038,
+      "p50": 0.090146,
+      "p95": 0.33313509999999996,
+      "p99": 0.5026953299999998
+    },
+    "throughput_qps": 58297.5,
+    "recall_at_1": 0.999,
+    "recall_at_5": 0.999,
+    "recall_at_10": 0.9976
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 32,
+      "efConstruction": 256,
+      "efSearch": 256
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.205,
+    "memory_mb": 16.27,
+    "search_latency_ms": {
+      "mean": 0.16576564800000002,
+      "std": 0.03409249312907602,
+      "p50": 0.165771,
+      "p95": 0.21746105000000002,
+      "p99": 0.28496949999999993
+    },
+    "throughput_qps": 32227.5,
+    "recall_at_1": 1.0,
+    "recall_at_5": 0.9996,
+    "recall_at_10": 0.9996
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 64,
+      "efConstruction": 128,
+      "efSearch": 128
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.129,
+    "memory_mb": 20.33,
+    "search_latency_ms": {
+      "mean": 0.08059548999999999,
+      "std": 0.020451371135987436,
+      "p50": 0.081875,
+      "p95": 0.10766905,
+      "p99": 0.14881559
+    },
+    "throughput_qps": 60168.1,
+    "recall_at_1": 0.997,
+    "recall_at_5": 0.9978,
+    "recall_at_10": 0.9963
+  },
+  {
+    "index_type": "hnsw",
+    "params": {
+      "M": 64,
+      "efConstruction": 256,
+      "efSearch": 256
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.2102,
+    "memory_mb": 20.33,
+    "search_latency_ms": {
+      "mean": 0.171313572,
+      "std": 0.03980817700230464,
+      "p50": 0.171104,
+      "p95": 0.22313959999999997,
+      "p99": 0.3174007499999999
+    },
+    "throughput_qps": 30825.7,
+    "recall_at_1": 0.998,
+    "recall_at_5": 0.9992,
+    "recall_at_10": 0.9995
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 64,
+      "nprobe": 1
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0148,
+    "memory_mb": 12.14,
+    "search_latency_ms": {
+      "mean": 0.007685806000000002,
+      "std": 0.002456681318438352,
+      "p50": 0.007125,
+      "p95": 0.01270805,
+      "p99": 0.01641741
+    },
+    "throughput_qps": 522227.3,
+    "recall_at_1": 0.641,
+    "recall_at_5": 0.608,
+    "recall_at_10": 0.5762
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 64,
+      "nprobe": 4
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0128,
+    "memory_mb": 11.19,
+    "search_latency_ms": {
+      "mean": 0.016532192,
+      "std": 0.003633410054912052,
+      "p50": 0.016167,
+      "p95": 0.02116905,
+      "p99": 0.024274999999999977
+    },
+    "throughput_qps": 284078.6,
+    "recall_at_1": 0.865,
+    "recall_at_5": 0.821,
+    "recall_at_10": 0.7948
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 256,
+      "nprobe": 4
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0279,
+    "memory_mb": 11.47,
+    "search_latency_ms": {
+      "mean": 0.01218826,
+      "std": 0.0016610996936969194,
+      "p50": 0.011792,
+      "p95": 0.014667,
+      "p99": 0.018291010000000003
+    },
+    "throughput_qps": 472276.7,
+    "recall_at_1": 0.804,
+    "recall_at_5": 0.743,
+    "recall_at_10": 0.7071
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 256,
+      "nprobe": 16
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0276,
+    "memory_mb": 11.47,
+    "search_latency_ms": {
+      "mean": 0.023282106,
+      "std": 0.0041230947397269445,
+      "p50": 0.022542,
+      "p95": 0.02975,
+      "p99": 0.034047
+    },
+    "throughput_qps": 239589.5,
+    "recall_at_1": 0.922,
+    "recall_at_5": 0.8928,
+    "recall_at_10": 0.8695
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 1024,
+      "nprobe": 16
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0869,
+    "memory_mb": 12.61,
+    "search_latency_ms": {
+      "mean": 0.033839176,
+      "std": 0.008431966655355321,
+      "p50": 0.032,
+      "p95": 0.04055449999999999,
+      "p99": 0.06387666
+    },
+    "throughput_qps": 346000.8,
+    "recall_at_1": 0.913,
+    "recall_at_5": 0.852,
+    "recall_at_10": 0.8075
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 1024,
+      "nprobe": 64
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.086,
+    "memory_mb": 14.03,
+    "search_latency_ms": {
+      "mean": 0.053869767000000006,
+      "std": 0.012143165975507004,
+      "p50": 0.051146,
+      "p95": 0.06525,
+      "p99": 0.13182208999999995
+    },
+    "throughput_qps": 151069.8,
+    "recall_at_1": 0.981,
+    "recall_at_5": 0.9528,
+    "recall_at_10": 0.9318
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 1024,
+      "nprobe": 128
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0881,
+    "memory_mb": 15.5,
+    "search_latency_ms": {
+      "mean": 0.079949681,
+      "std": 0.013867177129294882,
+      "p50": 0.0775,
+      "p95": 0.0930452,
+      "p99": 0.11579249999999996
+    },
+    "throughput_qps": 85831.5,
+    "recall_at_1": 0.995,
+    "recall_at_5": 0.9798,
+    "recall_at_10": 0.9663
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 4096,
+      "nprobe": 16
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.3114,
+    "memory_mb": 29.44,
+    "search_latency_ms": {
+      "mean": 0.09353674,
+      "std": 0.008073789207949388,
+      "p50": 0.091875,
+      "p95": 0.1018372,
+      "p99": 0.11312625
+    },
+    "throughput_qps": 280246.1,
+    "recall_at_1": 0.941,
+    "recall_at_5": 0.843,
+    "recall_at_10": 0.759
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 4096,
+      "nprobe": 64
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.3102,
+    "memory_mb": 17.15,
+    "search_latency_ms": {
+      "mean": 0.109997152,
+      "std": 0.01378757210921836,
+      "p50": 0.107167,
+      "p95": 0.1228771,
+      "p99": 0.14435933999999995
+    },
+    "throughput_qps": 163422.8,
+    "recall_at_1": 0.997,
+    "recall_at_5": 0.9692,
+    "recall_at_10": 0.9356
+  },
+  {
+    "index_type": "ivf",
+    "params": {
+      "nlist": 4096,
+      "nprobe": 128
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.3086,
+    "memory_mb": 17.15,
+    "search_latency_ms": {
+      "mean": 0.135982922,
+      "std": 0.010421413544904357,
+      "p50": 0.134146,
+      "p95": 0.1531753,
+      "p99": 0.16955641999999999
+    },
+    "throughput_qps": 98762.2,
+    "recall_at_1": 0.999,
+    "recall_at_5": 0.9926,
+    "recall_at_10": 0.9819
+  },
+  {
+    "index_type": "lsh",
+    "params": {
+      "nbits": 384
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0031,
+    "memory_mb": 0.91,
+    "search_latency_ms": {
+      "mean": 0.08299656500000001,
+      "std": 0.011775718901017253,
+      "p50": 0.083729,
+      "p95": 0.10008925,
+      "p99": 0.11325125
+    },
+    "throughput_qps": 195319.9,
+    "recall_at_1": 0.512,
+    "recall_at_5": 0.5452,
+    "recall_at_10": 0.5605
+  },
+  {
+    "index_type": "lsh",
+    "params": {
+      "nbits": 768
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0062,
+    "memory_mb": 22.2,
+    "search_latency_ms": {
+      "mean": 0.089231381,
+      "std": 0.009044256331497852,
+      "p50": 0.089708,
+      "p95": 0.10175414999999999,
+      "p99": 0.110125
+    },
+    "throughput_qps": 175877.4,
+    "recall_at_1": 0.601,
+    "recall_at_5": 0.6574,
+    "recall_at_10": 0.6722
+  },
+  {
+    "index_type": "lsh",
+    "params": {
+      "nbits": 1536
+    },
+    "dataset_size": 7572,
+    "dataset_label": "full",
+    "build_time_s": 0.0162,
+    "memory_mb": 44.03,
+    "search_latency_ms": {
+      "mean": 0.101324447,
+      "std": 0.013365306486092679,
+      "p50": 0.101,
+      "p95": 0.11681074999999999,
+      "p99": 0.14316949999999998
+    },
+    "throughput_qps": 119489.0,
+    "recall_at_1": 0.713,
+    "recall_at_5": 0.7456,
+    "recall_at_10": 0.7545
+  }
+]
