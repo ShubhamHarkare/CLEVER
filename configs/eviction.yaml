@@ -1,0 +1,27 @@
+# ── Eviction experiment configuration ─────────────────────────────
+# Used by scripts/08_run_eviction.py
+
+cache:
+  index_type: hnsw
+  index_params:
+    M: 32
+    efConstruction: 128
+    efSearch: 128
+  cache_sizes_pct: [0.10, 0.20, 0.30]  # fraction of unique queries
+
+eviction:
+  policies: [lru, lfu, semantic, oracle]
+  semantic:
+    similarity_threshold: 0.30   # L2² threshold (≈ cosine 0.85)
+    alpha: 1.0                    # recency weight
+    beta: 1.0                     # frequency weight
+    recompute_interval: 50        # batch-recompute redundancy every N evictions
+
+evaluation:
+  warmup_pct: 0.30                # first 30% of queries warm up the cache
+  hit_threshold: 0.90             # L2² hit threshold for lookup
+  rolling_window: 1000            # window size for rolling hit rate
+  log_interval: 5000              # log progress every N queries
+
+seed: 42
+seeds: [42, 123, 456]

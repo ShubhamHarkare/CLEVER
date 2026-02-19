@@ -3,7 +3,7 @@ Semantic cache backed by a FAISS index.
 
 Stores query embeddings alongside their text and (simulated) responses.
 Supports lookup (search for nearest cached entry), insert (add new
-entry), eviction (LRU / LFU), and statistics tracking.
+entry), eviction (LRU / LFU / Semantic / Oracle), and statistics tracking.
 
 For CLEVER, we don't actually call an LLM — we simulate responses.
 The cache stores the original query text as the "response" and
@@ -16,18 +16,23 @@ deletion**: evicted entries are marked inactive and filtered from search
 results.  When dead entries exceed ``rebuild_threshold`` (default 20%)
 of total, the FAISS index is rebuilt from scratch with only the active
 entries.
+
+Eviction policies are implemented as strategy objects (see
+``src.cache.eviction``).  The cache delegates all eviction decisions to
+the policy instance.
 """
 
 import logging
 import time
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 
 from src.indexes.factory import create_index
 from src.indexes.base import BaseIndex
+from src.cache.eviction.base import EvictionPolicy
 
 logger = logging.getLogger(__name__)
 
@@ -61,14 +66,15 @@ class SemanticCache:
     Wraps a FAISS index and maintains a mapping from index IDs to
     cache entries (query text, response, metadata).
 
-    Supports optional bounded-size caching with LRU or LFU eviction.
+    Supports optional bounded-size caching with pluggable eviction
+    policies (LRU, LFU, Semantic, Oracle).
 
     Attributes:
         index: The underlying FAISS index.
         entries: List of cached entries.
         dim: Embedding dimensionality.
         max_size: Maximum cache entries (0 = unbounded).
-        eviction_policy: ``"none"`` | ``"lru"`` | ``"lfu"``.
+        eviction_policy: The eviction policy name or instance.
     """
 
     def __init__(
@@ -77,7 +83,8 @@ class SemanticCache:
         index_type: str = "hnsw",
         index_params: Optional[dict] = None,
         max_size: int = 0,
-        eviction_policy: str = "none",
+        eviction_policy: Union[str, EvictionPolicy] = "none",
+        policy_params: Optional[dict] = None,
         rebuild_threshold: float = 0.20,
     ):
         """
@@ -87,7 +94,11 @@ class SemanticCache:
             index_params: Parameters for the index.
             max_size: Maximum number of active cache entries.
                       0 means unbounded (no eviction).
-            eviction_policy: ``"none"`` (unbounded), ``"lru"``, or ``"lfu"``.
+            eviction_policy: Policy name (``"none"``, ``"lru"``,
+                ``"lfu"``, ``"semantic"``) or an ``EvictionPolicy``
+                instance (e.g. a pre-configured ``OraclePolicy``).
+            policy_params: Extra kwargs passed to the policy constructor
+                when ``eviction_policy`` is a string.
             rebuild_threshold: Fraction of dead entries that triggers a
                                full index rebuild (default 0.20).
         """
@@ -95,7 +106,6 @@ class SemanticCache:
         self.index_type = index_type
         self.index_params = index_params or {}
         self.max_size = max_size
-        self.eviction_policy = eviction_policy.lower()
         self.rebuild_threshold = rebuild_threshold
 
         self._index: Optional[BaseIndex] = None
@@ -104,9 +114,20 @@ class SemanticCache:
         # Eviction bookkeeping
         self._active: set[int] = set()        # set of active cache_ids
         self._n_dead: int = 0                 # count of logically deleted entries
-        self._access_order: OrderedDict = OrderedDict()  # LRU: id → None
-        self._access_count: dict[int, int] = {}           # LFU: id → count
         self._n_evictions: int = 0
+
+        # ── Eviction policy setup ────────────────────────────────
+        if isinstance(eviction_policy, EvictionPolicy):
+            self._policy: Optional[EvictionPolicy] = eviction_policy
+            self._policy_name = eviction_policy.name
+        elif eviction_policy.lower() == "none":
+            self._policy = None
+            self._policy_name = "none"
+        else:
+            self._policy = self._create_policy(
+                eviction_policy.lower(), policy_params or {}
+            )
+            self._policy_name = self._policy.name
 
         # Statistics
         self._n_lookups = 0
@@ -114,6 +135,31 @@ class SemanticCache:
         self._n_inserts = 0
         self._n_rebuilds = 0
         self._total_lookup_time_ms = 0.0
+
+    @staticmethod
+    def _create_policy(
+        name: str, params: dict
+    ) -> EvictionPolicy:
+        """Instantiate a policy from its name and parameters."""
+        from src.cache.eviction import POLICY_REGISTRY
+
+        if name not in POLICY_REGISTRY:
+            raise ValueError(
+                f"Unknown eviction policy '{name}'. "
+                f"Available: {list(POLICY_REGISTRY.keys())}"
+            )
+        cls = POLICY_REGISTRY[name]
+
+        # Oracle requires special constructor args — it cannot be
+        # created from a simple string.  Raise a helpful error.
+        if name == "oracle" and "future_stream_embeddings" not in params:
+            raise ValueError(
+                "OraclePolicy requires 'future_stream_embeddings', "
+                "'cache_embeddings', and 'cache_ids' in policy_params. "
+                "Pass an OraclePolicy instance directly instead."
+            )
+
+        return cls(**params)
 
     # ------------------------------------------------------------------
     # Build
@@ -154,8 +200,6 @@ class SemanticCache:
         # Build entries
         self._entries = []
         self._active.clear()
-        self._access_order.clear()
-        self._access_count.clear()
         self._n_dead = 0
 
         for i in range(n):
@@ -168,8 +212,9 @@ class SemanticCache:
             )
             self._entries.append(entry)
             self._active.add(i)
-            self._access_order[i] = None
-            self._access_count[i] = 0
+            # Notify policy about each initial entry
+            if self._policy is not None:
+                self._policy.on_insert(i, embeddings[i])
 
         # Build FAISS index
         t_start = time.perf_counter()
@@ -184,7 +229,7 @@ class SemanticCache:
             f"SemanticCache built: {n} entries, "
             f"index={self.index_type}, "
             f"max_size={self.max_size}, "
-            f"eviction={self.eviction_policy}, "
+            f"eviction={self._policy_name}, "
             f"build_time={build_time:.3f}s"
         )
         return build_time
@@ -335,13 +380,15 @@ class SemanticCache:
         )
         self._entries.append(entry)
         self._active.add(cache_id)
-        self._access_order[cache_id] = None
-        self._access_count[cache_id] = 0
+        self._n_inserts += 1
+
+        # Notify policy
+        if self._policy is not None:
+            self._policy.on_insert(cache_id, embedding)
 
         # Add to FAISS index
         emb = embedding.reshape(1, -1).astype(np.float32)
         self._index.add(emb)
-        self._n_inserts += 1
 
         # Rebuild if too many dead entries
         self._maybe_rebuild()
@@ -352,40 +399,22 @@ class SemanticCache:
 
     def _touch(self, cache_id: int):
         """Record an access for eviction bookkeeping."""
-        if self.eviction_policy == "lru":
-            # Move to end (most recently used)
-            self._access_order.move_to_end(cache_id)
-        elif self.eviction_policy == "lfu":
-            self._access_count[cache_id] = self._access_count.get(cache_id, 0) + 1
+        if self._policy is not None:
+            self._policy.on_access(cache_id)
 
     def _evict_one(self):
         """Evict a single entry according to the eviction policy."""
-        victim_id: Optional[int] = None
-
-        if self.eviction_policy == "lru":
-            # Evict least recently used (front of OrderedDict)
-            for cid in self._access_order:
-                if cid in self._active:
-                    victim_id = cid
-                    break
-        elif self.eviction_policy == "lfu":
-            # Evict least frequently used
-            min_count = float("inf")
-            for cid in self._active:
-                cnt = self._access_count.get(cid, 0)
-                if cnt < min_count:
-                    min_count = cnt
-                    victim_id = cid
-        else:
-            # No eviction policy — shouldn't reach here but be safe
+        if self._policy is None:
             return
 
-        if victim_id is not None:
-            self._active.discard(victim_id)
-            self._access_order.pop(victim_id, None)
-            self._access_count.pop(victim_id, None)
-            self._n_dead += 1
-            self._n_evictions += 1
+        victim_id = self._policy.select_victim(self._active)
+        if victim_id is None:
+            return
+
+        self._active.discard(victim_id)
+        self._policy.on_evict(victim_id)
+        self._n_dead += 1
+        self._n_evictions += 1
 
     def _maybe_rebuild(self):
         """Rebuild the FAISS index if dead entries exceed threshold."""
@@ -411,8 +440,6 @@ class SemanticCache:
         # Rebuild entries list (compacted)
         new_entries = []
         new_active = set()
-        new_order = OrderedDict()
-        new_count = {}
         for new_pos, old_id in enumerate(active_ids):
             old_entry = self._entries[old_id]
             new_entry = CacheEntry(
@@ -424,14 +451,14 @@ class SemanticCache:
             )
             new_entries.append(new_entry)
             new_active.add(new_pos)
-            new_order[new_pos] = None
-            new_count[new_pos] = self._access_count.get(old_id, 0)
 
         self._entries = new_entries
         self._active = new_active
-        self._access_order = new_order
-        self._access_count = new_count
         self._n_dead = 0
+
+        # Notify policy about the ID remapping
+        if self._policy is not None:
+            self._policy.on_rebuild(id_remap)
 
         # Rebuild FAISS index
         self._index = create_index(
@@ -459,13 +486,23 @@ class SemanticCache:
         return self._index.memory_usage_bytes / (1024 * 1024)
 
     @property
+    def eviction_policy(self) -> str:
+        """Return the eviction policy name."""
+        return self._policy_name
+
+    @property
+    def policy(self) -> Optional[EvictionPolicy]:
+        """Return the eviction policy instance (if any)."""
+        return self._policy
+
+    @property
     def stats(self) -> dict:
         """Return cache statistics."""
         avg_lookup = (
             self._total_lookup_time_ms / self._n_lookups
             if self._n_lookups > 0 else 0
         )
-        return {
+        result = {
             "size": self.size,
             "total_entries": len(self._entries),
             "n_active": len(self._active),
@@ -477,7 +514,13 @@ class SemanticCache:
             "n_rebuilds": self._n_rebuilds,
             "index_type": self.index_type,
             "max_size": self.max_size,
-            "eviction_policy": self.eviction_policy,
+            "eviction_policy": self._policy_name,
             "memory_mb": round(self.memory_mb, 2),
             "avg_lookup_time_ms": round(avg_lookup, 4),
         }
+
+        # Include policy-specific stats if available
+        if self._policy is not None and hasattr(self._policy, "stats"):
+            result["policy_stats"] = self._policy.stats
+
+        return result

@@ -1,0 +1,88 @@
+{
+  "per_seed": {
+    "oracle": {
+      "0.10": [
+        {
+          "policy": "oracle",
+          "cache_size_pct": 0.1,
+          "max_cache_size": 857,
+          "seed": 42,
+          "n_queries": 8572,
+          "n_warmup": 857,
+          "n_stream": 6001,
+          "final_hit_rate": 0.329612,
+          "n_hits": 1978,
+          "n_misses": 4023,
+          "semantic_coverage_avg_dist": 0.81715,
+          "cumulative_hit_rates": [
+            {
+              "query_idx": 5000,
+              "cumulative_hit_rate": 0.3302,
+              "rolling_hit_rate": 0.337,
+              "n_evictions": 3349,
+              "cache_size": 857
+            },
+            {
+              "query_idx": 6001,
+              "cumulative_hit_rate": 0.329612,
+              "rolling_hit_rate": 0.326,
+              "n_evictions": 4023,
+              "cache_size": 857
+            }
+          ],
+          "timing": {
+            "build_time_s": 0.589,
+            "stream_time_s": 2.349,
+            "coverage_time_s": 0.019,
+            "avg_query_time_ms": 0.3915
+          },
+          "cache_stats": {
+            "size": 857,
+            "total_entries": 1010,
+            "n_active": 857,
+            "n_dead": 153,
+            "n_lookups": 6001,
+            "n_hits": 1978,
+            "n_inserts": 4880,
+            "n_evictions": 4023,
+            "n_rebuilds": 18,
+            "index_type": "hnsw",
+            "max_size": 857,
+            "eviction_policy": "oracle",
+            "memory_mb": 2.17,
+            "avg_lookup_time_ms": 0.0614
+          }
+        }
+      ]
+    }
+  },
+  "aggregated": {
+    "oracle": {
+      "0.10": {
+        "hit_rate_mean": 0.329612,
+        "hit_rate_std": 0.0,
+        "coverage_mean": 0.81715,
+        "coverage_std": 0.0,
+        "stream_time_mean_s": 2.349,
+        "evictions_mean": 4023.0,
+        "n_seeds": 1,
+        "seeds": [
+          42
+        ]
+      }
+    }
+  },
+  "config": {
+    "policies": [
+      "oracle"
+    ],
+    "cache_sizes_pct": [
+      0.1
+    ],
+    "seeds": [
+      42
+    ],
+    "n_queries": 8572
+  },
+  "total_time_s": 3.0
+}

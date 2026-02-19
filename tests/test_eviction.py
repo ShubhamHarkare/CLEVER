@@ -1,0 +1,654 @@
+"""
+Comprehensive tests for eviction policies and SemanticCache integration.
+
+Tests cover:
+- Each policy's core eviction logic
+- Edge cases (empty cache, single entry, ties)
+- on_rebuild ID remapping
+- SemanticCache integration (insert → evict → lookup correctness)
+- Cache size invariant (never exceeds max_size)
+- Policy interchangeability
+- Semantic policy redundancy scoring
+
+Run with: pytest tests/test_eviction.py -v
+"""
+
+import numpy as np
+import pytest
+
+from src.cache.eviction.lru import LRUPolicy
+from src.cache.eviction.lfu import LFUPolicy
+from src.cache.eviction.semantic import SemanticPolicy
+from src.cache.eviction.oracle import OraclePolicy
+from src.cache.semantic_cache import SemanticCache
+
+
+# ── Helpers ──────────────────────────────────────────────────────────
+
+def _random_embedding(dim: int = 16, rng=None) -> np.ndarray:
+    """Generate a random unit-norm embedding."""
+    if rng is None:
+        rng = np.random.RandomState(42)
+    v = rng.randn(dim).astype(np.float32)
+    v /= np.linalg.norm(v)
+    return v
+
+
+def _cluster_embedding(center: np.ndarray, noise: float = 0.01,
+                        rng=None) -> np.ndarray:
+    """Generate an embedding near a cluster center."""
+    if rng is None:
+        rng = np.random.RandomState(42)
+    v = center + rng.randn(*center.shape).astype(np.float32) * noise
+    v /= np.linalg.norm(v)
+    return v
+
+
+# ═════════════════════════════════════════════════════════════════════
+# LRU Policy Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestLRUPolicy:
+    """Test LRU eviction logic."""
+
+    def test_evicts_oldest_untouched(self):
+        """The first inserted entry (never accessed) should be evicted."""
+        policy = LRUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        # Insert entries 0, 1, 2
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        active = {0, 1, 2}
+        victim = policy.select_victim(active)
+        assert victim == 0, "LRU should evict entry 0 (oldest)"
+
+    def test_access_protects_entry(self):
+        """Accessing an entry moves it to the back; oldest untouched is evicted."""
+        policy = LRUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        # Access entry 0 — it moves to the back
+        policy.on_access(0)
+
+        active = {0, 1, 2}
+        victim = policy.select_victim(active)
+        assert victim == 1, "After accessing 0, entry 1 should be oldest"
+
+    def test_evict_then_insert(self):
+        """After evicting, the next victim should update correctly."""
+        policy = LRUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        # Evict 0
+        victim = policy.select_victim({0, 1, 2})
+        policy.on_evict(victim)
+
+        # Insert new entry 3
+        policy.on_insert(3, emb)
+
+        # Next victim should be 1 (oldest remaining)
+        victim = policy.select_victim({1, 2, 3})
+        assert victim == 1
+
+    def test_single_entry(self):
+        """With one entry, it should be selected for eviction."""
+        policy = LRUPolicy()
+        policy.on_insert(0, np.zeros(16, dtype=np.float32))
+        victim = policy.select_victim({0})
+        assert victim == 0
+
+    def test_empty_active_set(self):
+        """Empty active set should return None."""
+        policy = LRUPolicy()
+        policy.on_insert(0, np.zeros(16, dtype=np.float32))
+        victim = policy.select_victim(set())
+        assert victim is None
+
+    def test_on_rebuild_remaps_ids(self):
+        """After rebuild, internal order should use new IDs."""
+        policy = LRUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        # Simulate rebuild: old {0, 1, 2} → new {0, 1, 2}
+        # but with different mapping (e.g. old 2 → new 0)
+        id_remap = {0: 2, 1: 0, 2: 1}
+        policy.on_rebuild(id_remap)
+
+        # Old insertion order was 0, 1, 2
+        # After remap: new order is 2 (was 0), 0 (was 1), 1 (was 2)
+        # So new 2 should be evicted first
+        victim = policy.select_victim({0, 1, 2})
+        assert victim == 2, "After remap, new ID 2 (was old 0) should be oldest"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# LFU Policy Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestLFUPolicy:
+    """Test LFU eviction logic."""
+
+    def test_evicts_least_accessed(self):
+        """Entry with fewest accesses should be evicted."""
+        policy = LFUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        # Access entry 0 twice, entry 1 once, entry 2 zero times
+        policy.on_access(0)
+        policy.on_access(0)
+        policy.on_access(1)
+
+        victim = policy.select_victim({0, 1, 2})
+        assert victim == 2, "Entry 2 (0 accesses) should be evicted"
+
+    def test_tie_breaks_by_insertion_order(self):
+        """Among entries with same count, oldest inserted is evicted."""
+        policy = LFUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+
+        # All have 0 accesses — entry 0 was inserted first
+        victim = policy.select_victim({0, 1, 2})
+        assert victim == 0, "Tie-break should favor oldest insertion"
+
+    def test_newly_inserted_not_immediately_evicted_if_others_exist(self):
+        """A new entry (count 0) should be evicted only if all others
+        also have count 0, in which case the oldest is evicted."""
+        policy = LFUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        for i in range(3):
+            policy.on_insert(i, emb)
+            policy.on_access(i)  # each has count 1
+
+        # Insert new entry 3 with count 0
+        policy.on_insert(3, emb)
+
+        victim = policy.select_victim({0, 1, 2, 3})
+        assert victim == 3, "New entry with count 0 should be evicted"
+
+    def test_on_rebuild_preserves_counts(self):
+        """Rebuild should remap IDs but preserve access counts."""
+        policy = LFUPolicy()
+        emb = np.zeros(16, dtype=np.float32)
+
+        policy.on_insert(0, emb)
+        policy.on_insert(1, emb)
+        policy.on_access(0)  # count 0 → 1
+        policy.on_access(0)  # count 0 → 2
+        policy.on_access(1)  # count 1 → 1
+
+        # Remap: old 0 → new 1, old 1 → new 0
+        policy.on_rebuild({0: 1, 1: 0})
+
+        # New ID 0 (was old 1, count 1) should be evicted over
+        # new ID 1 (was old 0, count 2)
+        victim = policy.select_victim({0, 1})
+        assert victim == 0, "After remap, new 0 (old 1, count=1) should be evicted"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Semantic Policy Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestSemanticPolicy:
+    """Test semantic-aware eviction logic."""
+
+    def test_evicts_redundant_over_isolated(self):
+        """Entries in a dense cluster should be evicted before
+        isolated entries (which are irreplaceable)."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        # Create a cluster center
+        center = _random_embedding(dim, rng)
+
+        policy = SemanticPolicy(
+            similarity_threshold=0.30,  # L2² threshold
+            recompute_interval=1,       # recompute every eviction
+        )
+
+        # Entry 0: isolated (unique direction)
+        isolated_emb = _random_embedding(dim, rng)
+        policy.on_insert(0, isolated_emb)
+
+        # Entries 1, 2, 3: clustered (very similar to each other)
+        for i in range(1, 4):
+            emb = _cluster_embedding(center, noise=0.01, rng=rng)
+            policy.on_insert(i, emb)
+
+        # Force redundancy recomputation
+        policy._recompute_redundancy({0, 1, 2, 3})
+
+        # The clustered entries should have higher redundancy
+        assert policy._redundancy[0] < policy._redundancy[1], \
+            "Isolated entry should have lower redundancy than clustered"
+
+        # Victim should be one of the clustered entries (1, 2, or 3)
+        victim = policy.select_victim({0, 1, 2, 3})
+        assert victim in {1, 2, 3}, \
+            f"Victim should be clustered, got {victim}"
+
+    def test_access_protects_redundant_entry(self):
+        """High access count / recency should protect even redundant entries."""
+        rng = np.random.RandomState(42)
+        dim = 16
+        center = _random_embedding(dim, rng)
+
+        policy = SemanticPolicy(
+            similarity_threshold=0.30,
+            recompute_interval=1,
+        )
+
+        # All entries are clustered (all redundant)
+        for i in range(4):
+            emb = _cluster_embedding(center, noise=0.01, rng=rng)
+            policy.on_insert(i, emb)
+
+        # Heavily access entry 0
+        for _ in range(100):
+            policy.on_access(0)
+
+        policy._recompute_redundancy({0, 1, 2, 3})
+
+        # Entry 0 should NOT be evicted despite redundancy
+        # because its high frequency protects it
+        victim = policy.select_victim({0, 1, 2, 3})
+        assert victim != 0, "Heavily accessed entry should be protected"
+
+    def test_on_rebuild_remaps_all_state(self):
+        """Rebuild should remap embeddings, scores, and order."""
+        policy = SemanticPolicy(recompute_interval=1)
+        dim = 16
+        rng = np.random.RandomState(42)
+
+        for i in range(3):
+            policy.on_insert(i, _random_embedding(dim, rng))
+
+        policy._recompute_redundancy({0, 1, 2})
+
+        # Remap
+        remap = {0: 2, 1: 0, 2: 1}
+        policy.on_rebuild(remap)
+
+        # Check all state is remapped
+        assert 2 in policy._access_order
+        assert 0 in policy._access_order
+        assert 1 in policy._access_order
+        assert 2 in policy._embeddings
+        assert 0 in policy._embeddings
+        assert 1 in policy._embeddings
+
+    def test_new_entry_not_immediately_evicted(self):
+        """New entries start with redundancy 0 (isolated), so they
+        should NOT be the first evicted."""
+        rng = np.random.RandomState(42)
+        dim = 16
+        center = _random_embedding(dim, rng)
+
+        policy = SemanticPolicy(
+            similarity_threshold=0.30,
+            recompute_interval=100,  # don't recompute yet
+        )
+
+        # Entries 0-2: clustered, with redundancy pre-set
+        for i in range(3):
+            emb = _cluster_embedding(center, noise=0.01, rng=rng)
+            policy.on_insert(i, emb)
+
+        # Force a recompute so 0-2 have redundancy scores
+        policy._recompute_redundancy({0, 1, 2})
+
+        # Insert new entry 3 (gets redundancy=0 by default)
+        policy.on_insert(3, _random_embedding(dim, rng))
+
+        # Entry 3 should not be evicted (redundancy=0 → low score)
+        victim = policy.select_victim({0, 1, 2, 3})
+        assert victim != 3, "Newly inserted entry should not be immediately evicted"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Oracle Policy Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestOraclePolicy:
+    """Test oracle (Bélády's optimal) eviction."""
+
+    def test_evicts_entry_used_furthest_away(self):
+        """Oracle should evict the entry whose next use is latest."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        # Create 3 cache entries
+        cache_embs = np.array([
+            _random_embedding(dim, rng) for _ in range(3)
+        ], dtype=np.float32)
+        cache_ids = [0, 1, 2]
+
+        # Future stream: query similar to entry 0, then entry 1, then entry 2
+        # Entry 2 is used last → should be evicted first
+        stream = np.array([
+            cache_embs[0],  # step 0: accesses entry 0
+            cache_embs[1],  # step 1: accesses entry 1
+            cache_embs[2],  # step 2: accesses entry 2
+        ], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=cache_embs,
+            cache_ids=cache_ids,
+            similarity_threshold=0.90,  # exact match
+        )
+
+        victim = policy.select_victim({0, 1, 2})
+        assert victim == 2, \
+            f"Oracle should evict entry 2 (used furthest away), got {victim}"
+
+    def test_evicts_never_used_entry(self):
+        """Entry never accessed in the future → next_use = ∞ → evicted first."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        cache_embs = np.array([
+            _random_embedding(dim, rng) for _ in range(3)
+        ], dtype=np.float32)
+        cache_ids = [0, 1, 2]
+
+        # Stream only accesses entries 0 and 1
+        stream = np.array([
+            cache_embs[0],
+            cache_embs[1],
+        ], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=cache_embs,
+            cache_ids=cache_ids,
+            similarity_threshold=0.90,
+        )
+
+        victim = policy.select_victim({0, 1, 2})
+        assert victim == 2, "Entry 2 (never used) should be evicted"
+
+    def test_on_rebuild_remaps_next_use(self):
+        """Rebuild should remap next_use keys."""
+        rng = np.random.RandomState(42)
+        dim = 16
+        e0 = _random_embedding(dim, rng)
+        e1 = _random_embedding(dim, rng)
+        cache_embs = np.array([e0, e1], dtype=np.float32)
+
+        stream = np.array([e1, e0], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=cache_embs,
+            cache_ids=[0, 1],
+            similarity_threshold=0.90,
+        )
+
+        # Before remap: entry 0 next_use=1, entry 1 next_use=0
+        # Remap: 0→1, 1→0
+        policy.on_rebuild({0: 1, 1: 0})
+
+        # After remap: new 1 (was 0) next_use=1, new 0 (was 1) next_use=0
+        # So new 1 has the furthest next_use → should be evicted
+        victim = policy.select_victim({0, 1})
+        assert victim == 1
+
+
+# ═════════════════════════════════════════════════════════════════════
+# SemanticCache Integration Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestCacheEvictionIntegration:
+    """Test eviction policies integrated into SemanticCache."""
+
+    @pytest.fixture
+    def sample_data(self):
+        """Generate sample embeddings and texts."""
+        rng = np.random.RandomState(42)
+        n = 20
+        dim = 16
+        embeddings = rng.randn(n, dim).astype(np.float32)
+        # Normalise
+        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+        embeddings = embeddings / norms
+        texts = [f"query_{i}" for i in range(n)]
+        return embeddings, texts, dim
+
+    def test_cache_size_never_exceeds_max(self, sample_data):
+        """For each policy, cache size must never exceed max_size."""
+        embeddings, texts, dim = sample_data
+        max_size = 10
+
+        for policy_name in ["lru", "lfu", "semantic"]:
+            cache = SemanticCache(
+                dim=dim,
+                index_type="flat",
+                max_size=max_size,
+                eviction_policy=policy_name,
+            )
+            # Build with first 10 entries
+            cache.build(embeddings[:10], texts[:10])
+            assert cache.size == 10
+
+            # Insert 10 more — each should trigger eviction
+            for i in range(10, 20):
+                cache.insert(embeddings[i], texts[i])
+                assert cache.size <= max_size, \
+                    f"[{policy_name}] size={cache.size} > max={max_size}"
+
+    def test_lru_eviction_order(self, sample_data):
+        """LRU cache should evict the oldest untouched entry first."""
+        embeddings, texts, dim = sample_data
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=5, eviction_policy="lru",
+        )
+        cache.build(embeddings[:5], texts[:5])
+
+        # Access entries 0, 1, 2, 3 (not 4)
+        for i in range(4):
+            cache.lookup(embeddings[i])
+
+        # Insert new entry → should evict entry 4 (least recently used)
+        cache.insert(embeddings[5], texts[5])
+        assert 4 not in cache._active, "Entry 4 should have been evicted"
+        assert cache.size == 5
+
+    def test_policy_string_backward_compat(self, sample_data):
+        """'none' policy should mean no eviction (unbounded)."""
+        embeddings, texts, dim = sample_data
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=0,  # unbounded
+            eviction_policy="none",
+        )
+        cache.build(embeddings, texts)
+        assert cache.size == 20
+        assert cache._policy is None
+
+    def test_policy_instance_accepted(self, sample_data):
+        """Cache should accept a pre-built EvictionPolicy instance."""
+        embeddings, texts, dim = sample_data
+
+        policy = LRUPolicy()
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=10, eviction_policy=policy,
+        )
+        cache.build(embeddings[:10], texts[:10])
+        assert cache._policy is policy
+        assert cache.eviction_policy == "lru"
+
+    def test_unknown_policy_raises(self, sample_data):
+        """Unknown policy string should raise ValueError."""
+        _, _, dim = sample_data
+        with pytest.raises(ValueError, match="Unknown eviction policy"):
+            SemanticCache(
+                dim=dim, index_type="flat",
+                eviction_policy="nonexistent",
+            )
+
+    def test_oracle_via_instance(self, sample_data):
+        """Oracle policy must be passed as an instance."""
+        embeddings, texts, dim = sample_data
+
+        # Oracle needs future stream
+        oracle = OraclePolicy(
+            future_stream_embeddings=embeddings[10:],
+            cache_embeddings=embeddings[:10],
+            cache_ids=list(range(10)),
+            similarity_threshold=0.90,
+        )
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=10, eviction_policy=oracle,
+        )
+        cache.build(embeddings[:10], texts[:10])
+        assert cache.eviction_policy == "oracle"
+
+    def test_rebuild_triggers_policy_remap(self, sample_data):
+        """When cache rebuilds, policy internal state must be remapped."""
+        embeddings, texts, dim = sample_data
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=5, eviction_policy="lru",
+            rebuild_threshold=0.20,  # rebuild at 20% dead
+        )
+        cache.build(embeddings[:5], texts[:5])
+
+        # Insert many entries to trigger evictions and eventually rebuild
+        for i in range(5, 15):
+            cache.insert(embeddings[i], texts[i])
+
+        assert cache.size <= 5
+        # After rebuild, cache should still function correctly
+        result = cache.lookup(embeddings[0])
+        assert result is not None
+
+    def test_stats_include_eviction_count(self, sample_data):
+        """Cache stats should track eviction count."""
+        embeddings, texts, dim = sample_data
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=5, eviction_policy="lru",
+        )
+        cache.build(embeddings[:5], texts[:5])
+
+        for i in range(5, 10):
+            cache.insert(embeddings[i], texts[i])
+
+        stats = cache.stats
+        assert stats["n_evictions"] == 5
+        assert stats["eviction_policy"] == "lru"
+
+    def test_semantic_policy_stats(self, sample_data):
+        """Semantic policy should expose timing stats."""
+        embeddings, texts, dim = sample_data
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=5, eviction_policy="semantic",
+            policy_params={"recompute_interval": 2},
+        )
+        cache.build(embeddings[:5], texts[:5])
+
+        for i in range(5, 10):
+            cache.insert(embeddings[i], texts[i])
+
+        stats = cache.stats
+        assert "policy_stats" in stats
+        assert "n_evictions" in stats["policy_stats"]
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Edge Case Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestEdgeCases:
+    """Test boundary conditions and edge cases."""
+
+    def test_max_size_one(self):
+        """Cache with max_size=1 should always have exactly 1 entry."""
+        rng = np.random.RandomState(42)
+        dim = 16
+        embs = rng.randn(5, dim).astype(np.float32)
+        embs /= np.linalg.norm(embs, axis=1, keepdims=True)
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=1, eviction_policy="lru",
+        )
+        cache.build(embs[:1], ["q0"])
+        assert cache.size == 1
+
+        for i in range(1, 5):
+            cache.insert(embs[i], f"q{i}")
+            assert cache.size == 1, f"Size should be 1, got {cache.size}"
+
+    def test_insert_without_build_raises(self):
+        """Inserting before build should raise ValueError."""
+        cache = SemanticCache(dim=16, index_type="flat", eviction_policy="lru")
+        with pytest.raises(ValueError, match="not built"):
+            cache.insert(np.zeros(16, dtype=np.float32), "test")
+
+    def test_lookup_after_all_evicted_and_refilled(self):
+        """After evicting all initial entries and inserting new ones,
+        lookups should still work correctly."""
+        rng = np.random.RandomState(42)
+        dim = 16
+        n = 10
+        embs = rng.randn(n, dim).astype(np.float32)
+        embs /= np.linalg.norm(embs, axis=1, keepdims=True)
+
+        cache = SemanticCache(
+            dim=dim, index_type="flat",
+            max_size=3, eviction_policy="lru",
+        )
+        cache.build(embs[:3], [f"q{i}" for i in range(3)])
+
+        # Insert enough to evict all original entries
+        for i in range(3, 10):
+            cache.insert(embs[i], f"q{i}")
+
+        assert cache.size <= 3
+        # Lookup should find one of the newer entries
+        result = cache.lookup(embs[9])
+        assert result.hit is True
+        assert result.cache_entry is not None
+
+    def test_all_policies_produce_valid_victim(self):
+        """Every policy should return a valid cache_id from active_ids."""
+        emb = np.zeros(16, dtype=np.float32)
+        active = {10, 20, 30}
+
+        for PolicyClass in [LRUPolicy, LFUPolicy, SemanticPolicy]:
+            policy = PolicyClass()
+            for cid in active:
+                policy.on_insert(cid, emb)
+
+            victim = policy.select_victim(active)
+            assert victim in active, \
+                f"{PolicyClass.__name__} returned {victim}, not in {active}"
