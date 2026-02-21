@@ -24,13 +24,21 @@ def measure_build(index, vectors: np.ndarray) -> dict:
         vectors: Database vectors to build the index on.
 
     Returns:
-        Dict with 'build_time_s' and 'memory_mb'.
+        Dict with 'build_time_s', 'peak_rss_mb', and 'post_build_rss_mb'.
     """
+    import os
+    import resource
+
     process = psutil.Process()
 
     # Force GC before measuring
     gc.collect()
+    
+    # Get current memory before build
     mem_before = process.memory_info().rss
+    
+    # Reset resource maxrss tracking if possible (often not possible to reset, but we take a baseline)
+    ru_before = resource.getrusage(resource.RUSAGE_SELF)
 
     t0 = time.perf_counter()
     index.build(vectors)
@@ -38,6 +46,24 @@ def measure_build(index, vectors: np.ndarray) -> dict:
 
     gc.collect()
     mem_after = process.memory_info().rss
+    ru_after = resource.getrusage(resource.RUSAGE_SELF)
+
+    # On Linux, maxrss is in kilobytes. On macOS, it's in bytes.
+    # We can handle this by checking OS type, but a robust way is to estimate based on magnitude.
+    # However, standard practice: macOS = bytes, Linux = KB.
+    import sys
+    maxrss_final = ru_after.ru_maxrss
+    if sys.platform.startswith("linux"):
+        maxrss_final *= 1024  # Linux: KB -> Bytes
+
+    # Peak RSS observed. Note: it's the high water mark for the whole process lifetime up to this point
+    # We try to infer if the build caused a new peak
+    peak_rss_bytes = maxrss_final
+    
+    # Memory retained after GC (approximate cost of the index in memory)
+    post_build_rss_bytes = mem_after
+    
+    # Calculated delta
     memory_delta = max(0, mem_after - mem_before)
 
     # Use the larger of: measured delta or index's self-reported estimate
@@ -46,13 +72,17 @@ def measure_build(index, vectors: np.ndarray) -> dict:
 
     result = {
         "build_time_s": round(build_time, 4),
-        "memory_mb": round(memory_used / (1024 * 1024), 2),
+        "post_build_rss_mb": round(post_build_rss_bytes / (1024 * 1024), 2),
+        "peak_rss_mb": round(peak_rss_bytes / (1024 * 1024), 2),
+        "memory_mb": round(memory_used / (1024 * 1024), 2), # Legacy compat
         "memory_bytes": memory_used,
     }
 
     logger.info(
         f"Build: {build_time:.3f}s, "
-        f"memory={result['memory_mb']:.1f}MB "
+        f"post_build_rss={result['post_build_rss_mb']:.1f}MB, "
+        f"peak_rss={result['peak_rss_mb']:.1f}MB, "
+        f"est_used={result['memory_mb']:.1f}MB "
         f"({index.ntotal} vectors)"
     )
     return result
@@ -74,10 +104,11 @@ def measure_search_latency(
         warmup: Number of warmup queries (not timed).
 
     Returns:
-        Tuple of (latencies_ns, all_distances, all_indices):
+        Tuple of (latencies_ns, all_distances, all_indices, warmup_used):
         - latencies_ns: Shape (Q,) — per-query latency in nanoseconds
         - all_distances: Shape (Q, k) — distances from each query
         - all_indices: Shape (Q, k) — neighbor IDs for each query
+        - warmup_used: Int — number of queries used for warmup
     """
     Q = queries.shape[0]
 
@@ -99,7 +130,7 @@ def measure_search_latency(
         all_distances[i] = D[0]
         all_indices[i] = I[0]
 
-    return latencies_ns, all_distances, all_indices
+    return latencies_ns, all_distances, all_indices, warmup
 
 
 def measure_batch_throughput(

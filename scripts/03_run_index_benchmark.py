@@ -32,6 +32,7 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.benchmark.runner import BenchmarkRunner
+from src.utils.env_check import require_supported_runtime, pin_numpy_threads
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,6 +70,8 @@ logger = logging.getLogger(__name__)
 )
 def main(config_path, embed_dir, size, output):
     """Run index benchmarks at a specified scale."""
+    require_supported_runtime()
+    pin_numpy_threads()
 
     # Load config
     with open(config_path, "r") as f:

@@ -36,6 +36,7 @@ import logging
 import sys
 import time
 from collections import deque
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -43,11 +44,15 @@ import pandas as pd
 import yaml
 
 # ── Project imports ──────────────────────────────────────────────
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from src.cache.semantic_cache import SemanticCache
 from src.cache.eviction.lru import LRUPolicy
 from src.cache.eviction.lfu import LFUPolicy
 from src.cache.eviction.semantic import SemanticPolicy
 from src.cache.eviction.oracle import OraclePolicy
+from src.utils.env_check import require_supported_runtime, pin_numpy_threads
+from src.utils.manifest import generate_manifest
 
 logging.basicConfig(
     level=logging.INFO,
@@ -152,12 +157,12 @@ def evaluate_policy(
     n_warmup = int(n * warmup_pct)
     max_cache_size = int(n * cache_size_pct)
 
-    # Shuffle all data with seed (deterministic)
-    perm = rng.permutation(n)
-    shuffled_embs = embeddings[perm]
-    shuffled_texts = [texts[i] for i in perm]
+    # (P0.6) Do NOT shuffle data — enforce chronological/temporal splitting
+    # for realistic evaluation of concept drift and caching
+    shuffled_embs = embeddings
+    shuffled_texts = texts
 
-    # Split: warmup seed entries fill the cache, rest is the stream
+    # Split: warmup entries fill the cache, rest is the stream
     warmup_embs = shuffled_embs[:n_warmup]
     warmup_texts = shuffled_texts[:n_warmup]
     stream_embs = shuffled_embs[n_warmup:]
@@ -308,8 +313,9 @@ def run_full_experiment(
     texts: list[str],
     config: dict,
     seeds: list[int],
+    max_workers: int = 1,
 ) -> dict:
-    """Run all policy × cache_size × seed combinations.
+    """Run all policy × cache_size × seed combinations in parallel.
 
     Returns:
         Dict with nested results: results[policy][cache_size_pct][seed]
@@ -324,36 +330,69 @@ def run_full_experiment(
     total_runs = len(policies) * len(cache_sizes) * len(seeds)
     run_num = 0
 
+    # Prepare data structure
     for policy_name in policies:
         all_results[policy_name] = {}
         aggregated[policy_name] = {}
-
         for cache_pct in cache_sizes:
             pct_key = f"{cache_pct:.2f}"
-            seed_results = []
+            all_results[policy_name][pct_key] = []
+            
+    tasks = []
+    
+    # If only 1 worker, run sequentially to avoid ProcessPool overhead and simplify logging
+    if max_workers <= 1:
+        for policy_name in policies:
+            for cache_pct in cache_sizes:
+                for seed in seeds:
+                    run_num += 1
+                    logger.info(
+                        f"\n{'═' * 60}\n"
+                        f"RUN {run_num}/{total_runs}: "
+                        f"policy={policy_name}, cache={cache_pct:.0%}, seed={seed}\n"
+                        f"{'═' * 60}"
+                    )
+                    res = evaluate_policy(
+                        policy_name=policy_name,
+                        embeddings=embeddings,
+                        texts=texts,
+                        config=config,
+                        cache_size_pct=cache_pct,
+                        seed=seed
+                    )
+                    all_results[policy_name][f"{cache_pct:.2f}"].append(res)
+    else:
+        logger.info(f"Starting parallel execution with {max_workers} workers for {total_runs} runs.")
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            future_to_info = {}
+            for policy_name in policies:
+                for cache_pct in cache_sizes:
+                    for seed in seeds:
+                        future = executor.submit(
+                            evaluate_policy,
+                            policy_name, embeddings, texts, config, cache_pct, seed
+                        )
+                        future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
 
-            for seed in seeds:
-                run_num += 1
-                logger.info(
-                    f"\n{'═' * 60}\n"
-                    f"RUN {run_num}/{total_runs}: "
-                    f"policy={policy_name}, cache={cache_pct:.0%}, seed={seed}\n"
-                    f"{'═' * 60}"
-                )
+            for future in as_completed(future_to_info):
+                policy_name, pct_key = future_to_info[future]
+                try:
+                    res = future.result()
+                    all_results[policy_name][pct_key].append(res)
+                    run_num += 1
+                    logger.info(f"Completed {run_num}/{total_runs} (Policy: {policy_name}, Cache: {pct_key}, Seed: {res['seed']})")
+                except Exception as exc:
+                    logger.error(f"Task generated an exception: {exc}")
 
-                result = evaluate_policy(
-                    policy_name=policy_name,
-                    embeddings=embeddings,
-                    texts=texts,
-                    config=config,
-                    cache_size_pct=cache_pct,
-                    seed=seed,
-                )
-                seed_results.append(result)
+    # Aggregation Phase
+    for policy_name in policies:
+        for cache_pct in cache_sizes:
+            pct_key = f"{cache_pct:.2f}"
+            seed_results = all_results[policy_name][pct_key]
+            
+            # Sort back by seed to ensure deterministic output array ordering
+            seed_results.sort(key=lambda x: x["seed"])
 
-            all_results[policy_name][pct_key] = seed_results
-
-            # Aggregate across seeds
             hit_rates = [r["final_hit_rate"] for r in seed_results]
             coverages = [r["semantic_coverage_avg_dist"] for r in seed_results]
             stream_times = [r["timing"]["stream_time_s"] for r in seed_results]
@@ -371,6 +410,7 @@ def run_full_experiment(
             }
 
     return {
+        "manifest": generate_manifest(config),
         "per_seed": all_results,
         "aggregated": aggregated,
         "config": {
@@ -418,10 +458,17 @@ def parse_args():
         "--cache-sizes", nargs="+", type=float, default=None,
         help="Override cache sizes (e.g. --cache-sizes 0.10 0.20)",
     )
+    parser.add_argument(
+        "--workers", type=int, default=1,
+        help="Number of parallel workers for multi-processing. Defaults to 1 (sequential).",
+    )
     return parser.parse_args()
 
 
 def main():
+    require_supported_runtime()
+    pin_numpy_threads()
+    
     args = parse_args()
 
     # Load config
@@ -444,7 +491,7 @@ def main():
 
     # Run experiment
     t_start = time.perf_counter()
-    results = run_full_experiment(embeddings, texts, config, seeds)
+    results = run_full_experiment(embeddings, texts, config, seeds, max_workers=args.workers)
     total_time = time.perf_counter() - t_start
 
     results["total_time_s"] = round(total_time, 1)

@@ -36,6 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.evaluation.routing_evaluator import EvalConfig, RoutingEvaluator
 from src.router.cost_model import CostModel
+from src.utils.env_check import require_supported_runtime, pin_numpy_threads
 
 logging.basicConfig(
     level=logging.INFO,
@@ -282,6 +283,9 @@ def print_multi_seed_summary(results: dict):
 
 
 def main():
+    require_supported_runtime()
+    pin_numpy_threads()
+    
     parser = argparse.ArgumentParser(
         description="Phase 3 — Cost-Based Query Routing Evaluation"
     )

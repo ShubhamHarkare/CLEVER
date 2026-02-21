@@ -204,11 +204,7 @@ class SemanticPolicy(EvictionPolicy):
     def _recompute_redundancy(self, active_ids: set[int]) -> None:
         """Batch-recompute redundancy scores for all active entries.
 
-        Uses brute-force pairwise L2² distance on the stored embeddings.
-        For caches up to ~100K entries this is fast enough (~1–2s on CPU).
-        For larger caches, we could use FAISS range search, but for the
-        experiment sizes in CLEVER the brute-force approach is simpler
-        and correct.
+        Uses GPU acceleration via PyTorch if available, falling back to NumPy.
         """
         if not active_ids:
             return
@@ -216,12 +212,59 @@ class SemanticPolicy(EvictionPolicy):
         ids = sorted(active_ids)
         n = len(ids)
 
-        # Stack embeddings into a matrix
         embs = np.array(
             [self._embeddings[cid] for cid in ids],
             dtype=np.float32,
         )
 
+        try:
+            import os
+            os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+            import torch
+            if torch.cuda.is_available():
+                self._recompute_redundancy_torch(ids, embs, n)
+                return
+        except ImportError:
+            pass
+            
+        self._recompute_redundancy_numpy(ids, embs, n)
+
+    def _recompute_redundancy_torch(self, ids: list[int], embs: np.ndarray, n: int) -> None:
+        """GPU-accelerated redundancy computation using PyTorch."""
+        import torch
+        
+        # Move everything to GPU
+        embs_t = torch.from_numpy(embs).cuda()
+        norms_sq = torch.sum(embs_t ** 2, dim=1)
+        neighbour_counts = torch.zeros(n, dtype=torch.int32, device='cuda')
+        
+        # We can use a larger batch size on an RTX 6000 (e.g. 8192)
+        batch_size = 8192
+        
+        for i in range(0, n, batch_size):
+            end = min(i + batch_size, n)
+            batch_embs = embs_t[i:end]
+            
+            dot = torch.matmul(batch_embs, embs_t.T)
+            # dist_sq = norms_sq_i + norms_sq_j - 2 * dot
+            dist_sq = norms_sq[i:end].unsqueeze(1) + norms_sq.unsqueeze(0) - 2 * dot
+            
+            is_neighbour = dist_sq <= self.similarity_threshold
+            
+            # Exclude self explicitly
+            for r in range(end - i):
+                is_neighbour[r, i + r] = False
+                
+            neighbour_counts[i:end] = is_neighbour.sum(dim=1)
+            
+        counts_cpu = neighbour_counts.cpu().numpy()
+        for i, cid in enumerate(ids):
+            self._redundancy[cid] = float(counts_cpu[i]) / max(n - 1, 1)
+            
+        self._n_recomputes += 1
+
+    def _recompute_redundancy_numpy(self, ids: list[int], embs: np.ndarray, n: int) -> None:
+        """CPU fallback redundancy computation."""
         norms_sq = np.sum(embs ** 2, axis=1)  # (N,)
         neighbour_counts = np.zeros(n, dtype=np.int32)
         

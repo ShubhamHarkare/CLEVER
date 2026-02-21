@@ -14,6 +14,7 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -24,6 +25,7 @@ from src.indexes.factory import create_index
 from src.router.adaptive_router import AdaptiveRouter
 from src.router.cost_model import CostModel
 from src.router.similarity_router import SimilarityRouter, RoutingDecision
+from src.utils.manifest import generate_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +98,44 @@ class RoutingEvaluator:
         self.dim = embeddings.shape[1]
         self.results: dict = {}
 
+    def setup(
+        self,
+        embeddings: np.ndarray,
+        texts: list[str],
+        split_ratio: float = 0.5,
+        temporal_split: bool = True,
+        seed: int = 42,
+        metadata: Optional[list[dict]] = None,
+    ) -> None:
+        """
+        Split data into calibration (warmup) and test sets.
+
+        Args:
+            embeddings: Full query embeddings.
+            texts: Corresponding query texts.
+            split_ratio: Fraction of data for calibration/warmup.
+            temporal_split: If True, uses sequential chronological split. If False, randomly shuffles.
+            seed: For random splitting.
+            metadata: Optional per-query metadata.
+        """
+        n = len(embeddings)
+        n_calib = int(n * split_ratio)
+
+        if temporal_split:
+            # P0.6: Enforce temporal evaluation for realistic query drift / sequence tracking
+            logger.info("Using chronological/temporal split.")
+            perm = np.arange(n)
+        else:
+            logger.warning("Using random split. This erases temporal patterns!")
+            rng = np.random.RandomState(seed)
+            perm = rng.permutation(n)
+
+        self.embeddings = embeddings
+        self.texts = texts
+        self.metadata = metadata or [{}] * len(texts)
+        self.dim = embeddings.shape[1]
+        self.results: dict = {}
+
     def run(self) -> dict:
         """Run the full evaluation pipeline.
 
@@ -118,13 +158,12 @@ class RoutingEvaluator:
             result = self._evaluate_strategy(strategy)
             all_results[strategy] = result
 
-        total_time = time.perf_counter() - t_start
         all_results["meta"] = {
             "total_queries": len(self.embeddings),
             "dim": self.dim,
-            "total_time_s": round(total_time, 2),
+            "total_time_s": round(time.perf_counter() - t_start, 2),
             "seed": self.config.seed,
-            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+            "timestamp": datetime.now().isoformat(),
             "config": {
                 "cache_fill_ratio": self.config.cache_fill_ratio,
                 "index_type": self.config.index_type,
@@ -132,6 +171,7 @@ class RoutingEvaluator:
                 "llm_latency_ms": self.config.llm_latency_ms,
                 "llm_cost_usd": self.config.llm_cost_usd,
             },
+            "manifest": generate_manifest(self.config),
         }
 
         self.results = all_results
@@ -165,7 +205,7 @@ class RoutingEvaluator:
         cache_distances, cache_indices = cache.batch_lookup(eval_emb, k=10)
 
         # --- Ground truth: eval queries against cache (exact) ---
-        gt_distances, gt_indices = gt_index.search(
+        gt_distances, gt_index.search(
             eval_emb.astype(np.float32), k=10
         )
 
@@ -412,6 +452,13 @@ class RoutingEvaluator:
         """Save results to JSON."""
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Ensure manifest is included in the results before saving
+        if "meta" not in self.results:
+            self.results["meta"] = {}
+        self.results["meta"]["manifest"] = generate_manifest(self.config)
+        self.results["meta"]["timestamp"] = datetime.now().isoformat()
+
         with open(output_path, "w") as f:
             json.dump(self.results, f, indent=2, default=str)
         logger.info(f"Results saved to {output_path}")
@@ -476,6 +523,7 @@ class RoutingEvaluator:
             "n_seeds": len(seeds),
             "aggregated": aggregated,
             "per_seed": per_seed_results,
+            "manifest": generate_manifest(config),
         }
 
     @staticmethod

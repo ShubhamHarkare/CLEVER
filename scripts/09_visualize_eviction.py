@@ -97,7 +97,42 @@ def load_results(path: str) -> dict:
     with open(fpath) as f:
         data = json.load(f)
 
-    logger.info(f"Loaded results from {fpath}")
+    # P0.7: Matrix completeness validation
+    logger.info("Validating eviction results matrix completeness...")
+    config = data.get("config", {})
+    per_seed = data.get("per_seed", {})
+    
+    policies = config.get("policies", [])
+    cache_sizes = config.get("cache_sizes_pct", [])
+    seeds = config.get("seeds", [])
+    
+    if not (policies and cache_sizes and seeds):
+        logger.warning("Missing config definitions for matrix validation, skipping strict check.")
+    else:
+        missing_cells = []
+        for policy in policies:
+            if policy not in per_seed:
+                missing_cells.append(f"[{policy}] missing entirely")
+                continue
+            for cache_pct in cache_sizes:
+                pct_key = f"{cache_pct:.2f}"
+                if pct_key not in per_seed[policy]:
+                    missing_cells.append(f"[{policy}][{pct_key}] missing entirely")
+                    continue
+                
+                # Check seed count
+                seed_runs = per_seed[policy][pct_key]
+                if len(seed_runs) < len(seeds):
+                    missing_cells.append(f"[{policy}][{pct_key}] has {len(seed_runs)} seeds (expected {len(seeds)})")
+                    
+        if missing_cells:
+            logger.error(f"FATAL: Incomplete eviction experiment matrix detected.")
+            for mc in missing_cells:
+                logger.error(f"  - {mc}")
+            logger.error("Cannot generate valid publication figures with incomplete evidence.")
+            sys.exit(1)
+            
+    logger.info(f"Loaded and validated complete results from {fpath}")
     return data
 
 

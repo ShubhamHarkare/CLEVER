@@ -133,9 +133,13 @@ class AdaptiveRouter:
             )
             self.sweep_results.append(result)
 
-            # Objective: maximize cost savings subject to quality constraint
+            # Objective: maximize cost savings subject to quality constraint,
+            # with an explicit penalty for pushing the threshold too high (false cache accepts).
+            # Objective = savings - penalty * (1.0 - quality)
             if quality >= self.min_quality:
-                objective = savings["latency_saving_pct"] + savings["monetary_saving_pct"]
+                # Add a strong penalty term to prevent runaway thresholds (P0.5)
+                penalty_weight = 2.0
+                objective = savings["latency_saving_pct"] + savings["monetary_saving_pct"] - (penalty_weight * (1.0 - quality) * 100)
                 if objective > best_objective:
                     best_objective = objective
                     best_threshold = threshold

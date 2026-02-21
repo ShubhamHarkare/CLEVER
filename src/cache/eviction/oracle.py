@@ -61,9 +61,12 @@ class OraclePolicy(EvictionPolicy):
     ) -> None:
         self.similarity_threshold = similarity_threshold
 
-        # ── Pre-compute next-use map ─────────────────────────────
-        # next_use[cache_id] = earliest stream index where this
-        # entry would be accessed.
+        # ── Pre-compute all future uses ──────────────────────────
+        # dict mapping cache_id -> deque of stream indices where it will be accessed
+        import collections
+        self._future_uses: dict[int, collections.deque] = {}
+        
+        # next_use indicates the *immediate* next use for eviction sorting
         self._next_use: dict[int, float] = {}
 
         # Also store the full stream for re-computation on insert
@@ -82,14 +85,17 @@ class OraclePolicy(EvictionPolicy):
         cache_embeddings: np.ndarray,
         stream_start: int,
     ) -> None:
-        """Compute next_use for each cache_id from stream_start onward.
+        """Compute all future uses for each cache_id from stream_start onward.
 
         Uses batch NN search: for each stream query, find its nearest
-        cache entry.  Then, for each cache entry, record the first
-        stream position where it's the nearest neighbour.
+        cache entry. Then, for each cache entry, append the stream position 
+        to its queue of future uses.
         """
+        import collections
+        
         if len(cache_ids) == 0 or stream_start >= len(self._stream_embs):
             for cid in cache_ids:
+                self._future_uses[cid] = collections.deque()
                 self._next_use[cid] = _INF
             return
 
@@ -111,10 +117,10 @@ class OraclePolicy(EvictionPolicy):
         # Map from local index position → cache_id
         pos_to_cid = {i: cid for i, cid in enumerate(cache_ids)}
 
-        # Initialise all to infinity (never accessed)
+        # Initialise empty queues
         for cid in cache_ids:
-            if cid not in self._next_use or self._next_use[cid] <= stream_start:
-                self._next_use[cid] = _INF
+            if cid not in self._future_uses:
+                self._future_uses[cid] = collections.deque()
 
         # Process in batches to control memory
         for batch_start in range(0, n_stream, batch_size):
@@ -134,24 +140,40 @@ class OraclePolicy(EvictionPolicy):
                 if cid is None:
                     continue
 
-                # Record the earliest future access
-                if self._next_use.get(cid, _INF) > stream_idx:
-                    self._next_use[cid] = stream_idx
+                # Append every future access directly to the queue (maintaining chronological order)
+                if len(self._future_uses[cid]) == 0 or self._future_uses[cid][-1] < stream_idx:
+                    self._future_uses[cid].append(stream_idx)
+                    
+        # Synchronize _next_use state
+        for cid in cache_ids:
+            self._update_next_use_from_queue(cid)
+            
+    def _update_next_use_from_queue(self, cid: int) -> None:
+        """Helper to sync the _next_use float with the front of the queue."""
+        q = self._future_uses.get(cid)
+        if q and len(q) > 0:
+            # Ensure the next use is actually in the future (>= stream_pos)
+            while len(q) > 0 and q[0] < self._stream_pos:
+                q.popleft()
+                
+            if len(q) > 0:
+                self._next_use[cid] = float(q[0])
+            else:
+                self._next_use[cid] = _INF
+        else:
+            self._next_use[cid] = _INF
 
     # ── Lifecycle hooks ──────────────────────────────────────────
 
     def on_access(self, cache_id: int) -> None:
-        """After an access, find the *next* time this entry is used.
-
-        We update next_use by scanning forward from current stream_pos.
-        For efficiency we set it to INF and rely on the pre-computed map
-        (the map already has the first access; after that access happens
-        we need the second access, etc.).
-        """
-        # Mark current next_use as consumed — find the next one
-        # (We rely on the pre-computed map; updating lazily is acceptable
-        # since the oracle still knows the next earliest among all entries)
-        pass
+        """After an access, pop the current use and find the *next* time this entry is used."""
+        q = self._future_uses.get(cache_id)
+        if q and len(q) > 0:
+            # The entry was just hit. It may have been the one at the front of the queue.
+            # Pop anything past or present. 
+            while len(q) > 0 and q[0] <= self._stream_pos:
+                q.popleft()
+        self._update_next_use_from_queue(cache_id)
 
     def on_insert(self, cache_id: int, embedding: np.ndarray) -> None:
         """Track the new entry's next use in the remaining stream."""

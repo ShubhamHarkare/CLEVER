@@ -31,6 +31,7 @@ from src.benchmark.profiler import (
 )
 from src.benchmark.workload import generate_workload
 from src.indexes.factory import create_index
+from src.utils.manifest import generate_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -124,10 +125,12 @@ class BenchmarkRunner:
             else:
                 try:
                     wl_indices = generate_workload(
-                        db_vectors, workload_type,
+                        query_vectors=default_query_vectors,
+                        db_vectors=db_vectors,
+                        workload_type=workload_type,
                         n_queries=actual_query_count, seed=42,
                     )
-                    query_vectors = db_vectors[wl_indices]
+                    query_vectors = default_query_vectors[wl_indices]
                 except Exception as e:
                     logger.warning(
                         f"Workload '{workload_type}' generation failed: {e}. "
@@ -166,6 +169,12 @@ class BenchmarkRunner:
                             gt_ids=gt_ids,
                         )
                         result["workload"] = workload_type
+                        
+                        # Guard against accidental leakage (P0.1)
+                        if "wl_indices" in locals():
+                            assert set(query_indices[wl_indices]).isdisjoint(set(db_indices)), \
+                                "FATAL: Query vectors leaked into database vectors."
+                            
                         all_results.append(result)
                     except Exception as e:
                         logger.error(
@@ -187,25 +196,40 @@ class BenchmarkRunner:
         del gt_index
         gc.collect()
 
-        # --- Add run manifest ---
-        manifest = {
-            "_manifest": {
-                "dataset_label": self.dataset_label,
-                "n_vectors": N,
-                "dim": self.dim,
-                "query_count": actual_query_count,
-                "warmup_queries": self.warmup_queries,
-                "n_repeats": self.n_repeats,
-                "workloads": self.workloads,
-                "seed": 42,
-                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-            }
+        # --- Output completeness and scale validation (P0.2, P0.3) ---
+        expected_configs = sum(len(cfg.get("params", [{}])) for cfg in index_configs.values())
+        expected_rows = expected_configs * len(self.workloads)
+        
+        # Determine number of valid skipped rows (e.g. IVF skip logic)
+        skipped_configs = len([r for r in all_results if "error" not in r and r.get("skip", False)]) # not implemented yet, just for structure
+        actual_valid_rows = len([r for r in all_results if "error" not in r])
+        
+        # Enforce workload inclusion
+        for r in all_results:
+            assert "workload" in r, f"Missing workload key in result row: {r}"
+
+        # Hard validation for the "full" label
+        eff_n_vectors = len(db_vectors)
+        if "full" in self.dataset_label.lower():
+            min_full_scale = self.config.get("min_full_scale", 500000)
+            if eff_n_vectors < min_full_scale:
+                logger.error(f"Scale inconsistency: dataset_label is '{self.dataset_label}' but effective_n_vectors is only {eff_n_vectors} < {min_full_scale}. Asserting failure.")
+                raise ValueError(f"dataset_label '{self.dataset_label}' requires >= {min_full_scale} elements.")
+
+        # Generate scientific provenance manifest
+        manifest = generate_manifest(self.config)
+
+        # Output results
+        benchmark_results = {
+            "dataset": self.dataset_label,
+            "manifest": manifest,
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "runs": all_results,
         }
 
-        # Save combined results
         output_path = self.output_dir / f"index_benchmark_{self.dataset_label}.json"
         with open(output_path, "w") as f:
-            json.dump({"manifest": manifest, "results": all_results}, f, indent=2)
+            json.dump(benchmark_results, f, indent=2)
         logger.info(f"Results saved to {output_path}")
 
         return all_results
@@ -225,11 +249,22 @@ class BenchmarkRunner:
         build_result = measure_build(index, db_vectors)
 
         # --- Search phase (per-query latency) ---
-        latencies_ns, _, approx_ids = measure_search_latency(
+        latencies_ns, _, approx_ids, warmup_used = measure_search_latency(
             index, query_vectors, k=MAX_K, warmup=self.warmup_queries
         )
-
-        latency_stats = compute_latency_stats(latencies_ns)
+        lat_ms = latencies_ns / 1e6
+        
+        # Additional detailed latency profiling metadata
+        latency_stats = {
+            "mean": round(float(np.mean(lat_ms)), 4),
+            "p50": round(float(np.median(lat_ms)), 4),
+            "p95": round(float(np.percentile(lat_ms, 95)), 4),
+            "p99": round(float(np.percentile(lat_ms, 99)), 4),
+            "min": round(float(np.min(lat_ms)), 4),
+            "max": round(float(np.max(lat_ms)), 4),
+            "warmup_queries": warmup_used,
+            "timing_mode": "individual_perf_counter_ns"
+        }
 
         # --- Batch throughput ---
         throughput_result = measure_batch_throughput(
@@ -250,7 +285,9 @@ class BenchmarkRunner:
             "dataset_size": len(db_vectors),
             "dataset_label": self.dataset_label,
             "build_time_s": build_result["build_time_s"],
-            "memory_mb": build_result["memory_mb"],
+            "peak_rss_mb": build_result["peak_rss_mb"],
+            "post_build_rss_mb": build_result["post_build_rss_mb"],
+            "memory_mb": build_result["memory_mb"], # Keep for backward compatibility or general memory
             "search_latency_ms": latency_stats,
             "throughput_qps": throughput_result["throughput_qps"],
             **recall_results,

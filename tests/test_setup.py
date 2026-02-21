@@ -95,6 +95,8 @@ class TestEncoder:
         from sentence_transformers import SentenceTransformer
         assert SentenceTransformer is not None
 
+    @pytest.mark.slow
+    @pytest.mark.integration
     def test_encode_basic(self):
         from sentence_transformers import SentenceTransformer
 
@@ -116,6 +118,8 @@ class TestEncoder:
         norm = np.linalg.norm(emb[0])
         assert abs(norm - 1.0) < 1e-5, f"Norm should be 1.0, got {norm}"
 
+    @pytest.mark.slow
+    @pytest.mark.integration
     def test_semantic_similarity(self):
         """Similar queries should have high cosine similarity."""
         from sentence_transformers import SentenceTransformer
@@ -138,6 +142,8 @@ class TestEncoder:
         assert sim_unrelated < 0.4, f"Unrelated queries should not be similar: {sim_unrelated}"
 
 
+@pytest.mark.slow
+@pytest.mark.integration
 class TestQueryEncoder:
     """Test our QueryEncoder wrapper."""
 
