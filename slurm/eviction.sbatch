@@ -44,7 +44,8 @@ python scripts/08_run_eviction.py \
     --queries data/full_queries.parquet \
     --config configs/eviction.yaml \
     --output results/eviction/ \
-    --multi-seed
+    --multi-seed \
+    --workers $SLURM_CPUS_PER_TASK
 
 echo ""
 echo ">>> Eviction evaluation complete."
