@@ -222,17 +222,32 @@ class SemanticPolicy(EvictionPolicy):
             dtype=np.float32,
         )
 
-        # Pairwise L2² distances: ||a - b||² = ||a||² + ||b||² - 2·a·b
-        # For normalised embeddings ||a||² = 1, so: 2 - 2·a·b = 2(1 - cos)
         norms_sq = np.sum(embs ** 2, axis=1)  # (N,)
-        dot = embs @ embs.T  # (N, N)
-        # dist_sq[i,j] = norms_sq[i] + norms_sq[j] - 2*dot[i,j]
-        dist_sq = norms_sq[:, None] + norms_sq[None, :] - 2 * dot
-
-        # Count neighbours within threshold (excluding self)
-        is_neighbour = dist_sq <= self.similarity_threshold
-        np.fill_diagonal(is_neighbour, False)
-        neighbour_counts = is_neighbour.sum(axis=1)  # (N,)
+        neighbour_counts = np.zeros(n, dtype=np.int32)
+        
+        # Batch size for distance computation to prevent OOM
+        # At B=2048, the dist_sq matrix is 2048 * N * 4 bytes
+        # For N=60k, that's only ~490MB instead of ~14GB for N*N
+        batch_size = 2048
+        
+        for i in range(0, n, batch_size):
+            end = min(i + batch_size, n)
+            batch_embs = embs[i:end]
+            
+            # dot: (B, N)
+            dot = batch_embs @ embs.T
+            
+            # dist_sq: (B, N)
+            dist_sq = norms_sq[i:end, None] + norms_sq[None, :] - 2 * dot
+            
+            # Count neighbours within threshold
+            is_neighbour = dist_sq <= self.similarity_threshold
+            
+            # Exclude self explicitly (diagonal elements)
+            for r in range(end - i):
+                is_neighbour[r, i + r] = False
+                
+            neighbour_counts[i:end] = is_neighbour.sum(axis=1)
 
         # Normalise: fraction of other active entries that are neighbours
         for i, cid in enumerate(ids):
