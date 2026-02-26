@@ -58,11 +58,16 @@ def _get_package_versions() -> dict:
     # Required core
     import numpy
     import pandas
-    import torch
     
     versions["numpy"] = numpy.__version__
     versions["pandas"] = pandas.__version__
-    versions["torch"] = torch.__version__
+    
+    # PyTorch (optional — may not be installed on CPU-only nodes)
+    try:
+        import torch
+        versions["torch"] = torch.__version__
+    except ImportError:
+        versions["torch"] = "not_installed"
     
     # Optional FAISS (may be cpu or gpu)
     try:

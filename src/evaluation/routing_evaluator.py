@@ -98,44 +98,6 @@ class RoutingEvaluator:
         self.dim = embeddings.shape[1]
         self.results: dict = {}
 
-    def setup(
-        self,
-        embeddings: np.ndarray,
-        texts: list[str],
-        split_ratio: float = 0.5,
-        temporal_split: bool = True,
-        seed: int = 42,
-        metadata: Optional[list[dict]] = None,
-    ) -> None:
-        """
-        Split data into calibration (warmup) and test sets.
-
-        Args:
-            embeddings: Full query embeddings.
-            texts: Corresponding query texts.
-            split_ratio: Fraction of data for calibration/warmup.
-            temporal_split: If True, uses sequential chronological split. If False, randomly shuffles.
-            seed: For random splitting.
-            metadata: Optional per-query metadata.
-        """
-        n = len(embeddings)
-        n_calib = int(n * split_ratio)
-
-        if temporal_split:
-            # P0.6: Enforce temporal evaluation for realistic query drift / sequence tracking
-            logger.info("Using chronological/temporal split.")
-            perm = np.arange(n)
-        else:
-            logger.warning("Using random split. This erases temporal patterns!")
-            rng = np.random.RandomState(seed)
-            perm = rng.permutation(n)
-
-        self.embeddings = embeddings
-        self.texts = texts
-        self.metadata = metadata or [{}] * len(texts)
-        self.dim = embeddings.shape[1]
-        self.results: dict = {}
-
     def run(self) -> dict:
         """Run the full evaluation pipeline.
 
@@ -205,7 +167,7 @@ class RoutingEvaluator:
         cache_distances, cache_indices = cache.batch_lookup(eval_emb, k=10)
 
         # --- Ground truth: eval queries against cache (exact) ---
-        gt_distances, gt_index.search(
+        gt_distances, gt_indices = gt_index.search(
             eval_emb.astype(np.float32), k=10
         )
 
