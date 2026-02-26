@@ -8,8 +8,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=06:00:00
-#SBATCH --output=logs/eviction_%j.log
-#SBATCH --error=logs/eviction_%j.err
+#SBATCH --output=eviction_%j.log
+#SBATCH --error=eviction_%j.err
 #SBATCH --mail-user=yashkulk@umich.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 

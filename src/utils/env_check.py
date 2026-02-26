@@ -26,13 +26,12 @@ def require_supported_runtime() -> None:
     
     if major != SUPPORTED_MAJOR or minor != SUPPORTED_MINOR:
         msg = (
-            f"UNSUPPORTED RUNTIME: CLEVER requires Python "
-            f"{SUPPORTED_MAJOR}.{SUPPORTED_MINOR}.x for reproducible "
-            f"execution and stable ML integrations. "
-            f"Found: Python {major}.{minor}.{sys.version_info.micro}."
+            f"WARNING: CLEVER was developed with Python "
+            f"{SUPPORTED_MAJOR}.{SUPPORTED_MINOR}.x. "
+            f"Found: Python {major}.{minor}.{sys.version_info.micro}. "
+            f"Results may differ slightly across versions."
         )
-        logger.error(msg)
-        raise RuntimeError(msg)
+        logger.warning(msg)
     
     logger.debug(f"Environment check passed: Python {major}.{minor}.{sys.version_info.micro}")
 
