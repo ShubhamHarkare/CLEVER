@@ -8,8 +8,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
 #SBATCH --time=08:00:00
-#SBATCH --output=eviction_%j.log
-#SBATCH --error=eviction_%j.err
+#SBATCH --output=logs/eviction_%j.log
+#SBATCH --error=logs/eviction_%j.err
 #SBATCH --mail-user=yashkulk@umich.edu
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -17,12 +17,19 @@
 # Phase 4: Semantic-Aware Eviction Policy Evaluation (Multi-Seed)
 # Runs the eviction evaluation pipeline on Great Lakes.
 #
+# IMPORTANT: Before first submission, create the logs directory:
+#   mkdir -p ~/scratch/yashkulk/CSE584/CLEVER/slurm/logs
+#
 # NOTE: We use --workers 1 (sequential) because CUDA contexts do
 #       not survive fork(). With ProcessPoolExecutor, child processes
 #       silently fall back to CPU, making semantic policy ~100× slower.
 # ──────────────────────────────────────────────────────────────
 
 set -euo pipefail
+
+# ── Load CUDA ────────────────────────────────────────────────
+module load cuda
+echo "CUDA loaded: $(nvcc --version 2>/dev/null | grep release || echo 'version unknown')"
 
 echo "=== CLEVER Phase 4: Eviction Policy Evaluation (Multi-Seed) ==="
 echo "Job ID:   $SLURM_JOB_ID"
@@ -39,8 +46,13 @@ cd ~/scratch/yashkulk/CSE584/CLEVER
 # Activate virtual environment
 source venv/bin/activate
 
-# Create log and output directories
-mkdir -p logs results/eviction results/figures
+# Create output directories
+mkdir -p results/eviction results/figures
+
+# ── Verify CUDA is available to PyTorch ──────────────────────
+echo ">>> Checking CUDA availability..."
+python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available to PyTorch!'; print(f'PyTorch CUDA: {torch.cuda.get_device_name(0)}')"
+echo ""
 
 # ── Run eviction experiments (multi-seed, sequential) ────────
 echo ">>> Running multi-seed eviction evaluation..."
