@@ -60,6 +60,10 @@ class SemanticPolicy(EvictionPolicy):
             redundancy re-computations.
     """
 
+    # Maximum number of anchor entries for redundancy estimation.
+    # Instead of O(N²) all-pairs, we use O(N×S) sampled anchors.
+    MAX_REDUNDANCY_SAMPLES = 4096
+
     def __init__(
         self,
         similarity_threshold: float = 0.30,
@@ -202,9 +206,15 @@ class SemanticPolicy(EvictionPolicy):
     # ── Redundancy computation ───────────────────────────────────
 
     def _recompute_redundancy(self, active_ids: set[int]) -> None:
-        """Batch-recompute redundancy scores for all active entries.
+        """Batch-recompute redundancy scores using sampled anchors.
 
-        Uses GPU acceleration via PyTorch if available, falling back to NumPy.
+        Instead of O(N²) all-pairs distances, samples up to
+        MAX_REDUNDANCY_SAMPLES anchor entries and estimates each entry's
+        redundancy as the fraction of *anchors* within the similarity
+        threshold.  This gives O(N × S) complexity where S ≪ N.
+
+        Uses GPU acceleration via PyTorch if available, falling back
+        to NumPy.
         """
         if not active_ids:
             return
@@ -217,84 +227,141 @@ class SemanticPolicy(EvictionPolicy):
             dtype=np.float32,
         )
 
+        # ── Sample anchors if N is large ─────────────────────────
+        S = min(n, self.MAX_REDUNDANCY_SAMPLES)
+        if S < n:
+            rng = np.random.RandomState(self._n_recomputes)
+            anchor_idx = rng.choice(n, S, replace=False)
+            anchor_idx.sort()
+            anchor_embs = embs[anchor_idx]
+        else:
+            anchor_idx = np.arange(n)
+            anchor_embs = embs
+
         try:
             import os
             os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
             import torch
             if torch.cuda.is_available():
-                self._recompute_redundancy_torch(ids, embs, n)
+                self._recompute_redundancy_torch(
+                    ids, embs, n, anchor_embs, anchor_idx, S
+                )
                 return
         except ImportError:
             pass
-            
-        self._recompute_redundancy_numpy(ids, embs, n)
 
-    def _recompute_redundancy_torch(self, ids: list[int], embs: np.ndarray, n: int) -> None:
+        self._recompute_redundancy_numpy(
+            ids, embs, n, anchor_embs, anchor_idx, S
+        )
+
+    def _recompute_redundancy_torch(
+        self,
+        ids: list[int],
+        embs: np.ndarray,
+        n: int,
+        anchor_embs: np.ndarray,
+        anchor_idx: np.ndarray,
+        S: int,
+    ) -> None:
         """GPU-accelerated redundancy computation using PyTorch."""
         import torch
-        
-        # Move everything to GPU
-        embs_t = torch.from_numpy(embs).cuda()
-        norms_sq = torch.sum(embs_t ** 2, dim=1)
-        neighbour_counts = torch.zeros(n, dtype=torch.int32, device='cuda')
-        
-        # We can use a larger batch size on an RTX 6000 (e.g. 8192)
+
+        device = torch.device("cuda")
+        embs_t = torch.from_numpy(embs).to(device)
+        anch_t = torch.from_numpy(anchor_embs).to(device)
+
+        norms_sq_all = torch.sum(embs_t ** 2, dim=1)     # (N,)
+        norms_sq_anc = torch.sum(anch_t ** 2, dim=1)      # (S,)
+
+        neighbour_counts = torch.zeros(n, dtype=torch.int32, device=device)
+
+        # Process all entries against anchors in batches
         batch_size = 8192
-        
         for i in range(0, n, batch_size):
             end = min(i + batch_size, n)
-            batch_embs = embs_t[i:end]
-            
-            dot = torch.matmul(batch_embs, embs_t.T)
-            # dist_sq = norms_sq_i + norms_sq_j - 2 * dot
-            dist_sq = norms_sq[i:end].unsqueeze(1) + norms_sq.unsqueeze(0) - 2 * dot
-            
-            is_neighbour = dist_sq <= self.similarity_threshold
-            
-            # Exclude self explicitly
-            for r in range(end - i):
-                is_neighbour[r, i + r] = False
-                
-            neighbour_counts[i:end] = is_neighbour.sum(dim=1)
-            
+            batch = embs_t[i:end]                          # (B, D)
+
+            dot = torch.matmul(batch, anch_t.T)            # (B, S)
+            dist_sq = (
+                norms_sq_all[i:end].unsqueeze(1)
+                + norms_sq_anc.unsqueeze(0)
+                - 2 * dot
+            )                                               # (B, S)
+
+            is_neighbour = dist_sq <= self.similarity_threshold  # (B, S)
+
+            # Exclude self: if row i+r corresponds to anchor_idx[j],
+            # zero out that cell.  Build a mask vectorised.
+            if S == n:
+                # Full mode — anchor_idx is identity range
+                row_ids = torch.arange(i, end, device=device)  # (B,)
+                # Self-match: row_ids == col index (anchor_idx is 0..N-1)
+                self_mask = row_ids.unsqueeze(1) == torch.arange(
+                    S, device=device
+                ).unsqueeze(0)
+                is_neighbour = is_neighbour & ~self_mask
+            else:
+                # Sampled mode — check if global index appears in
+                # anchor_idx.  Much cheaper than looping.
+                anchor_set_t = torch.from_numpy(anchor_idx).to(device)
+                row_globals = torch.arange(i, end, device=device)
+                self_mask = row_globals.unsqueeze(1) == anchor_set_t.unsqueeze(0)
+                is_neighbour = is_neighbour & ~self_mask
+
+            neighbour_counts[i:end] = is_neighbour.sum(dim=1).to(torch.int32)
+
         counts_cpu = neighbour_counts.cpu().numpy()
+        denom = max(S - 1, 1) if S == n else max(S, 1)
         for i, cid in enumerate(ids):
-            self._redundancy[cid] = float(counts_cpu[i]) / max(n - 1, 1)
-            
+            self._redundancy[cid] = float(counts_cpu[i]) / denom
+
         self._n_recomputes += 1
 
-    def _recompute_redundancy_numpy(self, ids: list[int], embs: np.ndarray, n: int) -> None:
-        """CPU fallback redundancy computation."""
-        norms_sq = np.sum(embs ** 2, axis=1)  # (N,)
+    def _recompute_redundancy_numpy(
+        self,
+        ids: list[int],
+        embs: np.ndarray,
+        n: int,
+        anchor_embs: np.ndarray,
+        anchor_idx: np.ndarray,
+        S: int,
+    ) -> None:
+        """CPU fallback redundancy computation (sampled anchors)."""
+        norms_sq_all = np.sum(embs ** 2, axis=1)          # (N,)
+        norms_sq_anc = np.sum(anchor_embs ** 2, axis=1)    # (S,)
+
         neighbour_counts = np.zeros(n, dtype=np.int32)
-        
-        # Batch size for distance computation to prevent OOM
-        # At B=2048, the dist_sq matrix is 2048 * N * 4 bytes
-        # For N=60k, that's only ~490MB instead of ~14GB for N*N
+
+        # Batch rows against anchor columns
         batch_size = 2048
-        
         for i in range(0, n, batch_size):
             end = min(i + batch_size, n)
-            batch_embs = embs[i:end]
-            
-            # dot: (B, N)
-            dot = batch_embs @ embs.T
-            
-            # dist_sq: (B, N)
-            dist_sq = norms_sq[i:end, None] + norms_sq[None, :] - 2 * dot
-            
-            # Count neighbours within threshold
+            batch = embs[i:end]                             # (B, D)
+
+            dot = batch @ anchor_embs.T                     # (B, S)
+            dist_sq = (
+                norms_sq_all[i:end, None]
+                + norms_sq_anc[None, :]
+                - 2 * dot
+            )                                                # (B, S)
+
             is_neighbour = dist_sq <= self.similarity_threshold
-            
-            # Exclude self explicitly (diagonal elements)
-            for r in range(end - i):
-                is_neighbour[r, i + r] = False
-                
+
+            # Vectorised self-exclusion
+            if S == n:
+                row_ids = np.arange(i, end)[:, None]        # (B, 1)
+                col_ids = np.arange(S)[None, :]             # (1, S)
+                is_neighbour &= row_ids != col_ids
+            else:
+                row_ids = np.arange(i, end)[:, None]
+                anch_ids = anchor_idx[None, :]
+                is_neighbour &= row_ids != anch_ids
+
             neighbour_counts[i:end] = is_neighbour.sum(axis=1)
 
-        # Normalise: fraction of other active entries that are neighbours
+        denom = max(S - 1, 1) if S == n else max(S, 1)
         for i, cid in enumerate(ids):
-            self._redundancy[cid] = neighbour_counts[i] / max(n - 1, 1)
+            self._redundancy[cid] = neighbour_counts[i] / denom
 
         self._n_recomputes += 1
 
