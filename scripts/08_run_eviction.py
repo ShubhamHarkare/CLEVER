@@ -330,6 +330,10 @@ def run_full_experiment(
     total_runs = len(policies) * len(cache_sizes) * len(seeds)
     run_num = 0
 
+    # Separate CPU-bound and GPU-bound policies
+    cpu_policies = [p for p in policies if p != "semantic"]
+    gpu_policies = [p for p in policies if p == "semantic"]
+
     # Prepare data structure
     for policy_name in policies:
         all_results[policy_name] = {}
@@ -338,51 +342,55 @@ def run_full_experiment(
             pct_key = f"{cache_pct:.2f}"
             all_results[policy_name][pct_key] = []
             
-    tasks = []
-    
-    # If only 1 worker, run sequentially to avoid ProcessPool overhead and simplify logging
-    if max_workers <= 1:
-        for policy_name in policies:
+    # ── Phase 1: CPU-Bound Policies (Parallel) ──────────────────
+    if cpu_policies:
+        cpu_runs = len(cpu_policies) * len(cache_sizes) * len(seeds)
+        if max_workers <= 1:
+            logger.info(f"Running {cpu_runs} CPU-bound tasks sequentially...")
+            for policy_name in cpu_policies:
+                for cache_pct in cache_sizes:
+                    for seed in seeds:
+                        run_num += 1
+                        logger.info(f"RUN {run_num}/{total_runs}: policy={policy_name}, cache={cache_pct:.0%}, seed={seed}")
+                        res = evaluate_policy(policy_name, embeddings, texts, config, cache_pct, seed)
+                        all_results[policy_name][f"{cache_pct:.2f}"].append(res)
+        else:
+            logger.info(f"Starting parallel execution with {max_workers} workers for {cpu_runs} CPU-bound tasks.")
+            with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                future_to_info = {}
+                for policy_name in cpu_policies:
+                    for cache_pct in cache_sizes:
+                        for seed in seeds:
+                            future = executor.submit(
+                                evaluate_policy,
+                                policy_name, embeddings, texts, config, cache_pct, seed
+                            )
+                            future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
+
+                for future in as_completed(future_to_info):
+                    policy_name, pct_key = future_to_info[future]
+                    try:
+                        res = future.result()
+                        all_results[policy_name][pct_key].append(res)
+                        run_num += 1
+                        logger.info(f"Completed {run_num}/{total_runs} (Policy: {policy_name}, Cache: {pct_key}, Seed: {res['seed']})")
+                    except Exception as exc:
+                        logger.error(f"Task generated an exception: {exc}")
+
+    # ── Phase 2: GPU-Bound Policies (Sequential) ────────────────
+    if gpu_policies:
+        gpu_runs = len(gpu_policies) * len(cache_sizes) * len(seeds)
+        logger.info(f"\nRunning {gpu_runs} GPU-bound tasks sequentially (to avoid CUDA context sharing issues)...")
+        for policy_name in gpu_policies:
             for cache_pct in cache_sizes:
                 for seed in seeds:
                     run_num += 1
-                    logger.info(
-                        f"\n{'═' * 60}\n"
-                        f"RUN {run_num}/{total_runs}: "
-                        f"policy={policy_name}, cache={cache_pct:.0%}, seed={seed}\n"
-                        f"{'═' * 60}"
-                    )
-                    res = evaluate_policy(
-                        policy_name=policy_name,
-                        embeddings=embeddings,
-                        texts=texts,
-                        config=config,
-                        cache_size_pct=cache_pct,
-                        seed=seed
-                    )
-                    all_results[policy_name][f"{cache_pct:.2f}"].append(res)
-    else:
-        logger.info(f"Starting parallel execution with {max_workers} workers for {total_runs} runs.")
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            future_to_info = {}
-            for policy_name in policies:
-                for cache_pct in cache_sizes:
-                    for seed in seeds:
-                        future = executor.submit(
-                            evaluate_policy,
-                            policy_name, embeddings, texts, config, cache_pct, seed
-                        )
-                        future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
-
-            for future in as_completed(future_to_info):
-                policy_name, pct_key = future_to_info[future]
-                try:
-                    res = future.result()
-                    all_results[policy_name][pct_key].append(res)
-                    run_num += 1
-                    logger.info(f"Completed {run_num}/{total_runs} (Policy: {policy_name}, Cache: {pct_key}, Seed: {res['seed']})")
-                except Exception as exc:
-                    logger.error(f"Task generated an exception: {exc}")
+                    logger.info(f"RUN {run_num}/{total_runs}: policy={policy_name}, cache={cache_pct:.0%}, seed={seed}")
+                    try:
+                        res = evaluate_policy(policy_name, embeddings, texts, config, cache_pct, seed)
+                        all_results[policy_name][f"{cache_pct:.2f}"].append(res)
+                    except Exception as exc:
+                        logger.error(f"GPU task generated an exception: {exc}")
 
     # Aggregation Phase
     for policy_name in policies:

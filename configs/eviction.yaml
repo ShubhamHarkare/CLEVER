@@ -15,7 +15,7 @@ eviction:
     similarity_threshold: 0.30   # L2² threshold (≈ cosine 0.85)
     alpha: 1.0                    # recency weight
     beta: 1.0                     # frequency weight
-    recompute_interval: 200       # batch-recompute redundancy every N evictions
+    recompute_interval: 1000      # batch-recompute redundancy every N evictions
 
 evaluation:
   warmup_pct: 0.30                # first 30% of queries warm up the cache

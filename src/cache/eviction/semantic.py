@@ -62,7 +62,7 @@ class SemanticPolicy(EvictionPolicy):
 
     # Maximum number of anchor entries for redundancy estimation.
     # Instead of O(N²) all-pairs, we use O(N×S) sampled anchors.
-    MAX_REDUNDANCY_SAMPLES = 4096
+    MAX_REDUNDANCY_SAMPLES = 1024
 
     def __init__(
         self,
