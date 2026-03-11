@@ -150,7 +150,7 @@ class SemanticPolicy(EvictionPolicy):
             cid: self._access_counts.get(cid, 0) for cid in active_ids
         }
         max_count = max(counts.values()) if counts else 1
-        max_count = max(max_count, 1)  # avoid div-by-zero
+        max_count = max(float(max_count), 1.0)  # avoid div-by-zero
 
         best_score = -1.0
         victim: Optional[int] = None
@@ -162,6 +162,10 @@ class SemanticPolicy(EvictionPolicy):
 
             utility = self.alpha * rec + self.beta * freq + self._epsilon
             score = r / utility
+
+            # Catch NaNs
+            if np.isnan(score):
+                score = 0.0
 
             if score > best_score:
                 best_score = score

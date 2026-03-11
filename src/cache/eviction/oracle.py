@@ -176,8 +176,11 @@ class OraclePolicy(EvictionPolicy):
         self._update_next_use_from_queue(cache_id)
 
     def on_insert(self, cache_id: int, embedding: np.ndarray) -> None:
-        """Track the new entry's next use in the remaining stream."""
+        """Track the new entry's all future uses in the remaining stream."""
+        import collections
+        
         self._cache_embs[cache_id] = embedding.copy()
+        self._future_uses[cache_id] = collections.deque()
 
         # Find first stream position from current pos where this
         # entry would be the nearest neighbour.
@@ -193,10 +196,10 @@ class OraclePolicy(EvictionPolicy):
 
         # Find positions where this entry would be close enough
         hits = np.where(dists <= self.similarity_threshold)[0]
-        if len(hits) > 0:
-            self._next_use[cache_id] = int(self._stream_pos + hits[0])
-        else:
-            self._next_use[cache_id] = _INF
+        for hit in hits:
+            self._future_uses[cache_id].append(int(self._stream_pos + hit))
+            
+        self._update_next_use_from_queue(cache_id)
 
     def on_evict(self, cache_id: int) -> None:
         """Clean up state for evicted entry."""
