@@ -24,10 +24,10 @@ echo "=========================================="
 # --- Environment Setup ---
 module load python/3.11
 
-# Navigate to project root (submit sbatch from CLEVER/ directory)
-cd $SLURM_SUBMIT_DIR
+# Navigate to project root explicitly
+cd ~/scratch/yashkulk/CSE584/CLEVER
 
-source ${PWD}/venv/bin/activate
+source venv/bin/activate
 
 echo ""
 echo "Python: $(python --version)"
