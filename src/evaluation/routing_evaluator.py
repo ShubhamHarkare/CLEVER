@@ -35,7 +35,7 @@ class EvalConfig:
     """Configuration for routing evaluation."""
 
     # Cache configuration
-    cache_fill_ratio: float = 0.5  # Fraction of data used to fill cache
+    cache_fill_ratio: float = 0.10  # Fraction of data used to fill cache
     index_type: str = "hnsw"
     index_params: dict = field(default_factory=lambda: {
         "M": 32, "efConstruction": 128, "efSearch": 128,
@@ -263,13 +263,13 @@ class RoutingEvaluator:
         """Compute multi-faceted quality metrics for cache hits.
 
         Returns dict with:
-            cosine_quality:  mean exp(-α * dist) over hits; decays with distance.
+            retrieval_similarity:  mean exp(-α * dist) over hits; decays with distance.
             recall_at_1:     fraction of hits where cache NN == ground-truth NN.
             distance_quality: legacy binary proxy (dist <= 2 * gt + 0.01).
         """
         n_hits = int(is_hit.sum())
         if n_hits == 0:
-            return {"cosine_quality": 1.0, "recall_at_1": 1.0, "distance_quality": 1.0}
+            return {"retrieval_similarity": 1.0, "recall_at_1": 1.0, "distance_quality": 1.0}
 
         hit_dists = cache_nn_dist[is_hit]
         hit_gt_dists = gt_nn_dist[is_hit]
@@ -278,7 +278,10 @@ class RoutingEvaluator:
         #    For normalized vectors: cosine_sim = 1 - L2²/2
         #    quality = mean(cosine_sim) mapped to [0, 1]
         cosine_sims = np.clip(1.0 - hit_dists / 2.0, 0.0, 1.0)
-        cosine_quality = float(np.mean(cosine_sims))
+        # Note: We name it 'retrieval_similarity' instead of 'cosine_quality'
+        # because this purely reflects representation collision (L2 mapped back),
+        # NOT the LLM's qualitative answer generation.
+        retrieval_similarity = float(np.mean(cosine_sims))
 
         # 2) Recall@1: does the cache return the same NN as ground truth?
         hit_cache_ids = cache_nn_ids[is_hit]
@@ -289,7 +292,7 @@ class RoutingEvaluator:
         distance_quality = float(np.mean(hit_dists <= hit_gt_dists * 2.0 + 0.01))
 
         return {
-            "cosine_quality": round(cosine_quality, 4),
+            "retrieval_similarity": round(retrieval_similarity, 4),
             "recall_at_1": round(recall_at_1, 4),
             "distance_quality": round(distance_quality, 4),
         }
@@ -497,7 +500,7 @@ class RoutingEvaluator:
         for strategy in strategies:
             # Collect adaptive routing metrics from each seed
             metrics_keys = [
-                "test_hit_rate", "cosine_quality", "recall_at_1",
+                "test_hit_rate", "retrieval_similarity", "recall_at_1",
                 "distance_quality", "best_threshold",
                 "latency_saving_pct", "monetary_saving_pct",
             ]

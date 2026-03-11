@@ -251,7 +251,7 @@ def print_summary(results: dict):
             logger.info(f"  Best fixed threshold:")
             logger.info(f"    Threshold:      {best['threshold']}")
             logger.info(f"    Hit rate:       {best['hit_rate']:.2%}")
-            logger.info(f"    Cosine quality: {best.get('cosine_quality', 'N/A')}")
+            logger.info(f"    Retrieval similarity: {best.get('retrieval_similarity', 'N/A')}")
             logger.info(f"    Recall@1:       {best.get('recall_at_1', 'N/A')}")
             logger.info(f"    Latency saving: {best['latency_saving_pct']:.1f}%")
             logger.info(f"    Cost saving:    {best['monetary_saving_pct']:.1f}%")
@@ -262,7 +262,7 @@ def print_summary(results: dict):
             logger.info(f"  Adaptive router:")
             logger.info(f"    Threshold:      {adaptive['best_threshold']}")
             logger.info(f"    Hit rate:       {adaptive['test_hit_rate']:.2%}")
-            logger.info(f"    Cosine quality: {adaptive.get('cosine_quality', 'N/A')}")
+            logger.info(f"    Retrieval similarity: {adaptive.get('retrieval_similarity', 'N/A')}")
             logger.info(f"    Recall@1:       {adaptive.get('recall_at_1', 'N/A')}")
             logger.info(f"    Latency saving: {adaptive['latency_saving_pct']:.1f}%")
 

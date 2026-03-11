@@ -2,7 +2,7 @@
 # Used by scripts/06_run_routing_eval.py (Phase 3)
 
 cache:
-  fill_ratio: 0.5         # Fraction of data used to seed the cache
+  fill_ratio: 0.10        # Fraction of data used to seed the cache
   fill_strategies:
     - random               # Random split (baseline)
     - frequency            # High-frequency queries fill cache first
@@ -49,7 +49,7 @@ index_comparison:
   - type: hnsw
     params: { M: 32, efConstruction: 128, efSearch: 128 }
   - type: ivf
-    params: { nlist: 256, nprobe: 16 }
+    params: { nlist: 707, nprobe: 64 }
   - type: lsh
     params: { nbits: 512 }
 

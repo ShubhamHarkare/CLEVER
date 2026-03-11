@@ -30,6 +30,10 @@ indexes:
       - { nlist: 64,   nprobe: 4 }
       - { nlist: 256,  nprobe: 4 }
       - { nlist: 256,  nprobe: 16 }
+      - { nlist: 316,  nprobe: 16 }  # sqrt(100,000) ~ 316
+      - { nlist: 316,  nprobe: 64 }
+      - { nlist: 707,  nprobe: 32 }  # sqrt(500,000) ~ 707
+      - { nlist: 707,  nprobe: 128 }
       - { nlist: 1024, nprobe: 16 }
       - { nlist: 1024, nprobe: 64 }
       - { nlist: 1024, nprobe: 128 }

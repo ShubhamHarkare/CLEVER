@@ -362,7 +362,7 @@ def plot_quality_hitrate(routing: dict, output_dir: Path):
         if adaptive:
             ax.plot(
                 adaptive["test_hit_rate"] * 100,
-                adaptive.get("cosine_quality", adaptive.get("test_quality", 1.0)) * 100,
+                adaptive.get("retrieval_similarity", adaptive.get("test_quality", 1.0)) * 100,
                 "*", markersize=18, color=COLORS["quality"],
                 label=f"Adaptive (θ={adaptive['best_threshold']:.2f})",
                 zorder=10,
@@ -422,7 +422,7 @@ def plot_index_comparison(comparison: dict, output_dir: Path):
         idx_type = label.split("_")[0]
         labels.append(idx_type.upper())
         hit_rates.append(adaptive.get("test_hit_rate", 0) * 100)
-        qualities.append(adaptive.get("cosine_quality", adaptive.get("test_quality", 0)) * 100)
+        qualities.append(adaptive.get("retrieval_similarity", adaptive.get("test_quality", 0)) * 100)
         latency_savings.append(adaptive.get("latency_saving_pct", 0))
 
     if not labels:
@@ -506,7 +506,7 @@ def plot_summary_dashboard(routing: dict, output_dir: Path):
             best = max(sweep, key=lambda x: x["latency_saving_pct"])
             best_thresh = f"{best['threshold']:.2f}"
             best_hr = f"{best['hit_rate']:.1%}"
-            best_q = f"{best.get('cosine_quality', best.get('quality', 0)):.1%}"
+            best_q = f"{best.get('retrieval_similarity', best.get('quality', 0)):.1%}"
             best_lat = f"{best['latency_saving_pct']:.1f}%"
             best_mon = f"{best['monetary_saving_pct']:.1f}%"
         else:
@@ -577,7 +577,7 @@ def plot_pareto_front(routing: dict, output_dir: Path):
 
         thresholds = [s["threshold"] for s in sweep]
         lat_savings = [s["latency_saving_pct"] for s in sweep]
-        quality_key = "cosine_quality" if "cosine_quality" in sweep[0] else "quality"
+        quality_key = "retrieval_similarity" if "retrieval_similarity" in sweep[0] else "quality"
         quality = [s.get(quality_key, 1.0) * 100 for s in sweep]
 
         # Scatter colored by threshold
