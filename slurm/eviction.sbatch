@@ -19,10 +19,6 @@
 #
 # IMPORTANT: Before first submission, create the logs directory:
 #   mkdir -p ~/scratch/yashkulk/CSE584/CLEVER/slurm/logs
-#
-# NOTE: We use --workers 1 (sequential) because CUDA contexts do
-#       not survive fork(). With ProcessPoolExecutor, child processes
-#       silently fall back to CPU, making semantic policy ~100× slower.
 # ──────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -62,7 +58,7 @@ python scripts/08_run_eviction.py \
     --config configs/eviction.yaml \
     --output results/eviction/ \
     --multi-seed \
-    --workers 1
+    --workers $SLURM_CPUS_PER_TASK
 
 echo ""
 echo ">>> Eviction evaluation complete."
