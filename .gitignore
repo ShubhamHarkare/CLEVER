@@ -7,6 +7,8 @@ build/
 *.egg
 venv/
 .venv/
+CSE584_Project_Proposal.pdf
+improvements.html
 
 # Environment
 .env

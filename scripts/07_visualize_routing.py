@@ -78,12 +78,8 @@ def load_results(results_dir: Path) -> tuple[dict, dict]:
     routing = {}
     comparison = {}
 
-    if routing_path.exists():
-        with open(routing_path) as f:
-            routing = json.load(f)
-        logger.info(f"Loaded routing results from {routing_path}")
-    elif multi_seed_path.exists():
-        # Fall back to multi-seed results: use the first per-seed run for plots
+    if multi_seed_path.exists():
+        # Prefer multi-seed results for more robust plots
         with open(multi_seed_path) as f:
             multi = json.load(f)
         per_seed = multi.get("per_seed", {})
@@ -96,6 +92,10 @@ def load_results(results_dir: Path) -> tuple[dict, dict]:
             )
         else:
             logger.warning(f"No per-seed data in {multi_seed_path}")
+    elif routing_path.exists():
+        with open(routing_path) as f:
+            routing = json.load(f)
+        logger.info(f"Loaded routing results from {routing_path}")
     else:
         logger.warning(f"No routing results at {routing_path} or {multi_seed_path}")
 
@@ -338,7 +338,7 @@ def plot_quality_hitrate(routing: dict, output_dir: Path):
             continue
 
         hit_rates = [r["hit_rate"] * 100 for r in sweep]
-        qualities = [r.get("cosine_quality", r.get("quality", 1.0)) * 100 for r in sweep]
+        qualities = [r.get("retrieval_similarity", r.get("cosine_quality", r.get("quality", 1.0))) * 100 for r in sweep]
 
         marker = "o" if strategy == "random" else "s"
         ax.plot(
