@@ -43,6 +43,8 @@ router:
     calibration_ratio: 0.2 # Fraction of eval set used for calibration
 
 # Index comparison: evaluate routing with different backends
+# Note: LSH excluded — FAISS IndexLSH returns Hamming distances, not L2²,
+# making the threshold sweep and cosine quality formula inapplicable.
 index_comparison:
   - type: flat
     params: {}
@@ -50,8 +52,6 @@ index_comparison:
     params: { M: 32, efConstruction: 128, efSearch: 128 }
   - type: ivf
     params: { nlist: 707, nprobe: 64 }
-  - type: lsh
-    params: { nbits: 512 }
 
 # Reproducibility
 seed: 42
