@@ -10,6 +10,7 @@ Supports multiple cache fill strategies and evaluates both
 fixed-threshold and adaptive routing.
 """
 
+import dataclasses
 import json
 import logging
 import time
@@ -133,7 +134,7 @@ class RoutingEvaluator:
                 "llm_latency_ms": self.config.llm_latency_ms,
                 "llm_cost_usd": self.config.llm_cost_usd,
             },
-            "manifest": generate_manifest(self.config),
+            "manifest": generate_manifest(dataclasses.asdict(self.config)),
         }
 
         self.results = all_results
@@ -421,7 +422,7 @@ class RoutingEvaluator:
         # Ensure manifest is included in the results before saving
         if "meta" not in self.results:
             self.results["meta"] = {}
-        self.results["meta"]["manifest"] = generate_manifest(self.config)
+        self.results["meta"]["manifest"] = generate_manifest(dataclasses.asdict(self.config))
         self.results["meta"]["timestamp"] = datetime.now().isoformat()
 
         with open(output_path, "w") as f:
@@ -488,7 +489,7 @@ class RoutingEvaluator:
             "n_seeds": len(seeds),
             "aggregated": aggregated,
             "per_seed": per_seed_results,
-            "manifest": generate_manifest(config),
+            "manifest": generate_manifest(dataclasses.asdict(config)),
         }
 
     @staticmethod

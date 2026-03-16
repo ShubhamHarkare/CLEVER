@@ -74,8 +74,11 @@ def load_results(results_dir: Path) -> dict[str, list[dict]]:
         label = f.stem.replace("index_benchmark_", "")
         with open(f) as fh:
             raw = json.load(fh)
-        # Support both old (flat list) and new ({manifest, results}) formats
-        data = raw["results"] if isinstance(raw, dict) and "results" in raw else raw
+        # Support flat list, {results: [...]}, and new {runs: [...]} formats
+        if isinstance(raw, dict):
+            data = raw.get("runs") or raw.get("results") or raw
+        else:
+            data = raw
         # Filter out entries with errors
         data = [r for r in data if "error" not in r]
         if data:
@@ -124,6 +127,11 @@ def _get_ordered_scales(results: dict) -> list[tuple[int, str]]:
             scale_order.append((size, label))
     scale_order.sort()
     return scale_order
+
+
+def _memory_mb(r: dict) -> float:
+    """Extract memory in MB — handles both old 'memory_mb' and new 'peak_rss_mb' fields."""
+    return r.get("memory_mb") or r.get("peak_rss_mb") or 0.0
 
 
 def _param_label(r: dict) -> str:
@@ -295,7 +303,7 @@ def plot_memory_usage(results: dict, output_dir: Path):
             continue
         best = max(entries, key=lambda r: r.get("recall_at_10", 0))
         idx_types.append(f"{INDEX_LABELS[idx_type]}\n{_param_label(best)}")
-        memory_mbs.append(best["memory_mb"])
+        memory_mbs.append(_memory_mb(best))
         colors.append(COLORS[idx_type])
 
     bars = ax.bar(idx_types, memory_mbs, color=colors, alpha=0.85,
@@ -505,7 +513,7 @@ def plot_scalability(results: dict, output_dir: Path):
         (axes[0, 0], "P50 Latency (ms)", lambda r: r["search_latency_ms"]["p50"]),
         (axes[0, 1], "Recall@10", lambda r: r.get("recall_at_10", 0)),
         (axes[1, 0], "Build Time (s)", lambda r: r["build_time_s"]),
-        (axes[1, 1], "Memory (MB)", lambda r: r["memory_mb"]),
+        (axes[1, 1], "Memory (MB)", lambda r: _memory_mb(r)),
     ]
 
     for ax, ylabel, extractor in metrics:
@@ -576,7 +584,7 @@ def plot_summary_dashboard(results: dict, output_dir: Path):
             INDEX_LABELS[idx_type],
             _param_label(best),
             f"{best['build_time_s']:.1f}" if best['build_time_s'] >= 1 else f"{best['build_time_s']:.3f}",
-            f"{best['memory_mb']:.0f}" if best['memory_mb'] >= 100 else f"{best['memory_mb']:.1f}",
+            f"{_memory_mb(best):.0f}" if _memory_mb(best) >= 100 else f"{_memory_mb(best):.1f}",
             f"{best['search_latency_ms']['p50']:.2f}",
             f"{best['search_latency_ms']['p99']:.2f}",
             f"{best['throughput_qps']:.0f}",
