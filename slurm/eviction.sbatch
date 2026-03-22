@@ -82,8 +82,7 @@ python scripts/08_run_eviction.py \
     --config configs/eviction.yaml \
     --output results/eviction/ \
     --multi-seed \
-    --workers $SLURM_CPUS_PER_TASK \
-    --gpu
+    --workers $SLURM_CPUS_PER_TASK
 
 echo ""
 echo ">>> Eviction evaluation complete."
