@@ -131,6 +131,7 @@ def create_policy(
             cache_ids=cache_ids,
             similarity_threshold=config["evaluation"].get("hit_threshold", 0.90),
             refresh_interval=oracle_cfg.get("refresh_interval", 100),
+            use_gpu=oracle_cfg.get("use_gpu", False),
         )
     else:
         raise ValueError(f"Unknown policy: {policy_name}")
@@ -373,9 +374,14 @@ def run_full_experiment(
     total_runs = len(policies) * len(cache_sizes) * len(workloads) * len(seeds)
     run_num = 0
 
-    # Separate CPU-bound and GPU-bound policies
-    cpu_policies = [p for p in policies if p != "semantic"]
-    gpu_policies = [p for p in policies if p == "semantic"]
+    # Separate CPU-bound and GPU-bound policies.
+    # Oracle uses GPU FAISS when use_gpu is set; semantic also runs sequentially.
+    oracle_uses_gpu = config.get("eviction", {}).get("oracle", {}).get("use_gpu", False)
+    gpu_policy_names = {"semantic"}
+    if oracle_uses_gpu:
+        gpu_policy_names.add("oracle")
+    cpu_policies = [p for p in policies if p not in gpu_policy_names]
+    gpu_policies = [p for p in policies if p in gpu_policy_names]
 
     # Prepare data structure
     for policy_name in policies:
@@ -561,6 +567,10 @@ def parse_args():
         "--workers", type=int, default=1,
         help="Number of parallel workers for multi-processing. Defaults to 1 (sequential).",
     )
+    parser.add_argument(
+        "--gpu", action="store_true",
+        help="Use GPU-accelerated FAISS for oracle batch search (requires faiss-gpu).",
+    )
     return parser.parse_args()
 
 
@@ -580,6 +590,8 @@ def main():
         config["cache"]["cache_sizes_pct"] = args.cache_sizes
     if args.workloads:
         config["evaluation"]["workloads"] = args.workloads
+    if args.gpu:
+        config.setdefault("eviction", {}).setdefault("oracle", {})["use_gpu"] = True
 
     # Load data
     embeddings, texts = load_data(args.embeddings, args.queries)

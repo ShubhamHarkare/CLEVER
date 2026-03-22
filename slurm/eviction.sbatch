@@ -46,6 +46,13 @@ source venv/bin/activate
 # Create output directories
 mkdir -p results/eviction results/figures
 
+# ── Ensure faiss-gpu is installed ────────────────────────────
+python -c "import faiss; faiss.StandardGpuResources()" 2>/dev/null || {
+    echo ">>> Installing faiss-gpu (replacing faiss-cpu)..."
+    pip uninstall -y faiss-cpu 2>/dev/null
+    pip install faiss-gpu
+}
+
 # ── Verify CUDA is available to PyTorch ──────────────────────
 echo ">>> Checking CUDA availability..."
 python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available to PyTorch!'; print(f'PyTorch CUDA: {torch.cuda.get_device_name(0)}')"
@@ -66,7 +73,8 @@ python scripts/08_run_eviction.py \
     --config configs/eviction.yaml \
     --output results/eviction/ \
     --multi-seed \
-    --workers $SLURM_CPUS_PER_TASK
+    --workers $SLURM_CPUS_PER_TASK \
+    --gpu
 
 echo ""
 echo ">>> Eviction evaluation complete."

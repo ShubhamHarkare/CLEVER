@@ -54,6 +54,8 @@ class OraclePolicy(EvictionPolicy):
             below this value.
         refresh_interval: Number of evictions between full future-use
             rebuilds.  Lower = more accurate but slower.
+        use_gpu: If True, use GPU-accelerated FAISS for batch search
+            in ``_full_refresh()``.  Requires ``faiss-gpu``.
     """
 
     def __init__(
@@ -63,9 +65,21 @@ class OraclePolicy(EvictionPolicy):
         cache_ids: list[int],
         similarity_threshold: float = 0.90,
         refresh_interval: int = 100,
+        use_gpu: bool = False,
     ) -> None:
         self.similarity_threshold = similarity_threshold
         self.refresh_interval = refresh_interval
+
+        # GPU acceleration for batch search in _full_refresh().
+        self._use_gpu = use_gpu
+        self._gpu_res = None
+        if use_gpu:
+            try:
+                self._gpu_res = faiss.StandardGpuResources()
+                logger.info("Oracle: GPU-accelerated FAISS enabled")
+            except (AttributeError, RuntimeError):
+                logger.warning("Oracle: faiss-gpu not available, falling back to CPU")
+                self._use_gpu = False
 
         # Full stream (read-only reference for refreshes).
         self._stream_embs = future_stream_embeddings
@@ -115,7 +129,11 @@ class OraclePolicy(EvictionPolicy):
             dtype=np.float32,
         )
         dim = active_embs.shape[1]
-        index = faiss.IndexFlatL2(dim)
+        cpu_index = faiss.IndexFlatL2(dim)
+        if self._use_gpu and self._gpu_res is not None:
+            index = faiss.index_cpu_to_gpu(self._gpu_res, 0, cpu_index)
+        else:
+            index = cpu_index
         index.add(active_embs)
 
         # Batch-search remaining stream against active cache.
