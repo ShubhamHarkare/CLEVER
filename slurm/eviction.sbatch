@@ -50,7 +50,16 @@ mkdir -p results/eviction results/figures
 python -c "import faiss; faiss.StandardGpuResources()" 2>/dev/null || {
     echo ">>> Installing faiss-gpu (replacing faiss-cpu)..."
     pip uninstall -y faiss-cpu 2>/dev/null
-    pip install faiss-gpu
+    # Detect CUDA major version for correct package
+    CUDA_VER=$(nvcc --version 2>/dev/null | grep -oP 'release \K[0-9]+' | head -1)
+    if [ "$CUDA_VER" = "12" ]; then
+        pip install faiss-gpu-cu12
+    elif [ "$CUDA_VER" = "11" ]; then
+        pip install faiss-gpu-cu11
+    else
+        echo "WARN: Unknown CUDA version ($CUDA_VER), trying faiss-gpu-cu12..."
+        pip install faiss-gpu-cu12
+    fi
 }
 
 # ── Verify CUDA is available to PyTorch ──────────────────────
