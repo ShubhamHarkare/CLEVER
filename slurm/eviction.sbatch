@@ -15,7 +15,7 @@
 
 # ──────────────────────────────────────────────────────────────
 # Phase 4: Semantic-Aware Eviction Policy Evaluation (Multi-Seed)
-# Runs the eviction evaluation pipeline on Great Lakes.
+# Runs the full eviction matrix: 4 policies x 3 cache sizes x 3 seeds
 #
 # IMPORTANT: Before first submission, create the logs directory:
 #   mkdir -p ~/scratch/yashkulk/CSE584/CLEVER/slurm/logs
@@ -37,7 +37,8 @@ echo "Started:  $(date)"
 echo ""
 
 # ── Setup ────────────────────────────────────────────────────
-cd ~/scratch/yashkulk/CSE584/CLEVER
+PROJECT_ROOT=~/scratch/yashkulk/CSE584/CLEVER
+cd "$PROJECT_ROOT"
 
 # Activate virtual environment
 source venv/bin/activate
@@ -50,7 +51,14 @@ echo ">>> Checking CUDA availability..."
 python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available to PyTorch!'; print(f'PyTorch CUDA: {torch.cuda.get_device_name(0)}')"
 echo ""
 
-# ── Run eviction experiments (multi-seed, sequential) ────────
+# ── Run eviction experiments (multi-seed, all policies) ──────
+# Config drives the full matrix:
+#   policies: [lru, lfu, semantic, oracle]
+#   cache_sizes_pct: [0.10, 0.20, 0.30]
+#   seeds: [42, 123, 456]
+#   workloads: [temporal]
+#   oracle.refresh_interval: 100
+#   log_interval: 500
 echo ">>> Running multi-seed eviction evaluation..."
 python scripts/08_run_eviction.py \
     --embeddings results/embeddings/full_embeddings.npy \
@@ -64,7 +72,7 @@ echo ""
 echo ">>> Eviction evaluation complete."
 
 # ── Generate visualizations ────────────────────────────────────
-echo ">>> Generating eviction visualizations..."
+echo ">>> Generating eviction visualizations (8 figures)..."
 python scripts/09_visualize_eviction.py \
     --results results/eviction/eviction_results_multi_seed.json \
     --output results/figures/

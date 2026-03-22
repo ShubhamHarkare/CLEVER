@@ -10,6 +10,9 @@ Simulates a realistic cache lifecycle:
 3. **Metrics**: Track cumulative hit rate, rolling hit rate, semantic
    coverage, and eviction overhead per policy.
 
+Supports workload diversity (temporal, uniform, clustered, bursty) and
+multi-seed evaluation for statistical rigor.
+
 Usage
 -----
 Local smoke test (8.5K dev subset)::
@@ -51,6 +54,7 @@ from src.cache.eviction.lru import LRUPolicy
 from src.cache.eviction.lfu import LFUPolicy
 from src.cache.eviction.semantic import SemanticPolicy
 from src.cache.eviction.oracle import OraclePolicy
+from src.benchmark.workload import generate_workload
 from src.utils.env_check import require_supported_runtime, pin_numpy_threads
 from src.utils.manifest import generate_manifest
 
@@ -120,14 +124,55 @@ def create_policy(
             recompute_interval=sem_cfg.get("recompute_interval", 50),
         )
     elif policy_name == "oracle":
+        oracle_cfg = eviction_cfg.get("oracle", {})
         return OraclePolicy(
             future_stream_embeddings=stream_embs,
             cache_embeddings=cache_embs,
             cache_ids=cache_ids,
             similarity_threshold=config["evaluation"].get("hit_threshold", 0.90),
+            refresh_interval=oracle_cfg.get("refresh_interval", 100),
         )
     else:
         raise ValueError(f"Unknown policy: {policy_name}")
+
+
+def reorder_stream(
+    stream_embs: np.ndarray,
+    stream_texts: list[str],
+    warmup_embs: np.ndarray,
+    workload_type: str,
+    seed: int,
+) -> tuple[np.ndarray, list[str]]:
+    """Reorder the query stream according to a workload pattern.
+
+    For 'temporal', returns the stream as-is (chronological order).
+    For 'uniform', 'clustered', 'bursty', uses generate_workload() to
+    produce a realistic access pattern by sampling with replacement.
+
+    Args:
+        stream_embs: Stream embeddings, shape (S, D).
+        stream_texts: Stream query texts.
+        warmup_embs: Warmup embeddings (clustering context for workloads).
+        workload_type: One of 'temporal', 'uniform', 'clustered', 'bursty'.
+        seed: Random seed.
+
+    Returns:
+        Reordered (stream_embs, stream_texts).
+    """
+    if workload_type == "temporal":
+        return stream_embs, stream_texts
+
+    n_stream = len(stream_embs)
+    indices = generate_workload(
+        query_vectors=stream_embs,
+        db_vectors=warmup_embs,
+        workload_type=workload_type,
+        n_queries=n_stream,
+        seed=seed,
+    )
+    reordered_embs = stream_embs[indices]
+    reordered_texts = [stream_texts[i] for i in indices]
+    return reordered_embs, reordered_texts
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -141,6 +186,7 @@ def evaluate_policy(
     config: dict,
     cache_size_pct: float,
     seed: int,
+    workload_type: str = "temporal",
 ) -> dict:
     """Run a single eviction evaluation for one policy + cache size.
 
@@ -157,16 +203,12 @@ def evaluate_policy(
     n_warmup = int(n * warmup_pct)
     max_cache_size = int(n * cache_size_pct)
 
-    # (P0.6) Do NOT shuffle data — enforce chronological/temporal splitting
-    # for realistic evaluation of concept drift and caching
-    shuffled_embs = embeddings
-    shuffled_texts = texts
-
-    # Split: warmup entries fill the cache, rest is the stream
-    warmup_embs = shuffled_embs[:n_warmup]
-    warmup_texts = shuffled_texts[:n_warmup]
-    stream_embs = shuffled_embs[n_warmup:]
-    stream_texts = shuffled_texts[n_warmup:]
+    # (P0.6) Enforce chronological/temporal splitting for realistic
+    # evaluation of concept drift and caching.
+    warmup_embs = embeddings[:n_warmup]
+    warmup_texts = texts[:n_warmup]
+    stream_embs = embeddings[n_warmup:]
+    stream_texts = texts[n_warmup:]
 
     # If warmup is larger than max_cache_size, truncate warmup to fill cache
     if n_warmup > max_cache_size:
@@ -174,12 +216,16 @@ def evaluate_policy(
         warmup_texts = warmup_texts[:max_cache_size]
         n_warmup = max_cache_size
 
+    # ── Apply workload reordering to stream ──────────────────────
+    stream_embs, stream_texts = reorder_stream(
+        stream_embs, stream_texts, warmup_embs, workload_type, seed,
+    )
     n_stream = len(stream_embs)
 
     logger.info(
         f"  [{policy_name}] cache_size={max_cache_size} "
         f"({cache_size_pct:.0%}), warmup={n_warmup}, stream={n_stream}, "
-        f"seed={seed}"
+        f"workload={workload_type}, seed={seed}"
     )
 
     # ── Create policy ────────────────────────────────────────────
@@ -205,13 +251,11 @@ def evaluate_policy(
     eval_cfg = config.get("evaluation", {})
     hit_threshold = eval_cfg.get("hit_threshold", 0.90)
     rolling_window = eval_cfg.get("rolling_window", 1000)
-    log_interval = eval_cfg.get("log_interval", 5000)
+    log_interval = eval_cfg.get("log_interval", 500)
 
     n_hits = 0
     rolling_hits = deque(maxlen=rolling_window)
     cumulative_hit_rates = []
-    rolling_hit_rates = []
-    eviction_timestamps = []  # (stream_idx, n_evictions_so_far)
 
     t_stream_start = time.perf_counter()
 
@@ -256,8 +300,6 @@ def evaluate_policy(
     stream_time = time.perf_counter() - t_stream_start
 
     # ── Compute semantic coverage ────────────────────────────────
-    # Avg min-distance from stream queries to their nearest cached entry
-    # Lower = better coverage (the cache covers more of the query space)
     t_coverage_start = time.perf_counter()
     sample_size = min(2000, n_stream)
     sample_idx = rng.choice(n_stream, sample_size, replace=False)
@@ -274,6 +316,7 @@ def evaluate_policy(
         "policy": policy_name,
         "cache_size_pct": cache_size_pct,
         "max_cache_size": max_cache_size,
+        "workload": workload_type,
         "seed": seed,
         "n_queries": n,
         "n_warmup": n_warmup,
@@ -315,19 +358,19 @@ def run_full_experiment(
     seeds: list[int],
     max_workers: int = 1,
 ) -> dict:
-    """Run all policy × cache_size × seed combinations in parallel.
+    """Run all policy x cache_size x workload x seed combinations.
 
     Returns:
-        Dict with nested results: results[policy][cache_size_pct][seed]
-        plus aggregated statistics.
+        Dict with nested results and aggregated statistics.
     """
     policies = config["eviction"]["policies"]
     cache_sizes = config["cache"]["cache_sizes_pct"]
+    workloads = config["evaluation"].get("workloads", ["temporal"])
 
     all_results = {}
     aggregated = {}
 
-    total_runs = len(policies) * len(cache_sizes) * len(seeds)
+    total_runs = len(policies) * len(cache_sizes) * len(workloads) * len(seeds)
     run_num = 0
 
     # Separate CPU-bound and GPU-bound policies
@@ -341,31 +384,42 @@ def run_full_experiment(
         for cache_pct in cache_sizes:
             pct_key = f"{cache_pct:.2f}"
             all_results[policy_name][pct_key] = []
-            
+
+    def _run_policy(policy_name, cache_pct, workload_type, seed):
+        return evaluate_policy(
+            policy_name, embeddings, texts, config,
+            cache_pct, seed, workload_type,
+        )
+
     # ── Phase 1: CPU-Bound Policies (Parallel) ──────────────────
     if cpu_policies:
-        cpu_runs = len(cpu_policies) * len(cache_sizes) * len(seeds)
+        cpu_runs = len(cpu_policies) * len(cache_sizes) * len(workloads) * len(seeds)
         if max_workers <= 1:
             logger.info(f"Running {cpu_runs} CPU-bound tasks sequentially...")
             for policy_name in cpu_policies:
                 for cache_pct in cache_sizes:
-                    for seed in seeds:
-                        run_num += 1
-                        logger.info(f"RUN {run_num}/{total_runs}: policy={policy_name}, cache={cache_pct:.0%}, seed={seed}")
-                        res = evaluate_policy(policy_name, embeddings, texts, config, cache_pct, seed)
-                        all_results[policy_name][f"{cache_pct:.2f}"].append(res)
+                    for workload_type in workloads:
+                        for seed in seeds:
+                            run_num += 1
+                            logger.info(
+                                f"RUN {run_num}/{total_runs}: "
+                                f"policy={policy_name}, cache={cache_pct:.0%}, "
+                                f"workload={workload_type}, seed={seed}"
+                            )
+                            res = _run_policy(policy_name, cache_pct, workload_type, seed)
+                            all_results[policy_name][f"{cache_pct:.2f}"].append(res)
         else:
             logger.info(f"Starting parallel execution with {max_workers} workers for {cpu_runs} CPU-bound tasks.")
             with ProcessPoolExecutor(max_workers=max_workers) as executor:
                 future_to_info = {}
                 for policy_name in cpu_policies:
                     for cache_pct in cache_sizes:
-                        for seed in seeds:
-                            future = executor.submit(
-                                evaluate_policy,
-                                policy_name, embeddings, texts, config, cache_pct, seed
-                            )
-                            future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
+                        for workload_type in workloads:
+                            for seed in seeds:
+                                future = executor.submit(
+                                    _run_policy, policy_name, cache_pct, workload_type, seed
+                                )
+                                future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
 
                 for future in as_completed(future_to_info):
                     policy_name, pct_key = future_to_info[future]
@@ -379,27 +433,35 @@ def run_full_experiment(
 
     # ── Phase 2: GPU-Bound Policies (Sequential) ────────────────
     if gpu_policies:
-        gpu_runs = len(gpu_policies) * len(cache_sizes) * len(seeds)
-        logger.info(f"\nRunning {gpu_runs} GPU-bound tasks sequentially (to avoid CUDA context sharing issues)...")
+        gpu_runs = len(gpu_policies) * len(cache_sizes) * len(workloads) * len(seeds)
+        logger.info(f"\nRunning {gpu_runs} GPU-bound tasks sequentially...")
         for policy_name in gpu_policies:
             for cache_pct in cache_sizes:
-                for seed in seeds:
-                    run_num += 1
-                    logger.info(f"RUN {run_num}/{total_runs}: policy={policy_name}, cache={cache_pct:.0%}, seed={seed}")
-                    try:
-                        res = evaluate_policy(policy_name, embeddings, texts, config, cache_pct, seed)
-                        all_results[policy_name][f"{cache_pct:.2f}"].append(res)
-                    except Exception as exc:
-                        logger.error(f"GPU task generated an exception: {exc}")
+                for workload_type in workloads:
+                    for seed in seeds:
+                        run_num += 1
+                        logger.info(
+                            f"RUN {run_num}/{total_runs}: "
+                            f"policy={policy_name}, cache={cache_pct:.0%}, "
+                            f"workload={workload_type}, seed={seed}"
+                        )
+                        try:
+                            res = _run_policy(policy_name, cache_pct, workload_type, seed)
+                            all_results[policy_name][f"{cache_pct:.2f}"].append(res)
+                        except Exception as exc:
+                            logger.error(f"GPU task generated an exception: {exc}")
 
-    # Aggregation Phase
+    # ── Aggregation ──────────────────────────────────────────────
     for policy_name in policies:
         for cache_pct in cache_sizes:
             pct_key = f"{cache_pct:.2f}"
             seed_results = all_results[policy_name][pct_key]
-            
-            # Sort back by seed to ensure deterministic output array ordering
-            seed_results.sort(key=lambda x: x["seed"])
+
+            # Sort by (workload, seed) for deterministic ordering
+            seed_results.sort(key=lambda x: (x.get("workload", ""), x["seed"]))
+
+            if not seed_results:
+                continue
 
             hit_rates = [r["final_hit_rate"] for r in seed_results]
             coverages = [r["semantic_coverage_avg_dist"] for r in seed_results]
@@ -415,7 +477,11 @@ def run_full_experiment(
                 "evictions_mean": round(float(np.mean(eviction_counts)), 1),
                 "n_seeds": len(seeds),
                 "seeds": seeds,
+                "workloads": workloads,
             }
+
+    # ── Oracle dominance check ───────────────────────────────────
+    _check_oracle_dominance(aggregated, policies)
 
     return {
         "manifest": generate_manifest(config),
@@ -424,10 +490,31 @@ def run_full_experiment(
         "config": {
             "policies": policies,
             "cache_sizes_pct": cache_sizes,
+            "workloads": workloads,
             "seeds": seeds,
             "n_queries": len(embeddings),
         },
     }
+
+
+def _check_oracle_dominance(aggregated: dict, policies: list[str]) -> None:
+    """Warn if oracle hit rate is below any other policy (should never happen)."""
+    if "oracle" not in policies:
+        return
+
+    oracle_agg = aggregated.get("oracle", {})
+    for pct_key, oracle_stats in oracle_agg.items():
+        oracle_hr = oracle_stats["hit_rate_mean"]
+        for other in policies:
+            if other == "oracle":
+                continue
+            other_hr = aggregated.get(other, {}).get(pct_key, {}).get("hit_rate_mean", 0)
+            if oracle_hr < other_hr - 0.001:
+                logger.warning(
+                    f"ORACLE VIOLATION: oracle ({oracle_hr:.4f}) < "
+                    f"{other} ({other_hr:.4f}) at cache={pct_key}. "
+                    f"This may indicate a correctness issue."
+                )
 
 
 # ═════════════════════════════════════════════════════════════════
@@ -467,6 +554,10 @@ def parse_args():
         help="Override cache sizes (e.g. --cache-sizes 0.10 0.20)",
     )
     parser.add_argument(
+        "--workloads", nargs="+", default=None,
+        help="Override workloads (e.g. --workloads temporal clustered)",
+    )
+    parser.add_argument(
         "--workers", type=int, default=1,
         help="Number of parallel workers for multi-processing. Defaults to 1 (sequential).",
     )
@@ -476,7 +567,7 @@ def parse_args():
 def main():
     require_supported_runtime()
     pin_numpy_threads()
-    
+
     args = parse_args()
 
     # Load config
@@ -487,6 +578,8 @@ def main():
         config["eviction"]["policies"] = args.policies
     if args.cache_sizes:
         config["cache"]["cache_sizes_pct"] = args.cache_sizes
+    if args.workloads:
+        config["evaluation"]["workloads"] = args.workloads
 
     # Load data
     embeddings, texts = load_data(args.embeddings, args.queries)
@@ -520,12 +613,12 @@ def main():
     logger.info(f"{'═' * 60}")
 
     # Print summary table
-    print("\n\n" + "=" * 70)
+    print("\n\n" + "=" * 80)
     print("EVICTION POLICY COMPARISON")
-    print("=" * 70)
+    print("=" * 80)
     agg = results["aggregated"]
     print(f"{'Policy':<12} {'Cache %':<10} {'Hit Rate':<18} {'Coverage':<18} {'Evictions':<12}")
-    print("-" * 70)
+    print("-" * 80)
     for policy in config["eviction"]["policies"]:
         for pct in config["cache"]["cache_sizes_pct"]:
             pct_key = f"{pct:.2f}"
@@ -535,7 +628,7 @@ def main():
                 cov = f"{a['coverage_mean']:.4f} ± {a['coverage_std']:.4f}"
                 ev = f"{a['evictions_mean']:.0f}"
                 print(f"{policy:<12} {pct:<10.0%} {hr:<18} {cov:<18} {ev:<12}")
-    print("=" * 70)
+    print("=" * 80)
 
 
 if __name__ == "__main__":

@@ -652,3 +652,257 @@ class TestEdgeCases:
             victim = policy.select_victim(active)
             assert victim in active, \
                 f"{PolicyClass.__name__} returned {victim}, not in {active}"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Oracle Dominance Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestOracleDominance:
+    """Verify that oracle hit rate >= all other policies.
+
+    This is the critical correctness property: Belady's algorithm
+    is the theoretical upper bound for any online eviction policy.
+    """
+
+    @staticmethod
+    def _run_eviction_simulation(
+        policy, stream_embs, cache, n_stream, hit_threshold, policy_name,
+    ) -> float:
+        """Replay a stream and return the final hit rate."""
+        n_hits = 0
+        for i in range(n_stream):
+            if policy_name == "oracle":
+                policy.advance_stream(i)
+
+            result = cache.lookup(stream_embs[i], k=1, threshold=hit_threshold)
+            if result.hit:
+                n_hits += 1
+            else:
+                cache.insert(stream_embs[i], f"stream_{i}")
+
+        return n_hits / n_stream if n_stream > 0 else 0.0
+
+    def test_oracle_dominates_all_policies(self):
+        """Run all 4 policies on synthetic data.  Oracle must win."""
+        rng = np.random.RandomState(42)
+        dim = 32
+        n_cache = 50
+        n_stream = 200
+        max_cache_size = n_cache
+        hit_threshold = 0.90
+
+        # Create cache entries: random unit-norm embeddings.
+        cache_embs = rng.randn(n_cache, dim).astype(np.float32)
+        cache_embs /= np.linalg.norm(cache_embs, axis=1, keepdims=True)
+        cache_texts = [f"cache_{i}" for i in range(n_cache)]
+
+        # Create stream: mix of near-duplicates (should be hits)
+        # and novel queries (should be misses).
+        stream_embs = np.empty((n_stream, dim), dtype=np.float32)
+        for i in range(n_stream):
+            if rng.rand() < 0.4:
+                # Near-duplicate of a random cache entry
+                base = cache_embs[rng.randint(n_cache)]
+                noise = rng.randn(dim).astype(np.float32) * 0.05
+                v = base + noise
+            else:
+                # Novel query
+                v = rng.randn(dim).astype(np.float32)
+            v /= np.linalg.norm(v)
+            stream_embs[i] = v
+
+        hit_rates = {}
+        for policy_name in ["lru", "lfu", "semantic", "oracle"]:
+            cache_ids = list(range(n_cache))
+
+            if policy_name == "lru":
+                policy = LRUPolicy()
+            elif policy_name == "lfu":
+                policy = LFUPolicy()
+            elif policy_name == "semantic":
+                policy = SemanticPolicy(
+                    similarity_threshold=0.30,
+                    recompute_interval=50,
+                )
+            else:
+                policy = OraclePolicy(
+                    future_stream_embeddings=stream_embs,
+                    cache_embeddings=cache_embs,
+                    cache_ids=cache_ids,
+                    similarity_threshold=hit_threshold,
+                    refresh_interval=20,
+                )
+
+            cache = SemanticCache(
+                dim=dim,
+                index_type="flat",
+                max_size=max_cache_size,
+                eviction_policy=policy,
+            )
+            cache.build(cache_embs.copy(), cache_texts[:])
+
+            hr = self._run_eviction_simulation(
+                policy, stream_embs, cache, n_stream,
+                hit_threshold, policy_name,
+            )
+            hit_rates[policy_name] = hr
+
+        oracle_hr = hit_rates["oracle"]
+        for other, hr in hit_rates.items():
+            if other == "oracle":
+                continue
+            assert oracle_hr >= hr - 0.01, (
+                f"Oracle ({oracle_hr:.4f}) must dominate {other} ({hr:.4f}). "
+                f"All rates: {hit_rates}"
+            )
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Oracle Refresh Correctness Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestOracleRefresh:
+    """Verify the periodic full-refresh mechanism."""
+
+    def test_refresh_updates_next_use(self):
+        """After a refresh, next_use should reflect current cache state."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        e0 = rng.randn(dim).astype(np.float32)
+        e0 /= np.linalg.norm(e0)
+        e1 = rng.randn(dim).astype(np.float32)
+        e1 /= np.linalg.norm(e1)
+
+        cache_embs = np.array([e0, e1], dtype=np.float32)
+
+        # Stream: e0 at step 0, e1 at step 1
+        stream = np.array([e0, e1], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=cache_embs,
+            cache_ids=[0, 1],
+            similarity_threshold=0.90,
+            refresh_interval=5,
+        )
+
+        # Entry 0 should be used at step 0, entry 1 at step 1
+        assert policy._next_use[0] <= policy._next_use[1], \
+            "Entry 0 should have earlier next_use than entry 1"
+
+        # Advance past step 0 and manually refresh
+        policy._stream_pos = 1
+        policy._full_refresh()
+
+        # Now entry 0 should have no future use (step 0 is past)
+        # Entry 1 should be used at step 1
+        assert policy._next_use[0] == float("inf") or policy._next_use[0] >= 1
+        assert policy._next_use[1] <= 1 or policy._next_use[1] == float("inf")
+
+    def test_refresh_after_eviction(self):
+        """After evicting an entry, refresh should redistribute its queries."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        # Create 3 entries and a stream that uses all 3
+        embs = rng.randn(3, dim).astype(np.float32)
+        embs /= np.linalg.norm(embs, axis=1, keepdims=True)
+
+        stream = np.array([embs[0], embs[1], embs[2]], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=embs,
+            cache_ids=[0, 1, 2],
+            similarity_threshold=0.90,
+            refresh_interval=1,  # refresh after every eviction
+        )
+
+        # Evict entry 2 — should trigger refresh
+        policy.on_evict(2)
+
+        # After eviction, entry 2 should be gone
+        assert 2 not in policy._active_ids
+        assert 2 not in policy._next_use
+
+    def test_on_insert_schedules_refresh(self):
+        """Inserting a new entry should bring refresh counter close to limit."""
+        rng = np.random.RandomState(42)
+        dim = 16
+
+        embs = rng.randn(2, dim).astype(np.float32)
+        embs /= np.linalg.norm(embs, axis=1, keepdims=True)
+
+        stream = np.array([embs[0]], dtype=np.float32)
+
+        policy = OraclePolicy(
+            future_stream_embeddings=stream,
+            cache_embeddings=embs,
+            cache_ids=[0, 1],
+            similarity_threshold=0.90,
+            refresh_interval=100,
+        )
+
+        # Insert a new entry
+        new_emb = rng.randn(dim).astype(np.float32)
+        new_emb /= np.linalg.norm(new_emb)
+        policy.on_insert(2, new_emb)
+
+        # Counter should be at least refresh_interval - 5
+        assert policy._evictions_since_refresh >= 95, \
+            f"Expected counter >= 95, got {policy._evictions_since_refresh}"
+
+
+# ═════════════════════════════════════════════════════════════════════
+# Workload Reordering Tests
+# ═════════════════════════════════════════════════════════════════════
+
+class TestWorkloadReordering:
+    """Test that workload reordering produces valid indices."""
+
+    def test_uniform_workload_valid(self):
+        """Uniform workload should produce valid index array."""
+        from src.benchmark.workload import generate_workload
+
+        rng = np.random.RandomState(42)
+        n = 100
+        dim = 16
+        embs = rng.randn(n, dim).astype(np.float32)
+        db_embs = rng.randn(50, dim).astype(np.float32)
+
+        indices = generate_workload(embs, db_embs, "uniform", n, seed=42)
+        assert len(indices) == n, f"Expected {n} indices, got {len(indices)}"
+        assert indices.max() < n, "Index out of bounds"
+        assert indices.min() >= 0, "Negative index"
+
+    def test_clustered_workload_valid(self):
+        """Clustered workload should produce valid index array."""
+        from src.benchmark.workload import generate_workload
+
+        rng = np.random.RandomState(42)
+        n = 100
+        dim = 16
+        query_embs = rng.randn(n, dim).astype(np.float32)
+        db_embs = rng.randn(50, dim).astype(np.float32)
+
+        indices = generate_workload(query_embs, db_embs, "clustered", n, seed=42)
+        assert len(indices) == n
+        assert indices.max() < n
+        assert indices.min() >= 0
+
+    def test_bursty_workload_valid(self):
+        """Bursty workload should produce valid index array."""
+        from src.benchmark.workload import generate_workload
+
+        rng = np.random.RandomState(42)
+        n = 100
+        dim = 16
+        query_embs = rng.randn(n, dim).astype(np.float32)
+        db_embs = rng.randn(50, dim).astype(np.float32)
+
+        indices = generate_workload(query_embs, db_embs, "bursty", n, seed=42)
+        assert len(indices) == n
+        assert indices.max() < n
+        assert indices.min() >= 0
