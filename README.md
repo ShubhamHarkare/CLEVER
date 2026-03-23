@@ -1,8 +1,11 @@
 # CLEVER — Cluster-Level Eviction for Vector Embedding Retrieval
 
+![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+
 Benchmarking and optimization framework for semantic caching in LLM applications.
 
-**Course:** CSE 584 — Advanced Database Systems, University of Michigan
+**Course:** CSE 584 — Advanced Database Systems, University of Michigan  
 **Team:** Yash Kulkarni, Shubham Harkare, Arvind Suresh
 
 ## Overview
@@ -13,20 +16,27 @@ CLEVER evaluates ANN index structures (HNSW, IVF, LSH, Flat) for semantic cachin
 
 ### 1. Setup Environment
 
+**Option A — pip (recommended):**
 ```bash
-# Clone and enter project
 git clone <repo-url>
 cd CLEVER
-
-# Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
+```
 
-# Verify installation
+**Option B — Conda:**
+```bash
+git clone <repo-url>
+cd CLEVER
+conda env create -f environment.yaml
+conda activate clever
+```
+
+**Verify installation:**
+```bash
 bash scripts/00_setup_environment.sh
+pytest tests/ -v
 ```
 
 ### 2. Download & Preprocess Data
@@ -64,15 +74,19 @@ CLEVER/
 │   ├── data/                # Data loading, preprocessing, sampling
 │   ├── embeddings/          # Sentence-transformers encoder
 │   ├── indexes/             # FAISS index wrappers (Flat, HNSW, IVF, LSH)
-│   ├── cache/               # Semantic cache + eviction policies
+│   ├── cache/               # Semantic cache + eviction policies (LRU, LFU, Semantic, Oracle)
+│   ├── router/              # Cost-based adaptive query routing
 │   ├── benchmark/           # Metrics, workload generation, profiling
-│   └── evaluation/          # LLM-as-judge, analysis
+│   ├── evaluation/          # Routing evaluator, analysis
+│   └── utils/               # Manifest generation, environment checks
 ├── scripts/                 # CLI entry points (one per phase)
 ├── configs/                 # YAML experiment configurations
 ├── slurm/                   # Great Lakes HPC job scripts
 ├── tests/                   # pytest test suite
 ├── results/                 # Outputs (embeddings, benchmarks, figures)
-└── data/                    # Processed datasets (parquet)
+├── data/                    # Processed datasets (parquet)
+├── requirements.txt         # Pinned pip dependencies
+└── environment.yaml         # Conda environment specification
 ```
 
 ## Experiment Phases
@@ -88,6 +102,18 @@ CLEVER/
 | — | `05_visualize_benchmarks.py` | Benchmark result plots (8 figures) |
 | 3 | `06_run_routing_eval.py` | Cost-based query routing evaluation |
 | — | `07_visualize_routing.py` | Routing evaluation plots (6 figures) |
+| 4 | `08_run_eviction.py` | Eviction policy evaluation (LRU, LFU, Semantic, Oracle) |
+| — | `09_visualize_eviction.py` | Eviction result visualizations (8 figures) |
+| 5 | `11_latency_sensitivity.py` | LLM call latency sensitivity analysis |
+
+### Slurm Jobs (Great Lakes HPC)
+
+| Job | Script | Resources |
+|-----|--------|-----------|
+| Embeddings | `slurm/embed.sbatch` | 1× GPU, 32 GB |
+| Benchmarks | `slurm/benchmark.sbatch` | CPU, 32 GB |
+| Routing | `slurm/routing.sbatch` | CPU, 32 GB |
+| Eviction | `slurm/eviction.sbatch` | 1× GPU (RTX 6000), 32 GB |
 
 ## Running Tests
 
@@ -98,4 +124,12 @@ pytest tests/ -v
 ## Hardware Requirements
 
 - **Local (MacBook):** Development, tests, ≤50K vectors. CPU-only FAISS.
-- **Great Lakes HPC:** Full experiments (100K–1M). GPU for embeddings, CPU for benchmarks.
+- **Great Lakes HPC:** Full experiments (100K–1M). GPU for embeddings and semantic eviction, CPU for benchmarks.
+
+## Reproducibility
+
+All stochastic components use deterministic seeding. Multi-seed evaluation (seeds 42, 123, 456) with mean ± std aggregation is supported. Every result file includes a manifest with hardware specs, Git state, and configuration hash via `src/utils/manifest.py`.
+
+## License
+
+MIT
