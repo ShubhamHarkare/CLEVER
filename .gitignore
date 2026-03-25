@@ -9,6 +9,11 @@ venv/
 .venv/
 CSE584_Project_Proposal.pdf
 improvements.html
+Semantic_Eviction_Policy_Evaluation.pdf
+.claude/
+.pytest_cache/
+.gemini/
+markdown/
 
 # Environment
 .env

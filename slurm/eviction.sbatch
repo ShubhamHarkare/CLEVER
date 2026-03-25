@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32G
-#SBATCH --time=08:00:00
+#SBATCH --time=20:00:00
 #SBATCH --output=logs/eviction_%j.log
 #SBATCH --error=logs/eviction_%j.err
 #SBATCH --mail-user=yashkulk@umich.edu
@@ -81,8 +81,7 @@ python scripts/08_run_eviction.py \
     --queries data/full_queries.parquet \
     --config configs/eviction.yaml \
     --output results/eviction/ \
-    --multi-seed \
-    --workers $SLURM_CPUS_PER_TASK
+    --multi-seed
 
 echo ""
 echo ">>> Eviction evaluation complete."

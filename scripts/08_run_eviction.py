@@ -39,7 +39,6 @@ import logging
 import sys
 import time
 from collections import deque
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -361,9 +360,20 @@ def run_full_experiment(
 ) -> dict:
     """Run all policy x cache_size x workload x seed combinations.
 
+    All policies run sequentially to avoid pickling issues with
+    ProcessPoolExecutor (nested functions / FAISS objects are not
+    safely serializable across process boundaries).
+
     Returns:
         Dict with nested results and aggregated statistics.
     """
+    if max_workers > 1:
+        logger.warning(
+            f"--workers {max_workers} requested but parallel execution is "
+            f"disabled (closure pickling incompatible with ProcessPoolExecutor). "
+            f"All policies will run sequentially."
+        )
+
     policies = config["eviction"]["policies"]
     cache_sizes = config["cache"]["cache_sizes_pct"]
     workloads = config["evaluation"].get("workloads", ["temporal"])
@@ -374,15 +384,6 @@ def run_full_experiment(
     total_runs = len(policies) * len(cache_sizes) * len(workloads) * len(seeds)
     run_num = 0
 
-    # Separate CPU-bound and GPU-bound policies.
-    # Oracle uses GPU FAISS when use_gpu is set; semantic also runs sequentially.
-    oracle_uses_gpu = config.get("eviction", {}).get("oracle", {}).get("use_gpu", False)
-    gpu_policy_names = {"semantic"}
-    if oracle_uses_gpu:
-        gpu_policy_names.add("oracle")
-    cpu_policies = [p for p in policies if p not in gpu_policy_names]
-    gpu_policies = [p for p in policies if p in gpu_policy_names]
-
     # Prepare data structure
     for policy_name in policies:
         all_results[policy_name] = {}
@@ -391,71 +392,23 @@ def run_full_experiment(
             pct_key = f"{cache_pct:.2f}"
             all_results[policy_name][pct_key] = []
 
-    def _run_policy(policy_name, cache_pct, workload_type, seed):
-        return evaluate_policy(
-            policy_name, embeddings, texts, config,
-            cache_pct, seed, workload_type,
-        )
-
-    # ── Phase 1: CPU-Bound Policies (Parallel) ──────────────────
-    if cpu_policies:
-        cpu_runs = len(cpu_policies) * len(cache_sizes) * len(workloads) * len(seeds)
-        if max_workers <= 1:
-            logger.info(f"Running {cpu_runs} CPU-bound tasks sequentially...")
-            for policy_name in cpu_policies:
-                for cache_pct in cache_sizes:
-                    for workload_type in workloads:
-                        for seed in seeds:
-                            run_num += 1
-                            logger.info(
-                                f"RUN {run_num}/{total_runs}: "
-                                f"policy={policy_name}, cache={cache_pct:.0%}, "
-                                f"workload={workload_type}, seed={seed}"
-                            )
-                            res = _run_policy(policy_name, cache_pct, workload_type, seed)
-                            all_results[policy_name][f"{cache_pct:.2f}"].append(res)
-        else:
-            logger.info(f"Starting parallel execution with {max_workers} workers for {cpu_runs} CPU-bound tasks.")
-            with ProcessPoolExecutor(max_workers=max_workers) as executor:
-                future_to_info = {}
-                for policy_name in cpu_policies:
-                    for cache_pct in cache_sizes:
-                        for workload_type in workloads:
-                            for seed in seeds:
-                                future = executor.submit(
-                                    _run_policy, policy_name, cache_pct, workload_type, seed
-                                )
-                                future_to_info[future] = (policy_name, f"{cache_pct:.2f}")
-
-                for future in as_completed(future_to_info):
-                    policy_name, pct_key = future_to_info[future]
-                    try:
-                        res = future.result()
-                        all_results[policy_name][pct_key].append(res)
-                        run_num += 1
-                        logger.info(f"Completed {run_num}/{total_runs} (Policy: {policy_name}, Cache: {pct_key}, Seed: {res['seed']})")
-                    except Exception as exc:
-                        logger.error(f"Task generated an exception: {exc}")
-
-    # ── Phase 2: GPU-Bound Policies (Sequential) ────────────────
-    if gpu_policies:
-        gpu_runs = len(gpu_policies) * len(cache_sizes) * len(workloads) * len(seeds)
-        logger.info(f"\nRunning {gpu_runs} GPU-bound tasks sequentially...")
-        for policy_name in gpu_policies:
-            for cache_pct in cache_sizes:
-                for workload_type in workloads:
-                    for seed in seeds:
-                        run_num += 1
-                        logger.info(
-                            f"RUN {run_num}/{total_runs}: "
-                            f"policy={policy_name}, cache={cache_pct:.0%}, "
-                            f"workload={workload_type}, seed={seed}"
-                        )
-                        try:
-                            res = _run_policy(policy_name, cache_pct, workload_type, seed)
-                            all_results[policy_name][f"{cache_pct:.2f}"].append(res)
-                        except Exception as exc:
-                            logger.error(f"GPU task generated an exception: {exc}")
+    # ── Run all policies sequentially ────────────────────────────
+    logger.info(f"Running {total_runs} tasks sequentially...")
+    for policy_name in policies:
+        for cache_pct in cache_sizes:
+            for workload_type in workloads:
+                for seed in seeds:
+                    run_num += 1
+                    logger.info(
+                        f"RUN {run_num}/{total_runs}: "
+                        f"policy={policy_name}, cache={cache_pct:.0%}, "
+                        f"workload={workload_type}, seed={seed}"
+                    )
+                    res = evaluate_policy(
+                        policy_name, embeddings, texts, config,
+                        cache_pct, seed, workload_type,
+                    )
+                    all_results[policy_name][f"{cache_pct:.2f}"].append(res)
 
     # ── Aggregation ──────────────────────────────────────────────
     for policy_name in policies:
