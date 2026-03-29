@@ -171,7 +171,7 @@ class OraclePolicy(EvictionPolicy):
             self._next_use[cid] = _INF
             return
 
-        # Drain any entries that are in the past.
+        # Drain any entries that are strictly in the past.
         while q and q[0] < self._stream_pos:
             q.popleft()
 
@@ -183,20 +183,37 @@ class OraclePolicy(EvictionPolicy):
         """Pop the current use and advance to next future use."""
         q = self._future_uses.get(cache_id)
         if q:
-            # Drain everything at or before current stream position.
+            # Pop the current access (at stream_pos) and any earlier ones.
             while q and q[0] <= self._stream_pos:
                 q.popleft()
         self._sync_next_use(cache_id)
 
     def on_insert(self, cache_id: int, embedding: np.ndarray) -> None:
-        """Register a newly inserted entry and schedule a refresh."""
+        """Register a newly inserted entry with a protective next_use.
+
+        The oracle evicts entries with the HIGHEST ``_next_use`` (furthest
+        in the future).  We must NOT assign ``_INF`` here because INF means
+        "never used again" — the worst possible victim — which would cause
+        every newly inserted entry to be immediately evicted on the next miss,
+        creating a thrashing loop.
+
+        Instead we assign ``stream_pos`` (the current query index) as a
+        temporary sentinel.  Since stream_pos < any future index, this entry
+        effectively appears as "next used right now" → lowest eviction priority.
+
+        A full refresh is scheduled within ``refresh_interval - 5`` evictions
+        so the real next_use replaces this sentinel quickly.
+        """
         self._active_ids.add(cache_id)
         self._cache_embs[cache_id] = embedding.copy()
         self._future_uses[cache_id] = collections.deque()
-        self._next_use[cache_id] = _INF
 
-        # Schedule an early refresh so the new entry (and the entries
-        # it may steal queries from) get correct future-use data.
+        # Protective sentinel: appears "just accessed", won't be chosen
+        # as victim (oracle picks MAX next_use, not MIN).
+        self._next_use[cache_id] = float(self._stream_pos)
+
+        # Schedule a full refresh soon so the real next_use is computed
+        # before too many eviction decisions are made with stale data.
         self._evictions_since_refresh = max(
             self._evictions_since_refresh,
             self.refresh_interval - 5,

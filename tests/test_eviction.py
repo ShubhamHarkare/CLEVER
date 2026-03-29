@@ -827,8 +827,15 @@ class TestOracleRefresh:
         assert 2 not in policy._active_ids
         assert 2 not in policy._next_use
 
-    def test_on_insert_schedules_refresh(self):
-        """Inserting a new entry should bring refresh counter close to limit."""
+    def test_on_insert_uses_protective_sentinel(self):
+        """on_insert must assign _next_use = stream_pos (not INF) so the
+        new entry is NOT immediately chosen as an eviction victim.
+
+        Oracle evicts entries with the HIGHEST next_use.  Assigning INF
+        would make new entries the first victim.  stream_pos is a low
+        value (below all future indices) so the entry is protected until
+        the next full refresh corrects it.
+        """
         rng = np.random.RandomState(42)
         dim = 16
 
@@ -845,14 +852,25 @@ class TestOracleRefresh:
             refresh_interval=100,
         )
 
+        # Advance stream to a known position
+        policy.advance_stream(42)
+
         # Insert a new entry
         new_emb = rng.randn(dim).astype(np.float32)
         new_emb /= np.linalg.norm(new_emb)
         policy.on_insert(2, new_emb)
 
-        # Counter should be at least refresh_interval - 5
-        assert policy._evictions_since_refresh >= 95, \
-            f"Expected counter >= 95, got {policy._evictions_since_refresh}"
+        # _next_use should be stream_pos (42), NOT INF
+        assert policy._next_use[2] == 42.0, (
+            f"Expected _next_use=42 (stream_pos), got {policy._next_use[2]}. "
+            "New entries must NOT get INF or they become immediate eviction victims."
+        )
+
+        # Early refresh should be scheduled (counter bumped to refresh_interval - 5)
+        assert policy._evictions_since_refresh >= 95, (
+            f"Expected early refresh scheduled (counter >= 95), "
+            f"got {policy._evictions_since_refresh}"
+        )
 
 
 # ═════════════════════════════════════════════════════════════════════

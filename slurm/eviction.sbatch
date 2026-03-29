@@ -1,13 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=clever-eviction
 #SBATCH --account=stats_dept2
-#SBATCH --partition=gpu-rtx6000
-#SBATCH --gres=gpu:1
+#SBATCH --partition=standard
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=32G
-#SBATCH --time=20:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=48G
+#SBATCH --time=48:00:00
 #SBATCH --output=logs/eviction_%j.log
 #SBATCH --error=logs/eviction_%j.err
 #SBATCH --mail-user=yashkulk@umich.edu
@@ -15,24 +14,20 @@
 
 # ──────────────────────────────────────────────────────────────
 # Phase 4: Semantic-Aware Eviction Policy Evaluation (Multi-Seed)
+# CPU-only job on stats_dept2 (no GPU billing).
 # Runs the full eviction matrix: 4 policies x 3 cache sizes x 3 seeds
 #
 # IMPORTANT: Before first submission, create the logs directory:
-#   mkdir -p ~/scratch/yashkulk/CSE584/CLEVER/slurm/logs
+#   mkdir -p ~/scratch/yashkulk/CSE584/CLEVER/logs
 # ──────────────────────────────────────────────────────────────
 
 set -euo pipefail
 
-# ── Load CUDA ────────────────────────────────────────────────
-module load cuda
-echo "CUDA loaded: $(nvcc --version 2>/dev/null | grep release || echo 'version unknown')"
-
-echo "=== CLEVER Phase 4: Eviction Policy Evaluation (Multi-Seed) ==="
+echo "=== CLEVER Phase 4: Eviction Policy Evaluation (Multi-Seed, CPU) ==="
 echo "Job ID:   $SLURM_JOB_ID"
 echo "Node:     $(hostname)"
 echo "CPUs:     $SLURM_CPUS_PER_TASK"
-echo "Memory:   $SLURM_MEM_PER_NODE MB"
-echo "GPU:      $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || echo 'N/A')"
+echo "Memory:   ${SLURM_MEM_PER_NODE:-48000} MB"
 echo "Started:  $(date)"
 echo ""
 
@@ -44,27 +39,20 @@ cd "$PROJECT_ROOT"
 source venv/bin/activate
 
 # Create output directories
-mkdir -p results/eviction results/figures
+mkdir -p results/eviction results/figures logs
 
-# ── Ensure faiss-gpu is installed ────────────────────────────
-python -c "import faiss; faiss.StandardGpuResources()" 2>/dev/null || {
-    echo ">>> Installing faiss-gpu (replacing faiss-cpu)..."
-    pip uninstall -y faiss-cpu 2>/dev/null
-    # Detect CUDA major version for correct package
-    CUDA_VER=$(nvcc --version 2>/dev/null | grep -oP 'release \K[0-9]+' | head -1)
-    if [ "$CUDA_VER" = "12" ]; then
-        pip install faiss-gpu-cu12
-    elif [ "$CUDA_VER" = "11" ]; then
-        pip install faiss-gpu-cu11
-    else
-        echo "WARN: Unknown CUDA version ($CUDA_VER), trying faiss-gpu-cu12..."
-        pip install faiss-gpu-cu12
-    fi
+# ── Verify faiss-cpu is installed (no GPU needed) ────────────
+python -c "import faiss; print(f'FAISS version: {faiss.__version__}')" || {
+    echo ">>> Installing faiss-cpu..."
+    pip install faiss-cpu
 }
 
-# ── Verify CUDA is available to PyTorch ──────────────────────
-echo ">>> Checking CUDA availability..."
-python -c "import torch; assert torch.cuda.is_available(), 'CUDA not available to PyTorch!'; print(f'PyTorch CUDA: {torch.cuda.get_device_name(0)}')"
+# ── Pin numpy threads to avoid oversubscription ──────────────
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export OPENBLAS_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+echo ">>> OMP/MKL threads pinned to $SLURM_CPUS_PER_TASK"
 echo ""
 
 # ── Run eviction experiments (multi-seed, all policies) ──────
@@ -75,7 +63,7 @@ echo ""
 #   workloads: [temporal]
 #   oracle.refresh_interval: 100
 #   log_interval: 500
-echo ">>> Running multi-seed eviction evaluation..."
+echo ">>> Running multi-seed eviction evaluation (CPU)..."
 python scripts/08_run_eviction.py \
     --embeddings results/embeddings/full_embeddings.npy \
     --queries data/full_queries.parquet \
