@@ -1,0 +1,59 @@
+# Routing Evaluation Configuration
+# Used by scripts/06_run_routing_eval.py (Phase 3)
+
+cache:
+  fill_ratio: 0.10        # Fraction of data used to seed the cache
+  fill_strategies:
+    - random               # Random split (baseline)
+    - frequency            # High-frequency queries fill cache first
+
+  # Index backing the cache (from Phase 2 best configs)
+  index_type: hnsw
+  index_params:
+    M: 32
+    efConstruction: 128
+    efSearch: 128
+
+cost_model:
+  llm_latency_ms: 500.0   # GPT-4-class API latency
+  llm_cost_usd: 0.01      # ~$0.01 per query (input+output tokens)
+
+router:
+  # Fixed thresholds to sweep (L2² distance)
+  thresholds:
+    - 0.05
+    - 0.10
+    - 0.15
+    - 0.20
+    - 0.25
+    - 0.30
+    - 0.40
+    - 0.50
+    - 0.60
+    - 0.70
+    - 0.80
+    - 0.90
+    - 1.00
+    - 1.20
+    - 1.50
+
+  # Adaptive router settings
+  adaptive:
+    min_quality: 0.8       # Minimum quality (recall proxy) target
+    calibration_ratio: 0.2 # Fraction of eval set used for calibration
+
+# Index comparison: evaluate routing with different backends
+# Note: LSH excluded — FAISS IndexLSH returns Hamming distances, not L2²,
+# making the threshold sweep and cosine quality formula inapplicable.
+index_comparison:
+  - type: flat
+    params: {}
+  - type: hnsw
+    params: { M: 32, efConstruction: 128, efSearch: 128 }
+  - type: ivf
+    params: { nlist: 707, nprobe: 64 }
+
+# Reproducibility
+seed: 42
+seeds: [42, 123, 456, 789, 1024]
+

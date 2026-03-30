@@ -1,0 +1,196 @@
+{
+  "manifest": {
+    "timestamp_utc": "2026-03-11T19:16:02.209631Z",
+    "command_line": "scripts/08_run_eviction.py --embeddings results/embeddings/full_embeddings.npy --queries data/full_queries.parquet --policies semantic oracle --cache-sizes 0.10 --workers 1",
+    "python_version": "3.13.7",
+    "hardware": {
+      "system": "Darwin",
+      "release": "25.3.0",
+      "machine": "arm64",
+      "processor": "arm",
+      "cpu_count_logical": 10,
+      "cpu_count_physical": 10,
+      "ram_total_gb": 16.0
+    },
+    "packages": {
+      "numpy": "2.4.2",
+      "pandas": "3.0.0",
+      "torch": "2.10.0",
+      "faiss": "1.13.2",
+      "transformers": "5.1.0",
+      "sentence_transformers": "5.2.2"
+    },
+    "git": {
+      "commit": "8b8eb104e55c115ac8cfe81eec508b66da7f49e0",
+      "branch": "main",
+      "is_dirty": true
+    },
+    "config_hash": "72d24c69c35f"
+  },
+  "per_seed": {
+    "semantic": {
+      "0.10": [
+        {
+          "policy": "semantic",
+          "cache_size_pct": 0.1,
+          "max_cache_size": 857,
+          "seed": 42,
+          "n_queries": 8572,
+          "n_warmup": 857,
+          "n_stream": 6001,
+          "final_hit_rate": 0.283286,
+          "n_hits": 1700,
+          "n_misses": 4301,
+          "semantic_coverage_avg_dist": 0.869377,
+          "cumulative_hit_rates": [
+            {
+              "query_idx": 5000,
+              "cumulative_hit_rate": 0.2824,
+              "rolling_hit_rate": 0.279,
+              "n_evictions": 3588,
+              "cache_size": 857
+            },
+            {
+              "query_idx": 6001,
+              "cumulative_hit_rate": 0.283286,
+              "rolling_hit_rate": 0.288,
+              "n_evictions": 4301,
+              "cache_size": 857
+            }
+          ],
+          "timing": {
+            "build_time_s": 0.037,
+            "stream_time_s": 4.248,
+            "coverage_time_s": 0.095,
+            "avg_query_time_ms": 0.7079
+          },
+          "cache_stats": {
+            "size": 857,
+            "total_entries": 858,
+            "n_active": 857,
+            "n_dead": 1,
+            "n_lookups": 6001,
+            "n_hits": 1700,
+            "n_inserts": 5158,
+            "n_evictions": 4301,
+            "n_rebuilds": 20,
+            "index_type": "hnsw",
+            "max_size": 857,
+            "eviction_policy": "semantic",
+            "memory_mb": 1.84,
+            "avg_lookup_time_ms": 0.0649,
+            "policy_stats": {
+              "n_evictions": 4301,
+              "n_recomputes": 20,
+              "avg_eviction_time_ms": 0.619,
+              "total_eviction_time_s": 2.662,
+              "similarity_threshold": 0.3,
+              "recompute_interval": 1000,
+              "alpha": 1.0,
+              "beta": 1.0
+            }
+          }
+        }
+      ]
+    },
+    "oracle": {
+      "0.10": [
+        {
+          "policy": "oracle",
+          "cache_size_pct": 0.1,
+          "max_cache_size": 857,
+          "seed": 42,
+          "n_queries": 8572,
+          "n_warmup": 857,
+          "n_stream": 6001,
+          "final_hit_rate": 0.137477,
+          "n_hits": 825,
+          "n_misses": 5176,
+          "semantic_coverage_avg_dist": 0.925547,
+          "cumulative_hit_rates": [
+            {
+              "query_idx": 5000,
+              "cumulative_hit_rate": 0.152,
+              "rolling_hit_rate": 0.067,
+              "n_evictions": 4240,
+              "cache_size": 857
+            },
+            {
+              "query_idx": 6001,
+              "cumulative_hit_rate": 0.137477,
+              "rolling_hit_rate": 0.065,
+              "n_evictions": 5176,
+              "cache_size": 857
+            }
+          ],
+          "timing": {
+            "build_time_s": 0.642,
+            "stream_time_s": 3.695,
+            "coverage_time_s": 0.097,
+            "avg_query_time_ms": 0.6157
+          },
+          "cache_stats": {
+            "size": 857,
+            "total_entries": 873,
+            "n_active": 857,
+            "n_dead": 16,
+            "n_lookups": 6001,
+            "n_hits": 825,
+            "n_inserts": 6033,
+            "n_evictions": 5176,
+            "n_rebuilds": 24,
+            "index_type": "hnsw",
+            "max_size": 857,
+            "eviction_policy": "oracle",
+            "memory_mb": 1.88,
+            "avg_lookup_time_ms": 0.0663
+          }
+        }
+      ]
+    }
+  },
+  "aggregated": {
+    "semantic": {
+      "0.10": {
+        "hit_rate_mean": 0.283286,
+        "hit_rate_std": 0.0,
+        "coverage_mean": 0.869377,
+        "coverage_std": 0.0,
+        "stream_time_mean_s": 4.248,
+        "evictions_mean": 4301.0,
+        "n_seeds": 1,
+        "seeds": [
+          42
+        ]
+      }
+    },
+    "oracle": {
+      "0.10": {
+        "hit_rate_mean": 0.137477,
+        "hit_rate_std": 0.0,
+        "coverage_mean": 0.925547,
+        "coverage_std": 0.0,
+        "stream_time_mean_s": 3.695,
+        "evictions_mean": 5176.0,
+        "n_seeds": 1,
+        "seeds": [
+          42
+        ]
+      }
+    }
+  },
+  "config": {
+    "policies": [
+      "semantic",
+      "oracle"
+    ],
+    "cache_sizes_pct": [
+      0.1
+    ],
+    "seeds": [
+      42
+    ],
+    "n_queries": 8572
+  },
+  "total_time_s": 12.9
+}

@@ -1,0 +1,2224 @@
+{
+  "dataset": "100k",
+  "manifest": {
+    "timestamp_utc": "2026-03-12T15:59:18.651730Z",
+    "command_line": "scripts/03_run_index_benchmark.py --embed-dir results/embeddings/ --size 100k --output results/benchmarks/ --config configs/index_benchmark.yaml",
+    "python_version": "3.11.5",
+    "hardware": {
+      "system": "Linux",
+      "release": "4.18.0-553.85.1.el8_10.x86_64",
+      "machine": "x86_64",
+      "processor": "x86_64",
+      "cpu_count_logical": 128,
+      "cpu_count_physical": 128,
+      "ram_total_gb": 1510.42
+    },
+    "packages": {
+      "numpy": "2.4.2",
+      "pandas": "3.0.0",
+      "torch": "2.10.0+cu128",
+      "faiss": "1.13.2",
+      "transformers": "5.1.0",
+      "sentence_transformers": "5.2.2"
+    },
+    "git": {
+      "commit": "5959dea80a41be617641871eafe78141c3caa99c",
+      "branch": "main",
+      "is_dirty": true
+    },
+    "config_hash": "b162d4d470a3"
+  },
+  "timestamp": "2026-03-12T15:59:28Z",
+  "runs": [
+    {
+      "index_type": "flat",
+      "params": {},
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.0534,
+      "peak_rss_mb": 780.44,
+      "post_build_rss_mb": 780.44,
+      "memory_mb": 146.28,
+      "search_latency_ms": {
+        "mean": 3.4348,
+        "p50": 3.3847,
+        "p95": 3.5794,
+        "p99": 3.8146,
+        "min": 3.2832,
+        "max": 22.7134,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 759.1,
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 64,
+        "efSearch": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.2746,
+      "peak_rss_mb": 793.91,
+      "post_build_rss_mb": 793.91,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.0555,
+        "p50": 0.0532,
+        "p95": 0.0843,
+        "p99": 0.1098,
+        "min": 0.0248,
+        "max": 0.2642,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 130564.1,
+      "recall_at_1": 0.926,
+      "recall_at_5": 0.9228,
+      "recall_at_10": 0.9121,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.5805,
+      "peak_rss_mb": 794.7,
+      "post_build_rss_mb": 794.7,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.1006,
+        "p50": 0.1022,
+        "p95": 0.1299,
+        "p99": 0.1435,
+        "min": 0.0493,
+        "max": 0.3332,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 66702.0,
+      "recall_at_1": 0.976,
+      "recall_at_5": 0.9716,
+      "recall_at_10": 0.966,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.8538,
+      "peak_rss_mb": 819.32,
+      "post_build_rss_mb": 819.32,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.1199,
+        "p50": 0.1218,
+        "p95": 0.1665,
+        "p99": 0.1892,
+        "min": 0.053,
+        "max": 0.3486,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 51216.9,
+      "recall_at_1": 0.978,
+      "recall_at_5": 0.9802,
+      "recall_at_10": 0.9781,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.868,
+      "peak_rss_mb": 819.32,
+      "post_build_rss_mb": 806.81,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.2082,
+        "p50": 0.2159,
+        "p95": 0.2821,
+        "p99": 0.3038,
+        "min": 0.0889,
+        "max": 0.5375,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 30675.5,
+      "recall_at_1": 0.988,
+      "recall_at_5": 0.9894,
+      "recall_at_10": 0.9886,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.695,
+      "peak_rss_mb": 819.32,
+      "post_build_rss_mb": 806.85,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.2387,
+        "p50": 0.247,
+        "p95": 0.3242,
+        "p99": 0.3581,
+        "min": 0.1045,
+        "max": 0.4181,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 26631.0,
+      "recall_at_1": 0.993,
+      "recall_at_5": 0.9944,
+      "recall_at_10": 0.9941,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.706,
+      "peak_rss_mb": 819.32,
+      "post_build_rss_mb": 806.85,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.4361,
+        "p50": 0.4553,
+        "p95": 0.5918,
+        "p99": 0.6355,
+        "min": 0.1695,
+        "max": 0.6794,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 14883.6,
+      "recall_at_1": 0.994,
+      "recall_at_5": 0.9962,
+      "recall_at_10": 0.9965,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 3.0128,
+      "peak_rss_mb": 855.58,
+      "post_build_rss_mb": 855.58,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.2234,
+        "p50": 0.2301,
+        "p95": 0.3119,
+        "p99": 0.3419,
+        "min": 0.0936,
+        "max": 0.3618,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 28541.1,
+      "recall_at_1": 0.991,
+      "recall_at_5": 0.9914,
+      "recall_at_10": 0.9907,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 6.1488,
+      "peak_rss_mb": 855.58,
+      "post_build_rss_mb": 855.36,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.4872,
+        "p50": 0.5056,
+        "p95": 0.6895,
+        "p99": 0.7503,
+        "min": 0.1842,
+        "max": 0.8563,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 13274.8,
+      "recall_at_1": 0.996,
+      "recall_at_5": 0.9978,
+      "recall_at_10": 0.9975,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 1
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3224,
+      "peak_rss_mb": 867.05,
+      "post_build_rss_mb": 867.05,
+      "memory_mb": 205.22,
+      "search_latency_ms": {
+        "mean": 0.072,
+        "p50": 0.0687,
+        "p95": 0.1333,
+        "p99": 0.143,
+        "min": 0.0181,
+        "max": 0.1774,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 61463.6,
+      "recall_at_1": 0.682,
+      "recall_at_5": 0.6478,
+      "recall_at_10": 0.629,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3152,
+      "peak_rss_mb": 871.49,
+      "post_build_rss_mb": 871.49,
+      "memory_mb": 155.15,
+      "search_latency_ms": {
+        "mean": 0.2551,
+        "p50": 0.2539,
+        "p95": 0.33,
+        "p99": 0.3594,
+        "min": 0.1572,
+        "max": 0.4111,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 17616.1,
+      "recall_at_1": 0.883,
+      "recall_at_5": 0.8624,
+      "recall_at_10": 0.8464,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.7367,
+      "peak_rss_mb": 871.49,
+      "post_build_rss_mb": 848.79,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.08,
+        "p50": 0.0734,
+        "p95": 0.127,
+        "p99": 0.1736,
+        "min": 0.0384,
+        "max": 0.2337,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 59172.5,
+      "recall_at_1": 0.84,
+      "recall_at_5": 0.8102,
+      "recall_at_10": 0.7919,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.7657,
+      "peak_rss_mb": 886.73,
+      "post_build_rss_mb": 864.93,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.2634,
+        "p50": 0.2509,
+        "p95": 0.3455,
+        "p99": 0.3614,
+        "min": 0.1807,
+        "max": 0.4704,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 16333.5,
+      "recall_at_1": 0.938,
+      "recall_at_5": 0.927,
+      "recall_at_10": 0.9162,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 4.0071,
+      "peak_rss_mb": 921.57,
+      "post_build_rss_mb": 862.17,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.2147,
+        "p50": 0.212,
+        "p95": 0.2678,
+        "p99": 0.2919,
+        "min": 0.1495,
+        "max": 0.4157,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 20573.0,
+      "recall_at_1": 0.944,
+      "recall_at_5": 0.9216,
+      "recall_at_10": 0.9137,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 4.0103,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 869.32,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.7612,
+        "p50": 0.7665,
+        "p95": 0.8564,
+        "p99": 0.8933,
+        "min": 0.5799,
+        "max": 0.9391,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 5968.6,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.9732,
+      "recall_at_10": 0.9694,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.374,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 870.45,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.2094,
+        "p50": 0.2021,
+        "p95": 0.2752,
+        "p99": 0.2975,
+        "min": 0.1236,
+        "max": 0.3173,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 21303.2,
+      "recall_at_1": 0.946,
+      "recall_at_5": 0.9358,
+      "recall_at_10": 0.927,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.383,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 879.23,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.7371,
+        "p50": 0.7309,
+        "p95": 0.859,
+        "p99": 0.9045,
+        "min": 0.5794,
+        "max": 0.9783,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 6534.4,
+      "recall_at_1": 0.978,
+      "recall_at_5": 0.979,
+      "recall_at_10": 0.975,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.7303,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 882.61,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.098,
+        "p50": 0.0909,
+        "p95": 0.1488,
+        "p99": 0.162,
+        "min": 0.0638,
+        "max": 0.2148,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 53795.8,
+      "recall_at_1": 0.9,
+      "recall_at_5": 0.8828,
+      "recall_at_10": 0.8708,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.8547,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 883.98,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.2951,
+        "p50": 0.2885,
+        "p95": 0.3663,
+        "p99": 0.3936,
+        "min": 0.2194,
+        "max": 0.4191,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 17563.5,
+      "recall_at_1": 0.966,
+      "recall_at_5": 0.9566,
+      "recall_at_10": 0.9508,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.7141,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 884.64,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.5461,
+        "p50": 0.5401,
+        "p95": 0.6487,
+        "p99": 0.6728,
+        "min": 0.4178,
+        "max": 0.7332,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 9286.5,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.9758,
+      "recall_at_10": 0.971,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 59.0887,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 889.68,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.0865,
+        "p50": 0.0851,
+        "p95": 0.1013,
+        "p99": 0.1113,
+        "min": 0.0712,
+        "max": 0.1436,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 78273.1,
+      "recall_at_1": 0.898,
+      "recall_at_5": 0.8548,
+      "recall_at_10": 0.8272,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 59.3334,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 889.4,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.1818,
+        "p50": 0.1785,
+        "p95": 0.2116,
+        "p99": 0.2236,
+        "min": 0.1505,
+        "max": 0.2859,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 35672.6,
+      "recall_at_1": 0.952,
+      "recall_at_5": 0.9388,
+      "recall_at_10": 0.9267,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 58.7315,
+      "peak_rss_mb": 948.48,
+      "post_build_rss_mb": 889.78,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.2923,
+        "p50": 0.2899,
+        "p95": 0.3309,
+        "p99": 0.3509,
+        "min": 0.2209,
+        "max": 0.4182,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 23417.1,
+      "recall_at_1": 0.97,
+      "recall_at_5": 0.9674,
+      "recall_at_10": 0.9579,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 384
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.5114,
+      "peak_rss_mb": 1039.0,
+      "post_build_rss_mb": 894.0,
+      "memory_mb": 5.09,
+      "search_latency_ms": {
+        "mean": 0.2964,
+        "p50": 0.2957,
+        "p95": 0.2995,
+        "p99": 0.3009,
+        "min": 0.2938,
+        "max": 0.3349,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 26236.1,
+      "recall_at_1": 0.536,
+      "recall_at_5": 0.5398,
+      "recall_at_10": 0.5398,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 768
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.0321,
+      "peak_rss_mb": 1253.47,
+      "post_build_rss_mb": 963.66,
+      "memory_mb": 69.66,
+      "search_latency_ms": {
+        "mean": 0.5303,
+        "p50": 0.5276,
+        "p95": 0.5493,
+        "p99": 0.5613,
+        "min": 0.5243,
+        "max": 0.5875,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 14399.9,
+      "recall_at_1": 0.656,
+      "recall_at_5": 0.6568,
+      "recall_at_10": 0.6539,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 1536
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.9978,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 963.66,
+      "memory_mb": 20.38,
+      "search_latency_ms": {
+        "mean": 0.8576,
+        "p50": 0.8515,
+        "p95": 0.8914,
+        "p99": 0.9062,
+        "min": 0.8385,
+        "max": 0.9412,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 8969.6,
+      "recall_at_1": 0.744,
+      "recall_at_5": 0.7354,
+      "recall_at_10": 0.7392,
+      "workload": "uniform"
+    },
+    {
+      "index_type": "flat",
+      "params": {},
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.0298,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1113.99,
+      "memory_mb": 145.77,
+      "search_latency_ms": {
+        "mean": 3.3694,
+        "p50": 3.3275,
+        "p95": 3.5479,
+        "p99": 3.5995,
+        "min": 3.2423,
+        "max": 20.2913,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 762.3,
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 64,
+        "efSearch": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.2444,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.21,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.0454,
+        "p50": 0.0453,
+        "p95": 0.0658,
+        "p99": 0.0737,
+        "min": 0.0151,
+        "max": 0.0907,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 171629.6,
+      "recall_at_1": 0.924,
+      "recall_at_5": 0.92,
+      "recall_at_10": 0.9139,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.5525,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.08,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.0897,
+        "p50": 0.0905,
+        "p95": 0.123,
+        "p99": 0.1384,
+        "min": 0.032,
+        "max": 0.2877,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 76163.9,
+      "recall_at_1": 0.971,
+      "recall_at_5": 0.9598,
+      "recall_at_10": 0.9613,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.8261,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.22,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.1085,
+        "p50": 0.1097,
+        "p95": 0.1566,
+        "p99": 0.1743,
+        "min": 0.0413,
+        "max": 0.2108,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 67438.2,
+      "recall_at_1": 0.969,
+      "recall_at_5": 0.9688,
+      "recall_at_10": 0.9695,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.8383,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.22,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.1977,
+        "p50": 0.2005,
+        "p95": 0.2819,
+        "p99": 0.3148,
+        "min": 0.0778,
+        "max": 0.3381,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 34615.9,
+      "recall_at_1": 0.977,
+      "recall_at_5": 0.9796,
+      "recall_at_10": 0.9829,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.7447,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.22,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.2293,
+        "p50": 0.2343,
+        "p95": 0.3236,
+        "p99": 0.376,
+        "min": 0.0979,
+        "max": 0.5101,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 28724.6,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.9842,
+      "recall_at_10": 0.9889,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.7372,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1115.22,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.4179,
+        "p50": 0.4313,
+        "p95": 0.5746,
+        "p99": 0.6278,
+        "min": 0.1787,
+        "max": 0.7173,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 16033.8,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.9882,
+      "recall_at_10": 0.9912,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 3.0315,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1163.95,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.2174,
+        "p50": 0.2224,
+        "p95": 0.3167,
+        "p99": 0.3511,
+        "min": 0.0838,
+        "max": 0.5609,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 33445.8,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.982,
+      "recall_at_10": 0.9845,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 6.2567,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 1163.95,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.4595,
+        "p50": 0.4696,
+        "p95": 0.6629,
+        "p99": 0.7189,
+        "min": 0.1865,
+        "max": 0.8153,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 13859.8,
+      "recall_at_1": 0.981,
+      "recall_at_5": 0.9878,
+      "recall_at_10": 0.9923,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 1
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3406,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 987.96,
+      "memory_mb": 145.11,
+      "search_latency_ms": {
+        "mean": 0.0588,
+        "p50": 0.0531,
+        "p95": 0.1236,
+        "p99": 0.144,
+        "min": 0.0188,
+        "max": 0.3024,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 99419.0,
+      "recall_at_1": 0.741,
+      "recall_at_5": 0.6742,
+      "recall_at_10": 0.6443,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3151,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 971.24,
+      "memory_mb": 145.11,
+      "search_latency_ms": {
+        "mean": 0.2276,
+        "p50": 0.2241,
+        "p95": 0.3119,
+        "p99": 0.3642,
+        "min": 0.1237,
+        "max": 0.4333,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 21832.2,
+      "recall_at_1": 0.911,
+      "recall_at_5": 0.8806,
+      "recall_at_10": 0.8703,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.7524,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 956.66,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.0671,
+        "p50": 0.0614,
+        "p95": 0.1214,
+        "p99": 0.1724,
+        "min": 0.0274,
+        "max": 0.2134,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 81483.9,
+      "recall_at_1": 0.841,
+      "recall_at_5": 0.8322,
+      "recall_at_10": 0.8114,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.752,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 965.25,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.2497,
+        "p50": 0.2409,
+        "p95": 0.326,
+        "p99": 0.3677,
+        "min": 0.1744,
+        "max": 0.3986,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 20991.9,
+      "recall_at_1": 0.952,
+      "recall_at_5": 0.944,
+      "recall_at_10": 0.9289,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 4.0201,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 957.0,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.1965,
+        "p50": 0.1923,
+        "p95": 0.2612,
+        "p99": 0.2781,
+        "min": 0.1232,
+        "max": 0.3028,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 25844.7,
+      "recall_at_1": 0.947,
+      "recall_at_5": 0.9296,
+      "recall_at_10": 0.9233,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 4.0123,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 947.96,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.7609,
+        "p50": 0.7511,
+        "p95": 0.8658,
+        "p99": 0.9239,
+        "min": 0.6102,
+        "max": 1.0347,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 6280.6,
+      "recall_at_1": 0.988,
+      "recall_at_5": 0.9798,
+      "recall_at_10": 0.9796,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.356,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 949.84,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.2041,
+        "p50": 0.1984,
+        "p95": 0.2596,
+        "p99": 0.2701,
+        "min": 0.1449,
+        "max": 0.2803,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 26484.7,
+      "recall_at_1": 0.942,
+      "recall_at_5": 0.9364,
+      "recall_at_10": 0.9325,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.3525,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 955.96,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.754,
+        "p50": 0.7564,
+        "p95": 0.8576,
+        "p99": 0.9137,
+        "min": 0.5851,
+        "max": 0.9414,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 6645.7,
+      "recall_at_1": 0.991,
+      "recall_at_5": 0.9848,
+      "recall_at_10": 0.9813,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.8644,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 960.17,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.0886,
+        "p50": 0.0837,
+        "p95": 0.1422,
+        "p99": 0.159,
+        "min": 0.0554,
+        "max": 0.2282,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 63438.9,
+      "recall_at_1": 0.916,
+      "recall_at_5": 0.8988,
+      "recall_at_10": 0.8772,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.8661,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 961.96,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.2942,
+        "p50": 0.2863,
+        "p95": 0.3609,
+        "p99": 0.3887,
+        "min": 0.2057,
+        "max": 0.4455,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 18686.5,
+      "recall_at_1": 0.968,
+      "recall_at_5": 0.9576,
+      "recall_at_10": 0.9511,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.8449,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 962.86,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.5628,
+        "p50": 0.5529,
+        "p95": 0.6552,
+        "p99": 0.766,
+        "min": 0.4256,
+        "max": 2.8312,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 9655.8,
+      "recall_at_1": 0.989,
+      "recall_at_5": 0.9774,
+      "recall_at_10": 0.9722,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 59.2814,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 968.11,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.0894,
+        "p50": 0.0882,
+        "p95": 0.1057,
+        "p99": 0.117,
+        "min": 0.0738,
+        "max": 0.1428,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 87755.0,
+      "recall_at_1": 0.91,
+      "recall_at_5": 0.856,
+      "recall_at_10": 0.833,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 58.9626,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 968.23,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.1729,
+        "p50": 0.1732,
+        "p95": 0.2099,
+        "p99": 0.2209,
+        "min": 0.119,
+        "max": 0.2966,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 44074.6,
+      "recall_at_1": 0.959,
+      "recall_at_5": 0.9438,
+      "recall_at_10": 0.9251,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 58.6245,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 968.24,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.2805,
+        "p50": 0.2812,
+        "p95": 0.3276,
+        "p99": 0.3477,
+        "min": 0.1969,
+        "max": 0.4028,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 25740.0,
+      "recall_at_1": 0.98,
+      "recall_at_5": 0.9722,
+      "recall_at_10": 0.9594,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 384
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.5085,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 971.01,
+      "memory_mb": 5.09,
+      "search_latency_ms": {
+        "mean": 0.2954,
+        "p50": 0.2945,
+        "p95": 0.2989,
+        "p99": 0.3003,
+        "min": 0.2927,
+        "max": 0.3178,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 25658.7,
+      "recall_at_1": 0.553,
+      "recall_at_5": 0.5452,
+      "recall_at_10": 0.5344,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 768
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.0134,
+      "peak_rss_mb": 1543.73,
+      "post_build_rss_mb": 971.03,
+      "memory_mb": 10.19,
+      "search_latency_ms": {
+        "mean": 0.5317,
+        "p50": 0.5281,
+        "p95": 0.5454,
+        "p99": 0.5669,
+        "min": 0.5245,
+        "max": 1.8799,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 14308.5,
+      "recall_at_1": 0.65,
+      "recall_at_5": 0.6726,
+      "recall_at_10": 0.6351,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 1536
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.9917,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 971.03,
+      "memory_mb": 20.38,
+      "search_latency_ms": {
+        "mean": 0.8591,
+        "p50": 0.8533,
+        "p95": 0.8967,
+        "p99": 0.9179,
+        "min": 0.8332,
+        "max": 1.0322,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 8909.5,
+      "recall_at_1": 0.785,
+      "recall_at_5": 0.7374,
+      "recall_at_10": 0.7508,
+      "workload": "clustered"
+    },
+    {
+      "index_type": "flat",
+      "params": {},
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.0377,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.17,
+      "memory_mb": 145.77,
+      "search_latency_ms": {
+        "mean": 3.3698,
+        "p50": 3.3516,
+        "p95": 3.474,
+        "p99": 3.608,
+        "min": 3.2946,
+        "max": 4.3115,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 767.7,
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 64,
+        "efSearch": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.2429,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.21,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.0331,
+        "p50": 0.0296,
+        "p95": 0.0604,
+        "p99": 0.0711,
+        "min": 0.0088,
+        "max": 0.0857,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 213583.9,
+      "recall_at_1": 0.936,
+      "recall_at_5": 0.9322,
+      "recall_at_10": 0.922,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 16,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.5432,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.21,
+      "memory_mb": 186.11,
+      "search_latency_ms": {
+        "mean": 0.0652,
+        "p50": 0.0612,
+        "p95": 0.1163,
+        "p99": 0.1311,
+        "min": 0.0163,
+        "max": 0.1469,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 99158.5,
+      "recall_at_1": 0.99,
+      "recall_at_5": 0.9704,
+      "recall_at_10": 0.9689,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.8087,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.08,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.0802,
+        "p50": 0.079,
+        "p95": 0.1471,
+        "p99": 0.1675,
+        "min": 0.0175,
+        "max": 0.243,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 78848.8,
+      "recall_at_1": 0.978,
+      "recall_at_5": 0.973,
+      "recall_at_10": 0.9751,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.8232,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.08,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.1423,
+        "p50": 0.1426,
+        "p95": 0.2543,
+        "p99": 0.2884,
+        "min": 0.0298,
+        "max": 0.3649,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 41246.0,
+      "recall_at_1": 0.994,
+      "recall_at_5": 0.9862,
+      "recall_at_10": 0.9882,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.6828,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.08,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.1674,
+        "p50": 0.1706,
+        "p95": 0.2973,
+        "p99": 0.3272,
+        "min": 0.0328,
+        "max": 0.5421,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 34323.4,
+      "recall_at_1": 0.994,
+      "recall_at_5": 0.9908,
+      "recall_at_10": 0.9922,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 32,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 5.7119,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1118.22,
+      "memory_mb": 212.7,
+      "search_latency_ms": {
+        "mean": 0.3201,
+        "p50": 0.3352,
+        "p95": 0.548,
+        "p99": 0.605,
+        "min": 0.055,
+        "max": 0.6695,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 18443.1,
+      "recall_at_1": 0.994,
+      "recall_at_5": 0.9972,
+      "recall_at_10": 0.9964,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 128,
+        "efSearch": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.9982,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1166.95,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.1574,
+        "p50": 0.1558,
+        "p95": 0.2932,
+        "p99": 0.323,
+        "min": 0.0314,
+        "max": 0.3457,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 36526.5,
+      "recall_at_1": 0.985,
+      "recall_at_5": 0.9912,
+      "recall_at_10": 0.9869,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "hnsw",
+      "params": {
+        "M": 64,
+        "efConstruction": 256,
+        "efSearch": 256
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 6.1797,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 1166.95,
+      "memory_mb": 265.87,
+      "search_latency_ms": {
+        "mean": 0.3567,
+        "p50": 0.371,
+        "p95": 0.6326,
+        "p99": 0.7139,
+        "min": 0.0569,
+        "max": 0.7748,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 16492.7,
+      "recall_at_1": 0.994,
+      "recall_at_5": 0.9978,
+      "recall_at_10": 0.995,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 1
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3008,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 991.32,
+      "memory_mb": 145.11,
+      "search_latency_ms": {
+        "mean": 0.0456,
+        "p50": 0.037,
+        "p95": 0.0765,
+        "p99": 0.1052,
+        "min": 0.0131,
+        "max": 0.2847,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 126699.2,
+      "recall_at_1": 0.663,
+      "recall_at_5": 0.6902,
+      "recall_at_10": 0.6733,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 64,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.3006,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 973.06,
+      "memory_mb": 150.5,
+      "search_latency_ms": {
+        "mean": 0.1665,
+        "p50": 0.1597,
+        "p95": 0.2564,
+        "p99": 0.2888,
+        "min": 0.0842,
+        "max": 0.3426,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 22982.2,
+      "recall_at_1": 0.875,
+      "recall_at_5": 0.8896,
+      "recall_at_10": 0.8812,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 4
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.7179,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 948.78,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.0528,
+        "p50": 0.052,
+        "p95": 0.0868,
+        "p99": 0.1027,
+        "min": 0.0229,
+        "max": 0.183,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 104418.0,
+      "recall_at_1": 0.826,
+      "recall_at_5": 0.8292,
+      "recall_at_10": 0.8228,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 256,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.7135,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 949.08,
+      "memory_mb": 145.4,
+      "search_latency_ms": {
+        "mean": 0.1817,
+        "p50": 0.1756,
+        "p95": 0.2584,
+        "p99": 0.3125,
+        "min": 0.103,
+        "max": 0.3635,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 25199.7,
+      "recall_at_1": 0.936,
+      "recall_at_5": 0.9404,
+      "recall_at_10": 0.9346,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 3.984,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 944.2,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.1523,
+        "p50": 0.1471,
+        "p95": 0.2185,
+        "p99": 0.2546,
+        "min": 0.0906,
+        "max": 0.2868,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 28927.4,
+      "recall_at_1": 0.951,
+      "recall_at_5": 0.9426,
+      "recall_at_10": 0.9387,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 316,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 3.9966,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 950.75,
+      "memory_mb": 145.49,
+      "search_latency_ms": {
+        "mean": 0.7226,
+        "p50": 0.7262,
+        "p95": 0.8303,
+        "p99": 0.8833,
+        "min": 0.5259,
+        "max": 0.9362,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 6446.6,
+      "recall_at_1": 0.992,
+      "recall_at_5": 0.9854,
+      "recall_at_10": 0.983,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 32
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.4315,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 949.65,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.1514,
+        "p50": 0.149,
+        "p95": 0.2189,
+        "p99": 0.2607,
+        "min": 0.0892,
+        "max": 0.3077,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 34761.5,
+      "recall_at_1": 0.947,
+      "recall_at_5": 0.9546,
+      "recall_at_10": 0.9489,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 707,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 10.4358,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 957.45,
+      "memory_mb": 146.07,
+      "search_latency_ms": {
+        "mean": 0.725,
+        "p50": 0.7243,
+        "p95": 0.8477,
+        "p99": 0.8915,
+        "min": 0.5231,
+        "max": 0.9942,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 6970.1,
+      "recall_at_1": 0.979,
+      "recall_at_5": 0.9896,
+      "recall_at_10": 0.9882,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.8556,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 960.92,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.0662,
+        "p50": 0.0633,
+        "p95": 0.0938,
+        "p99": 0.1167,
+        "min": 0.0434,
+        "max": 0.2424,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 95917.6,
+      "recall_at_1": 0.897,
+      "recall_at_5": 0.9012,
+      "recall_at_10": 0.8924,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.6952,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 962.8,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.2137,
+        "p50": 0.2109,
+        "p95": 0.294,
+        "p99": 0.345,
+        "min": 0.1278,
+        "max": 0.3903,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 22263.4,
+      "recall_at_1": 0.966,
+      "recall_at_5": 0.9638,
+      "recall_at_10": 0.9616,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 1024,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 14.7294,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 963.77,
+      "memory_mb": 146.54,
+      "search_latency_ms": {
+        "mean": 0.4796,
+        "p50": 0.4852,
+        "p95": 0.5867,
+        "p99": 0.6264,
+        "min": 0.2787,
+        "max": 0.7062,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 10268.4,
+      "recall_at_1": 0.978,
+      "recall_at_5": 0.9814,
+      "recall_at_10": 0.9792,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 16
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 58.7552,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 968.76,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.0849,
+        "p50": 0.083,
+        "p95": 0.1026,
+        "p99": 0.1101,
+        "min": 0.068,
+        "max": 0.1492,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 93790.7,
+      "recall_at_1": 0.908,
+      "recall_at_5": 0.8832,
+      "recall_at_10": 0.8629,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 64
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 58.6659,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 968.25,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.1338,
+        "p50": 0.1322,
+        "p95": 0.1754,
+        "p99": 0.1961,
+        "min": 0.0965,
+        "max": 0.2535,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 51159.9,
+      "recall_at_1": 0.951,
+      "recall_at_5": 0.9574,
+      "recall_at_10": 0.9516,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "ivf",
+      "params": {
+        "nlist": 4096,
+        "nprobe": 128
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 59.2175,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 968.64,
+      "memory_mb": 151.08,
+      "search_latency_ms": {
+        "mean": 0.2062,
+        "p50": 0.204,
+        "p95": 0.277,
+        "p99": 0.3138,
+        "min": 0.1413,
+        "max": 0.488,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 30985.1,
+      "recall_at_1": 0.966,
+      "recall_at_5": 0.9762,
+      "recall_at_10": 0.9731,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 384
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 0.5175,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 971.34,
+      "memory_mb": 5.09,
+      "search_latency_ms": {
+        "mean": 0.2952,
+        "p50": 0.2944,
+        "p95": 0.2988,
+        "p99": 0.3007,
+        "min": 0.2924,
+        "max": 0.3332,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 25417.6,
+      "recall_at_1": 0.532,
+      "recall_at_5": 0.5616,
+      "recall_at_10": 0.5327,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 768
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 1.0367,
+      "peak_rss_mb": 1551.11,
+      "post_build_rss_mb": 971.34,
+      "memory_mb": 10.19,
+      "search_latency_ms": {
+        "mean": 0.5292,
+        "p50": 0.5288,
+        "p95": 0.5346,
+        "p99": 0.5431,
+        "min": 0.5247,
+        "max": 0.5921,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 14069.8,
+      "recall_at_1": 0.664,
+      "recall_at_5": 0.657,
+      "recall_at_10": 0.6517,
+      "workload": "bursty"
+    },
+    {
+      "index_type": "lsh",
+      "params": {
+        "nbits": 1536
+      },
+      "dataset_size": 99000,
+      "dataset_label": "100k",
+      "build_time_s": 2.0374,
+      "peak_rss_mb": 1553.21,
+      "post_build_rss_mb": 973.19,
+      "memory_mb": 20.38,
+      "search_latency_ms": {
+        "mean": 0.8446,
+        "p50": 0.8433,
+        "p95": 0.8522,
+        "p99": 0.8651,
+        "min": 0.8374,
+        "max": 0.9545,
+        "warmup_queries": 100,
+        "timing_mode": "individual_perf_counter_ns"
+      },
+      "throughput_qps": 8872.7,
+      "recall_at_1": 0.734,
+      "recall_at_5": 0.7072,
+      "recall_at_10": 0.7354,
+      "workload": "bursty"
+    }
+  ]
+}

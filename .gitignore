@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.venv/
+CSE584_Project_Proposal.pdf
+improvements.html
+Semantic_Eviction_Policy_Evaluation.pdf
+.claude/
+.pytest_cache/
+.gemini/
+markdown/
+
+# Environment
+.env
+
+# Data & results (large files only)
+data/*.parquet
+data/*.csv
+results/embeddings/*.npy
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.ipynb
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# HPC logs
+logs/
+slurm-*.out

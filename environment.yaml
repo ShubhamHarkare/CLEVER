@@ -1,0 +1,14 @@
+# Conda environment for CLEVER (Cluster-Level Eviction for Vector Embedding Retrieval)
+# Usage: conda env create -f environment.yaml
+#        conda activate clever
+name: clever
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.13.7
+  - pip>=25.0
+  - pip:
+      - -r requirements.txt
