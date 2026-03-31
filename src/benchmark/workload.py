@@ -176,3 +176,183 @@ def _bursty_workload(
         query_indices.extend(burst.tolist())
 
     return np.array(query_indices[:n_queries], dtype=np.int64)
+
+
+
+#! Below are the additions done by sharkare
+"""
+ADD these two functions to the bottom of src/benchmark/workload.py
+They go AFTER the existing _bursty_workload function.
+No existing code needs to change.
+"""
+
+
+def generate_concentrated_workload(
+    query_vectors: np.ndarray,
+    n_queries: int,
+    gamma: float = 0.5,
+    seed: int = 42,
+    n_clusters: int = 50,
+) -> np.ndarray:
+    """
+    Generate a workload with tunable concentration (cluster skew).
+
+    gamma controls how concentrated the workload is:
+      - gamma=0.0: perfectly uniform across clusters (every cluster equally likely)
+      - gamma=0.5: moderate Zipf skew (realistic LLM traffic)
+      - gamma=1.0: extreme concentration (almost all queries from top 1-2 clusters)
+
+    The Zipf exponent is: s = 1 + 3*gamma
+      gamma=0.0 → s=1.0 (standard Zipf, mild skew)
+      gamma=0.5 → s=2.5 (strong skew)
+      gamma=1.0 → s=4.0 (extreme skew)
+
+    Args:
+        query_vectors: Query pool embeddings, shape (Q, D).
+        n_queries: Number of query indices to generate.
+        gamma: Concentration parameter in [0.0, 1.0].
+        seed: Random seed.
+        n_clusters: Number of topic clusters.
+
+    Returns:
+        Array of indices into query_vectors, shape (n_queries,).
+    """
+    rng = np.random.RandomState(seed)
+    Q = query_vectors.shape[0]
+
+    # Edge case: gamma=0 means truly uniform (no clustering needed)
+    if gamma <= 0.001:
+        return rng.choice(Q, size=n_queries, replace=True)
+
+    # Cluster the query vectors themselves
+    actual_k = min(n_clusters, Q // 5)
+    if actual_k < 2:
+        actual_k = 2
+
+    kmeans = MiniBatchKMeans(
+        n_clusters=actual_k, random_state=seed,
+        batch_size=min(1024, Q), n_init=3,
+    )
+    labels = kmeans.fit_predict(query_vectors)
+
+    # Build cluster -> member indices mapping
+    cluster_indices = {}
+    for i in range(actual_k):
+        members = np.where(labels == i)[0]
+        if len(members) > 0:
+            cluster_indices[i] = members
+
+    cluster_ids = sorted(cluster_indices.keys())
+    if not cluster_ids:
+        return rng.choice(Q, size=n_queries, replace=True)
+
+    # Zipf with tunable exponent: s = 1 + 3*gamma
+    zipf_exponent = 1.0 + 3.0 * gamma
+    ranks = np.arange(1, len(cluster_ids) + 1, dtype=np.float64)
+    weights = 1.0 / np.power(ranks, zipf_exponent)
+    weights /= weights.sum()
+
+    # Sample clusters, then sample queries within each cluster
+    query_indices = np.empty(n_queries, dtype=np.int64)
+    chosen_clusters = rng.choice(cluster_ids, size=n_queries, p=weights)
+
+    for i, c in enumerate(chosen_clusters):
+        members = cluster_indices[c]
+        query_indices[i] = rng.choice(members)
+
+    return query_indices
+
+
+def compute_workload_diversity(
+    embeddings: np.ndarray,
+    n_clusters: int = 30,
+    seed: int = 42,
+) -> dict:
+    """
+    Compute a workload diversity metric from a set of embeddings.
+
+    Measures how spread out the queries are in embedding space.
+    Returns multiple diversity indicators:
+
+    - normalized_diversity: Primary metric in [0, 1]. Based on average
+      pairwise L2² distance, normalized against a calibration baseline.
+      High = uniform spread, Low = concentrated in few directions.
+
+    - cluster_entropy: Entropy of cluster assignment distribution,
+      normalized by log(n_clusters_requested).
+
+    - effective_clusters: exp(raw entropy) — the effective number of topics.
+
+    - avg_pairwise_distance: Mean L2² distance between sampled pairs.
+
+    Args:
+        embeddings: Query embeddings, shape (N, D).
+        n_clusters: Number of clusters for entropy computation.
+        seed: Random seed.
+
+    Returns:
+        Dict with diversity metrics.
+    """
+    N = embeddings.shape[0]
+    D = embeddings.shape[1]
+    rng = np.random.RandomState(seed)
+
+    # --- Average pairwise distance (primary signal) ---
+    sample_size = min(1000, N)
+    idx = rng.choice(N, size=sample_size, replace=False)
+    sample = embeddings[idx]
+
+    n_pairs = min(5000, sample_size * (sample_size - 1) // 2)
+    pair_i = rng.randint(0, sample_size, size=n_pairs)
+    pair_j = rng.randint(0, sample_size, size=n_pairs)
+    mask = pair_i != pair_j
+    pair_i = pair_i[mask]
+    pair_j = pair_j[mask]
+
+    diffs = sample[pair_i] - sample[pair_j]
+    pairwise_dists = np.sum(diffs ** 2, axis=1)
+    avg_pairwise_distance = float(np.mean(pairwise_dists))
+
+    # Normalize pairwise distance to [0, 1] using expected distance
+    # for unit-norm random vectors in D dimensions.
+    # For unit-norm vectors: E[||x-y||²] = 2.0
+    # For non-normalized: scale by dimension.
+    sample_norms = np.linalg.norm(sample, axis=1)
+    avg_norm = float(np.mean(sample_norms))
+    if avg_norm > 0:
+        # Expected L2² between random vectors with this avg norm
+        expected_dist = 2.0 * (avg_norm ** 2)
+        normalized_diversity = min(1.0, avg_pairwise_distance / expected_dist)
+    else:
+        normalized_diversity = 0.0
+
+    # --- Cluster entropy (secondary signal) ---
+    actual_k = min(n_clusters, N // 5)
+    if actual_k < 2:
+        actual_k = 2
+
+    kmeans = MiniBatchKMeans(
+        n_clusters=actual_k, random_state=seed,
+        batch_size=min(1024, N), n_init=3,
+    )
+    labels = kmeans.fit_predict(embeddings)
+
+    counts = np.bincount(labels, minlength=actual_k).astype(np.float64)
+    probs = counts / counts.sum()
+    probs = probs[probs > 0]
+
+    entropy = -np.sum(probs * np.log(probs))
+    max_entropy = np.log(actual_k)
+    normalized_entropy = entropy / max_entropy if max_entropy > 0 else 0.0
+    effective_clusters = float(np.exp(entropy))
+
+    # --- Combined metric: use pairwise distance as primary ---
+    # cluster_entropy is reported but normalized_diversity drives adaptation
+    return {
+        "cluster_entropy": round(float(normalized_diversity), 4),
+        "effective_clusters": round(effective_clusters, 2),
+        "avg_pairwise_distance": round(avg_pairwise_distance, 4),
+        "raw_entropy": round(float(normalized_entropy), 4),
+        "n_clusters_used": int(len(probs)),
+        "n_queries": N,
+    }

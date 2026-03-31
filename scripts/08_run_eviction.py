@@ -56,6 +56,8 @@ from src.cache.eviction.oracle import OraclePolicy
 from src.benchmark.workload import generate_workload
 from src.utils.env_check import require_supported_runtime, pin_numpy_threads
 from src.utils.manifest import generate_manifest
+from src.cache.eviction.adaptive_semantic import AdaptiveSemanticPolicy
+from src.benchmark.workload import compute_workload_diversity,generate_concentrated_workload
 
 logging.basicConfig(
     level=logging.INFO,
@@ -131,6 +133,19 @@ def create_policy(
             similarity_threshold=config["evaluation"].get("hit_threshold", 0.90),
             refresh_interval=oracle_cfg.get("refresh_interval", 100),
             use_gpu=oracle_cfg.get("use_gpu", False),
+        )
+    elif policy_name == "adaptive":
+        sem_cfg = eviction_cfg.get("semantic", {})
+        adapt_cfg = eviction_cfg.get("adaptive", {})
+        return AdaptiveSemanticPolicy(
+            similarity_threshold=sem_cfg.get("similarity_threshold", 0.30),
+            base_alpha=sem_cfg.get("alpha", 1.0),
+            beta=sem_cfg.get("beta", 1.0),
+            recompute_interval=sem_cfg.get("recompute_interval", 50),
+            adaptation_window=adapt_cfg.get("adaptation_window", 500),
+            adaptation_interval=adapt_cfg.get("adaptation_interval", 200),
+            alpha_min=adapt_cfg.get("alpha_min", 0.3),
+            alpha_max=adapt_cfg.get("alpha_max", 2.5),
         )
     else:
         raise ValueError(f"Unknown policy: {policy_name}")
@@ -266,6 +281,10 @@ def evaluate_policy(
         # Advance oracle stream position
         if policy_name == "oracle":
             policy.advance_stream(i)
+
+        
+        if hasattr(policy,'on_query'):
+            policy.on_query(query_emb)
 
         # Lookup
         result = cache.lookup(query_emb, k=1, threshold=hit_threshold)

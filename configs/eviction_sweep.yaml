@@ -1,0 +1,38 @@
+# ── Eviction sweep experiment configuration ──────────────────────
+# Used by scripts/10_run_eviction_sweep.py
+# Sweeps gamma (workload concentration) to find when semantic eviction helps
+
+cache:
+  index_type: hnsw
+  index_params:
+    M: 32
+    efConstruction: 128
+    efSearch: 128
+  cache_sizes_pct: [0.10, 0.20]    # keep 2 sizes to limit total runs
+
+eviction:
+  policies: [lru, lfu, semantic, adaptive, oracle]
+  oracle:
+    refresh_interval: 100
+  semantic:
+    similarity_threshold: 0.30
+    alpha: 1.0
+    beta: 1.0
+    recompute_interval: 50
+  adaptive:
+    adaptation_window: 500
+    adaptation_interval: 200
+    alpha_min: 0.3
+    alpha_max: 2.5
+
+evaluation:
+  warmup_pct: 0.30
+  hit_threshold: 0.90
+  rolling_window: 1000
+  log_interval: 500
+
+sweep:
+  gamma_values: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+seed: 42
+seeds: [42, 123, 456]

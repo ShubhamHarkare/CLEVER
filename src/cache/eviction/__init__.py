@@ -14,12 +14,13 @@ from src.cache.eviction.lru import LRUPolicy
 from src.cache.eviction.lfu import LFUPolicy
 from src.cache.eviction.semantic import SemanticPolicy
 from src.cache.eviction.oracle import OraclePolicy
-
+from src.cache.eviction.adaptive_semantic import AdaptiveSemanticPolicy
 POLICY_REGISTRY: dict[str, type[EvictionPolicy]] = {
     "lru": LRUPolicy,
     "lfu": LFUPolicy,
     "semantic": SemanticPolicy,
     "oracle": OraclePolicy,
+    'adaptive': AdaptiveSemanticPolicy
 }
 
 __all__ = [
@@ -29,4 +30,5 @@ __all__ = [
     "SemanticPolicy",
     "OraclePolicy",
     "POLICY_REGISTRY",
+    'AdaptiveSemanticPolicy'
 ]

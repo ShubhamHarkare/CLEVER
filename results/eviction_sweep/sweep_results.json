@@ -1,0 +1,5713 @@
+{
+  "manifest": {
+    "timestamp_utc": "2026-03-30T03:15:16.713242Z",
+    "command_line": "scripts/10_run_eviction_sweep.py --embeddings results/embeddings/full_embeddings.npy --queries data/full_queries.parquet --config configs/eviction_sweep.yaml --output results/eviction_sweep/ --policies lru semantic adaptive --gammas 0.0 0.5 1.0",
+    "python_version": "3.13.5",
+    "hardware": {
+      "system": "Darwin",
+      "release": "25.3.0",
+      "machine": "arm64",
+      "processor": "arm",
+      "cpu_count_logical": 8,
+      "cpu_count_physical": 8,
+      "ram_total_gb": 16.0
+    },
+    "packages": {
+      "numpy": "2.4.2",
+      "pandas": "3.0.0",
+      "torch": "2.10.0",
+      "faiss": "1.13.2",
+      "transformers": "5.1.0",
+      "sentence_transformers": "5.2.2"
+    },
+    "git": {
+      "commit": "c59ee9f90dc76c15ffad52e1109a0cf92bfb5b6e",
+      "branch": "main",
+      "is_dirty": true
+    },
+    "config_hash": "ea301801020b"
+  },
+  "sweep_results": [
+    {
+      "policy": "lru",
+      "gamma": 0.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.31978,
+      "n_hits": 1919,
+      "n_misses": 4082,
+      "semantic_coverage_avg_dist": 0.774047,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.304,
+          "rolling_hit_rate": 0.304,
+          "n_evictions": 348,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.304,
+          "rolling_hit_rate": 0.304,
+          "n_evictions": 696,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.307333,
+          "rolling_hit_rate": 0.309,
+          "n_evictions": 1039,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.3195,
+          "rolling_hit_rate": 0.335,
+          "n_evictions": 1361,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.3196,
+          "rolling_hit_rate": 0.338,
+          "n_evictions": 1701,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.316,
+          "rolling_hit_rate": 0.309,
+          "n_evictions": 2052,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.319714,
+          "rolling_hit_rate": 0.32,
+          "n_evictions": 2381,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.32175,
+          "rolling_hit_rate": 0.339,
+          "n_evictions": 2713,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.320444,
+          "rolling_hit_rate": 0.323,
+          "n_evictions": 3058,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.3202,
+          "rolling_hit_rate": 0.314,
+          "n_evictions": 3399,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.319091,
+          "rolling_hit_rate": 0.313,
+          "n_evictions": 3745,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.319667,
+          "rolling_hit_rate": 0.317,
+          "n_evictions": 4082,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.31978,
+          "rolling_hit_rate": 0.318,
+          "n_evictions": 4082,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.039,
+        "stream_time_s": 1.525,
+        "avg_query_time_ms": 0.2541
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 1069,
+        "n_active": 857,
+        "n_dead": 212,
+        "n_lookups": 6001,
+        "n_hits": 1919,
+        "n_inserts": 4939,
+        "n_evictions": 4082,
+        "n_rebuilds": 18,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "lru",
+        "memory_mb": 2.3,
+        "avg_lookup_time_ms": 0.0664
+      }
+    },
+    {
+      "policy": "lru",
+      "gamma": 0.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.38127,
+      "n_hits": 2288,
+      "n_misses": 3713,
+      "semantic_coverage_avg_dist": 0.576163,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.352,
+          "rolling_hit_rate": 0.352,
+          "n_evictions": 324,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.348,
+          "rolling_hit_rate": 0.348,
+          "n_evictions": 652,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.362,
+          "rolling_hit_rate": 0.367,
+          "n_evictions": 957,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.3745,
+          "rolling_hit_rate": 0.401,
+          "n_evictions": 1251,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.372,
+          "rolling_hit_rate": 0.387,
+          "n_evictions": 1570,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.373,
+          "rolling_hit_rate": 0.37,
+          "n_evictions": 1881,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.377143,
+          "rolling_hit_rate": 0.39,
+          "n_evictions": 2180,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.38075,
+          "rolling_hit_rate": 0.404,
+          "n_evictions": 2477,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.379778,
+          "rolling_hit_rate": 0.389,
+          "n_evictions": 2791,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.3808,
+          "rolling_hit_rate": 0.381,
+          "n_evictions": 3096,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.380727,
+          "rolling_hit_rate": 0.385,
+          "n_evictions": 3406,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.381167,
+          "rolling_hit_rate": 0.383,
+          "n_evictions": 3713,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.38127,
+          "rolling_hit_rate": 0.384,
+          "n_evictions": 3713,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.096,
+        "stream_time_s": 1.929,
+        "avg_query_time_ms": 0.3214
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1995,
+        "n_active": 1714,
+        "n_dead": 281,
+        "n_lookups": 6001,
+        "n_hits": 2288,
+        "n_inserts": 5427,
+        "n_evictions": 3713,
+        "n_rebuilds": 8,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "lru",
+        "memory_mb": 4.29,
+        "avg_lookup_time_ms": 0.0986
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 0.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.283619,
+      "n_hits": 1702,
+      "n_misses": 4299,
+      "semantic_coverage_avg_dist": 0.805062,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.306,
+          "rolling_hit_rate": 0.306,
+          "n_evictions": 347,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.291,
+          "rolling_hit_rate": 0.291,
+          "n_evictions": 709,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.278,
+          "rolling_hit_rate": 0.264,
+          "n_evictions": 1083,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.289,
+          "rolling_hit_rate": 0.287,
+          "n_evictions": 1422,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.2832,
+          "rolling_hit_rate": 0.291,
+          "n_evictions": 1792,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.28,
+          "rolling_hit_rate": 0.262,
+          "n_evictions": 2160,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.281714,
+          "rolling_hit_rate": 0.278,
+          "n_evictions": 2514,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.28375,
+          "rolling_hit_rate": 0.295,
+          "n_evictions": 2865,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.284,
+          "rolling_hit_rate": 0.292,
+          "n_evictions": 3222,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.2828,
+          "rolling_hit_rate": 0.279,
+          "n_evictions": 3586,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.282,
+          "rolling_hit_rate": 0.273,
+          "n_evictions": 3949,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.2835,
+          "rolling_hit_rate": 0.287,
+          "n_evictions": 4299,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.283619,
+          "rolling_hit_rate": 0.288,
+          "n_evictions": 4299,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.04,
+        "stream_time_s": 4.457,
+        "avg_query_time_ms": 0.7427
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 1071,
+        "n_active": 857,
+        "n_dead": 214,
+        "n_lookups": 6001,
+        "n_hits": 1702,
+        "n_inserts": 5156,
+        "n_evictions": 4299,
+        "n_rebuilds": 19,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "semantic",
+        "memory_mb": 2.3,
+        "avg_lookup_time_ms": 0.0678,
+        "policy_stats": {
+          "n_evictions": 4299,
+          "n_recomputes": 99,
+          "avg_eviction_time_ms": 0.6461,
+          "total_eviction_time_s": 2.778,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 0.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.345942,
+      "n_hits": 2076,
+      "n_misses": 3925,
+      "semantic_coverage_avg_dist": 0.655174,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.352,
+          "rolling_hit_rate": 0.352,
+          "n_evictions": 324,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.349,
+          "rolling_hit_rate": 0.349,
+          "n_evictions": 651,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.363333,
+          "rolling_hit_rate": 0.369,
+          "n_evictions": 955,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.368,
+          "rolling_hit_rate": 0.387,
+          "n_evictions": 1264,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.3572,
+          "rolling_hit_rate": 0.348,
+          "n_evictions": 1607,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.347667,
+          "rolling_hit_rate": 0.307,
+          "n_evictions": 1957,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.349143,
+          "rolling_hit_rate": 0.329,
+          "n_evictions": 2278,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.34975,
+          "rolling_hit_rate": 0.356,
+          "n_evictions": 2601,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.349333,
+          "rolling_hit_rate": 0.35,
+          "n_evictions": 2928,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.3474,
+          "rolling_hit_rate": 0.338,
+          "n_evictions": 3263,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.347091,
+          "rolling_hit_rate": 0.337,
+          "n_evictions": 3591,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.346,
+          "rolling_hit_rate": 0.339,
+          "n_evictions": 3924,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.345942,
+          "rolling_hit_rate": 0.339,
+          "n_evictions": 3925,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.1,
+        "stream_time_s": 6.445,
+        "avg_query_time_ms": 1.074
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1778,
+        "n_active": 1714,
+        "n_dead": 64,
+        "n_lookups": 6001,
+        "n_hits": 2076,
+        "n_inserts": 5639,
+        "n_evictions": 3925,
+        "n_rebuilds": 9,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "semantic",
+        "memory_mb": 3.82,
+        "avg_lookup_time_ms": 0.1047,
+        "policy_stats": {
+          "n_evictions": 3925,
+          "n_recomputes": 82,
+          "avg_eviction_time_ms": 1.0747,
+          "total_eviction_time_s": 4.218,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 0.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.283619,
+      "n_hits": 1702,
+      "n_misses": 4299,
+      "semantic_coverage_avg_dist": 0.805062,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9351,
+          "effective_clusters": 16.53,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3572
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9356,
+          "effective_clusters": 17.07,
+          "old_alpha": 2.3572,
+          "new_alpha": 2.3583
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9366,
+          "effective_clusters": 18.51,
+          "old_alpha": 2.3583,
+          "new_alpha": 2.3605
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9351,
+          "effective_clusters": 18.05,
+          "old_alpha": 2.3605,
+          "new_alpha": 2.3572
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9374,
+          "effective_clusters": 17.73,
+          "old_alpha": 2.3572,
+          "new_alpha": 2.3623
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9319,
+          "effective_clusters": 17.66,
+          "old_alpha": 2.3623,
+          "new_alpha": 2.3502
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.9331,
+          "effective_clusters": 17.71,
+          "old_alpha": 2.3502,
+          "new_alpha": 2.3528
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9364,
+          "effective_clusters": 16.46,
+          "old_alpha": 2.3528,
+          "new_alpha": 2.3601
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9305,
+          "effective_clusters": 16.08,
+          "old_alpha": 2.3601,
+          "new_alpha": 2.3471
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9281,
+          "effective_clusters": 17.64,
+          "old_alpha": 2.3471,
+          "new_alpha": 2.3418
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.931,
+          "effective_clusters": 17.05,
+          "old_alpha": 2.3418,
+          "new_alpha": 2.3482
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.9303,
+          "effective_clusters": 16.51,
+          "old_alpha": 2.3482,
+          "new_alpha": 2.3467
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9294,
+          "effective_clusters": 17.56,
+          "old_alpha": 2.3467,
+          "new_alpha": 2.3447
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9275,
+          "effective_clusters": 17.2,
+          "old_alpha": 2.3447,
+          "new_alpha": 2.3405
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.932,
+          "effective_clusters": 16.66,
+          "old_alpha": 2.3405,
+          "new_alpha": 2.3504
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9248,
+          "effective_clusters": 16.51,
+          "old_alpha": 2.3504,
+          "new_alpha": 2.3346
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9278,
+          "effective_clusters": 17.74,
+          "old_alpha": 2.3346,
+          "new_alpha": 2.3412
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 16.06,
+          "old_alpha": 2.3412,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9346,
+          "effective_clusters": 17.3,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3561
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.9327,
+          "effective_clusters": 16.53,
+          "old_alpha": 2.3561,
+          "new_alpha": 2.3519
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.933,
+          "effective_clusters": 16.93,
+          "old_alpha": 2.3519,
+          "new_alpha": 2.3526
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9356,
+          "effective_clusters": 16.61,
+          "old_alpha": 2.3526,
+          "new_alpha": 2.3583
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9303,
+          "effective_clusters": 17.0,
+          "old_alpha": 2.3583,
+          "new_alpha": 2.3467
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9285,
+          "effective_clusters": 17.23,
+          "old_alpha": 2.3467,
+          "new_alpha": 2.3427
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9281,
+          "effective_clusters": 16.07,
+          "old_alpha": 2.3427,
+          "new_alpha": 2.3418
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9269,
+          "effective_clusters": 17.71,
+          "old_alpha": 2.3418,
+          "new_alpha": 2.3392
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9296,
+          "effective_clusters": 17.38,
+          "old_alpha": 2.3392,
+          "new_alpha": 2.3451
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9332,
+          "effective_clusters": 17.43,
+          "old_alpha": 2.3451,
+          "new_alpha": 2.353
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9295,
+          "effective_clusters": 17.59,
+          "old_alpha": 2.353,
+          "new_alpha": 2.3449
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 15.54,
+          "old_alpha": 2.3449,
+          "new_alpha": 2.3489
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.306,
+          "rolling_hit_rate": 0.306,
+          "n_evictions": 347,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.291,
+          "rolling_hit_rate": 0.291,
+          "n_evictions": 709,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.278,
+          "rolling_hit_rate": 0.264,
+          "n_evictions": 1083,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.289,
+          "rolling_hit_rate": 0.287,
+          "n_evictions": 1422,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.2832,
+          "rolling_hit_rate": 0.291,
+          "n_evictions": 1792,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.28,
+          "rolling_hit_rate": 0.262,
+          "n_evictions": 2160,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.281714,
+          "rolling_hit_rate": 0.278,
+          "n_evictions": 2514,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.28375,
+          "rolling_hit_rate": 0.295,
+          "n_evictions": 2865,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.284,
+          "rolling_hit_rate": 0.292,
+          "n_evictions": 3222,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.2828,
+          "rolling_hit_rate": 0.279,
+          "n_evictions": 3586,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.282,
+          "rolling_hit_rate": 0.273,
+          "n_evictions": 3949,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.2835,
+          "rolling_hit_rate": 0.287,
+          "n_evictions": 4299,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.283619,
+          "rolling_hit_rate": 0.288,
+          "n_evictions": 4299,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.04,
+        "stream_time_s": 4.633,
+        "avg_query_time_ms": 0.7721
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 1071,
+        "n_active": 857,
+        "n_dead": 214,
+        "n_lookups": 6001,
+        "n_hits": 1702,
+        "n_inserts": 5156,
+        "n_evictions": 4299,
+        "n_rebuilds": 19,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "adaptive",
+        "memory_mb": 2.3,
+        "avg_lookup_time_ms": 0.0681,
+        "policy_stats": {
+          "n_evictions": 4299,
+          "n_recomputes": 99,
+          "avg_eviction_time_ms": 0.5327,
+          "total_eviction_time_s": 2.29,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.34886,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9313,
+          "current_alpha": 2.3489,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9351,
+              "effective_clusters": 16.53,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3572
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9356,
+              "effective_clusters": 17.07,
+              "old_alpha": 2.3572,
+              "new_alpha": 2.3583
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9366,
+              "effective_clusters": 18.51,
+              "old_alpha": 2.3583,
+              "new_alpha": 2.3605
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9351,
+              "effective_clusters": 18.05,
+              "old_alpha": 2.3605,
+              "new_alpha": 2.3572
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9374,
+              "effective_clusters": 17.73,
+              "old_alpha": 2.3572,
+              "new_alpha": 2.3623
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9319,
+              "effective_clusters": 17.66,
+              "old_alpha": 2.3623,
+              "new_alpha": 2.3502
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.9331,
+              "effective_clusters": 17.71,
+              "old_alpha": 2.3502,
+              "new_alpha": 2.3528
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9364,
+              "effective_clusters": 16.46,
+              "old_alpha": 2.3528,
+              "new_alpha": 2.3601
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9305,
+              "effective_clusters": 16.08,
+              "old_alpha": 2.3601,
+              "new_alpha": 2.3471
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9281,
+              "effective_clusters": 17.64,
+              "old_alpha": 2.3471,
+              "new_alpha": 2.3418
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.931,
+              "effective_clusters": 17.05,
+              "old_alpha": 2.3418,
+              "new_alpha": 2.3482
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.9303,
+              "effective_clusters": 16.51,
+              "old_alpha": 2.3482,
+              "new_alpha": 2.3467
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9294,
+              "effective_clusters": 17.56,
+              "old_alpha": 2.3467,
+              "new_alpha": 2.3447
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9275,
+              "effective_clusters": 17.2,
+              "old_alpha": 2.3447,
+              "new_alpha": 2.3405
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.932,
+              "effective_clusters": 16.66,
+              "old_alpha": 2.3405,
+              "new_alpha": 2.3504
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9248,
+              "effective_clusters": 16.51,
+              "old_alpha": 2.3504,
+              "new_alpha": 2.3346
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9278,
+              "effective_clusters": 17.74,
+              "old_alpha": 2.3346,
+              "new_alpha": 2.3412
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 16.06,
+              "old_alpha": 2.3412,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9346,
+              "effective_clusters": 17.3,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3561
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.9327,
+              "effective_clusters": 16.53,
+              "old_alpha": 2.3561,
+              "new_alpha": 2.3519
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.933,
+              "effective_clusters": 16.93,
+              "old_alpha": 2.3519,
+              "new_alpha": 2.3526
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9356,
+              "effective_clusters": 16.61,
+              "old_alpha": 2.3526,
+              "new_alpha": 2.3583
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9303,
+              "effective_clusters": 17.0,
+              "old_alpha": 2.3583,
+              "new_alpha": 2.3467
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9285,
+              "effective_clusters": 17.23,
+              "old_alpha": 2.3467,
+              "new_alpha": 2.3427
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9281,
+              "effective_clusters": 16.07,
+              "old_alpha": 2.3427,
+              "new_alpha": 2.3418
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9269,
+              "effective_clusters": 17.71,
+              "old_alpha": 2.3418,
+              "new_alpha": 2.3392
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9296,
+              "effective_clusters": 17.38,
+              "old_alpha": 2.3392,
+              "new_alpha": 2.3451
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9332,
+              "effective_clusters": 17.43,
+              "old_alpha": 2.3451,
+              "new_alpha": 2.353
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9295,
+              "effective_clusters": 17.59,
+              "old_alpha": 2.353,
+              "new_alpha": 2.3449
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 15.54,
+              "old_alpha": 2.3449,
+              "new_alpha": 2.3489
+            }
+          ]
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 0.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.345942,
+      "n_hits": 2076,
+      "n_misses": 3925,
+      "semantic_coverage_avg_dist": 0.654107,
+      "workload_diversity": {
+        "cluster_entropy": 0.9324,
+        "effective_clusters": 27.56,
+        "avg_pairwise_distance": 1.8648,
+        "raw_entropy": 0.975,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9351,
+          "effective_clusters": 16.53,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3572
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9356,
+          "effective_clusters": 17.07,
+          "old_alpha": 2.3572,
+          "new_alpha": 2.3583
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9366,
+          "effective_clusters": 18.51,
+          "old_alpha": 2.3583,
+          "new_alpha": 2.3605
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9351,
+          "effective_clusters": 18.05,
+          "old_alpha": 2.3605,
+          "new_alpha": 2.3572
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9374,
+          "effective_clusters": 17.73,
+          "old_alpha": 2.3572,
+          "new_alpha": 2.3623
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9319,
+          "effective_clusters": 17.66,
+          "old_alpha": 2.3623,
+          "new_alpha": 2.3502
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.9331,
+          "effective_clusters": 17.71,
+          "old_alpha": 2.3502,
+          "new_alpha": 2.3528
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9364,
+          "effective_clusters": 16.46,
+          "old_alpha": 2.3528,
+          "new_alpha": 2.3601
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9305,
+          "effective_clusters": 16.08,
+          "old_alpha": 2.3601,
+          "new_alpha": 2.3471
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9281,
+          "effective_clusters": 17.64,
+          "old_alpha": 2.3471,
+          "new_alpha": 2.3418
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.931,
+          "effective_clusters": 17.05,
+          "old_alpha": 2.3418,
+          "new_alpha": 2.3482
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.9303,
+          "effective_clusters": 16.51,
+          "old_alpha": 2.3482,
+          "new_alpha": 2.3467
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9294,
+          "effective_clusters": 17.56,
+          "old_alpha": 2.3467,
+          "new_alpha": 2.3447
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9275,
+          "effective_clusters": 17.2,
+          "old_alpha": 2.3447,
+          "new_alpha": 2.3405
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.932,
+          "effective_clusters": 16.66,
+          "old_alpha": 2.3405,
+          "new_alpha": 2.3504
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9248,
+          "effective_clusters": 16.51,
+          "old_alpha": 2.3504,
+          "new_alpha": 2.3346
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9278,
+          "effective_clusters": 17.74,
+          "old_alpha": 2.3346,
+          "new_alpha": 2.3412
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 16.06,
+          "old_alpha": 2.3412,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9346,
+          "effective_clusters": 17.3,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3561
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.9327,
+          "effective_clusters": 16.53,
+          "old_alpha": 2.3561,
+          "new_alpha": 2.3519
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.933,
+          "effective_clusters": 16.93,
+          "old_alpha": 2.3519,
+          "new_alpha": 2.3526
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9356,
+          "effective_clusters": 16.61,
+          "old_alpha": 2.3526,
+          "new_alpha": 2.3583
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9303,
+          "effective_clusters": 17.0,
+          "old_alpha": 2.3583,
+          "new_alpha": 2.3467
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9285,
+          "effective_clusters": 17.23,
+          "old_alpha": 2.3467,
+          "new_alpha": 2.3427
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9281,
+          "effective_clusters": 16.07,
+          "old_alpha": 2.3427,
+          "new_alpha": 2.3418
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9269,
+          "effective_clusters": 17.71,
+          "old_alpha": 2.3418,
+          "new_alpha": 2.3392
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9296,
+          "effective_clusters": 17.38,
+          "old_alpha": 2.3392,
+          "new_alpha": 2.3451
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9332,
+          "effective_clusters": 17.43,
+          "old_alpha": 2.3451,
+          "new_alpha": 2.353
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9295,
+          "effective_clusters": 17.59,
+          "old_alpha": 2.353,
+          "new_alpha": 2.3449
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 15.54,
+          "old_alpha": 2.3449,
+          "new_alpha": 2.3489
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.352,
+          "rolling_hit_rate": 0.352,
+          "n_evictions": 324,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.344,
+          "rolling_hit_rate": 0.344,
+          "n_evictions": 656,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.36,
+          "rolling_hit_rate": 0.364,
+          "n_evictions": 960,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.365,
+          "rolling_hit_rate": 0.386,
+          "n_evictions": 1270,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.3544,
+          "rolling_hit_rate": 0.346,
+          "n_evictions": 1614,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.346333,
+          "rolling_hit_rate": 0.309,
+          "n_evictions": 1961,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.348286,
+          "rolling_hit_rate": 0.333,
+          "n_evictions": 2281,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.3495,
+          "rolling_hit_rate": 0.359,
+          "n_evictions": 2602,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.348889,
+          "rolling_hit_rate": 0.351,
+          "n_evictions": 2930,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.3472,
+          "rolling_hit_rate": 0.338,
+          "n_evictions": 3264,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.346545,
+          "rolling_hit_rate": 0.336,
+          "n_evictions": 3594,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.346,
+          "rolling_hit_rate": 0.34,
+          "n_evictions": 3924,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.345942,
+          "rolling_hit_rate": 0.34,
+          "n_evictions": 3925,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.099,
+        "stream_time_s": 7.046,
+        "avg_query_time_ms": 1.1741
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1778,
+        "n_active": 1714,
+        "n_dead": 64,
+        "n_lookups": 6001,
+        "n_hits": 2076,
+        "n_inserts": 5639,
+        "n_evictions": 3925,
+        "n_rebuilds": 9,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "adaptive",
+        "memory_mb": 3.82,
+        "avg_lookup_time_ms": 0.104,
+        "policy_stats": {
+          "n_evictions": 3925,
+          "n_recomputes": 82,
+          "avg_eviction_time_ms": 1.0725,
+          "total_eviction_time_s": 4.21,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.34886,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9313,
+          "current_alpha": 2.3489,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9351,
+              "effective_clusters": 16.53,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3572
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9356,
+              "effective_clusters": 17.07,
+              "old_alpha": 2.3572,
+              "new_alpha": 2.3583
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9366,
+              "effective_clusters": 18.51,
+              "old_alpha": 2.3583,
+              "new_alpha": 2.3605
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9351,
+              "effective_clusters": 18.05,
+              "old_alpha": 2.3605,
+              "new_alpha": 2.3572
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9374,
+              "effective_clusters": 17.73,
+              "old_alpha": 2.3572,
+              "new_alpha": 2.3623
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9319,
+              "effective_clusters": 17.66,
+              "old_alpha": 2.3623,
+              "new_alpha": 2.3502
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.9331,
+              "effective_clusters": 17.71,
+              "old_alpha": 2.3502,
+              "new_alpha": 2.3528
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9364,
+              "effective_clusters": 16.46,
+              "old_alpha": 2.3528,
+              "new_alpha": 2.3601
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9305,
+              "effective_clusters": 16.08,
+              "old_alpha": 2.3601,
+              "new_alpha": 2.3471
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9281,
+              "effective_clusters": 17.64,
+              "old_alpha": 2.3471,
+              "new_alpha": 2.3418
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.931,
+              "effective_clusters": 17.05,
+              "old_alpha": 2.3418,
+              "new_alpha": 2.3482
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.9303,
+              "effective_clusters": 16.51,
+              "old_alpha": 2.3482,
+              "new_alpha": 2.3467
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9294,
+              "effective_clusters": 17.56,
+              "old_alpha": 2.3467,
+              "new_alpha": 2.3447
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9275,
+              "effective_clusters": 17.2,
+              "old_alpha": 2.3447,
+              "new_alpha": 2.3405
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.932,
+              "effective_clusters": 16.66,
+              "old_alpha": 2.3405,
+              "new_alpha": 2.3504
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9248,
+              "effective_clusters": 16.51,
+              "old_alpha": 2.3504,
+              "new_alpha": 2.3346
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9278,
+              "effective_clusters": 17.74,
+              "old_alpha": 2.3346,
+              "new_alpha": 2.3412
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 16.06,
+              "old_alpha": 2.3412,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9346,
+              "effective_clusters": 17.3,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3561
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.9327,
+              "effective_clusters": 16.53,
+              "old_alpha": 2.3561,
+              "new_alpha": 2.3519
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.933,
+              "effective_clusters": 16.93,
+              "old_alpha": 2.3519,
+              "new_alpha": 2.3526
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9356,
+              "effective_clusters": 16.61,
+              "old_alpha": 2.3526,
+              "new_alpha": 2.3583
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9303,
+              "effective_clusters": 17.0,
+              "old_alpha": 2.3583,
+              "new_alpha": 2.3467
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9285,
+              "effective_clusters": 17.23,
+              "old_alpha": 2.3467,
+              "new_alpha": 2.3427
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9281,
+              "effective_clusters": 16.07,
+              "old_alpha": 2.3427,
+              "new_alpha": 2.3418
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9269,
+              "effective_clusters": 17.71,
+              "old_alpha": 2.3418,
+              "new_alpha": 2.3392
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9296,
+              "effective_clusters": 17.38,
+              "old_alpha": 2.3392,
+              "new_alpha": 2.3451
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9332,
+              "effective_clusters": 17.43,
+              "old_alpha": 2.3451,
+              "new_alpha": 2.353
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9295,
+              "effective_clusters": 17.59,
+              "old_alpha": 2.353,
+              "new_alpha": 2.3449
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 15.54,
+              "old_alpha": 2.3449,
+              "new_alpha": 2.3489
+            }
+          ]
+        }
+      }
+    },
+    {
+      "policy": "lru",
+      "gamma": 0.5,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.921513,
+      "n_hits": 5530,
+      "n_misses": 471,
+      "semantic_coverage_avg_dist": 0.111749,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.574,
+          "rolling_hit_rate": 0.574,
+          "n_evictions": 213,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.72,
+          "rolling_hit_rate": 0.72,
+          "n_evictions": 280,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.784667,
+          "rolling_hit_rate": 0.89,
+          "n_evictions": 323,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.827,
+          "rolling_hit_rate": 0.934,
+          "n_evictions": 346,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.8552,
+          "rolling_hit_rate": 0.961,
+          "n_evictions": 362,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.872667,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 382,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.886,
+          "rolling_hit_rate": 0.963,
+          "n_evictions": 399,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.89575,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 417,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.904,
+          "rolling_hit_rate": 0.967,
+          "n_evictions": 432,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9112,
+          "rolling_hit_rate": 0.973,
+          "n_evictions": 444,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.917091,
+          "rolling_hit_rate": 0.976,
+          "n_evictions": 456,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.9215,
+          "rolling_hit_rate": 0.973,
+          "n_evictions": 471,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.921513,
+          "rolling_hit_rate": 0.973,
+          "n_evictions": 471,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.04,
+        "stream_time_s": 0.542,
+        "avg_query_time_ms": 0.0903
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 898,
+        "n_active": 857,
+        "n_dead": 41,
+        "n_lookups": 6001,
+        "n_hits": 5530,
+        "n_inserts": 1328,
+        "n_evictions": 471,
+        "n_rebuilds": 2,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "lru",
+        "memory_mb": 1.93,
+        "avg_lookup_time_ms": 0.0668
+      }
+    },
+    {
+      "policy": "lru",
+      "gamma": 0.5,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.926346,
+      "n_hits": 5559,
+      "n_misses": 442,
+      "semantic_coverage_avg_dist": 0.119924,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.588,
+          "rolling_hit_rate": 0.588,
+          "n_evictions": 206,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.734,
+          "rolling_hit_rate": 0.734,
+          "n_evictions": 266,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.795333,
+          "rolling_hit_rate": 0.899,
+          "n_evictions": 307,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8365,
+          "rolling_hit_rate": 0.939,
+          "n_evictions": 327,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.8628,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 343,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.879667,
+          "rolling_hit_rate": 0.966,
+          "n_evictions": 361,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.892,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 378,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.90175,
+          "rolling_hit_rate": 0.968,
+          "n_evictions": 393,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.909556,
+          "rolling_hit_rate": 0.971,
+          "n_evictions": 407,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9164,
+          "rolling_hit_rate": 0.975,
+          "n_evictions": 418,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.922,
+          "rolling_hit_rate": 0.978,
+          "n_evictions": 429,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.926333,
+          "rolling_hit_rate": 0.976,
+          "n_evictions": 442,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.926346,
+          "rolling_hit_rate": 0.976,
+          "n_evictions": 442,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.099,
+        "stream_time_s": 0.88,
+        "avg_query_time_ms": 0.1467
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1727,
+        "n_active": 1714,
+        "n_dead": 13,
+        "n_lookups": 6001,
+        "n_hits": 5559,
+        "n_inserts": 2156,
+        "n_evictions": 442,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "lru",
+        "memory_mb": 3.71,
+        "avg_lookup_time_ms": 0.118
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 0.5,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.92018,
+      "n_hits": 5522,
+      "n_misses": 479,
+      "semantic_coverage_avg_dist": 0.106271,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.57,
+          "rolling_hit_rate": 0.57,
+          "n_evictions": 215,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.719,
+          "rolling_hit_rate": 0.719,
+          "n_evictions": 281,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.783333,
+          "rolling_hit_rate": 0.89,
+          "n_evictions": 325,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8255,
+          "rolling_hit_rate": 0.932,
+          "n_evictions": 349,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.854,
+          "rolling_hit_rate": 0.96,
+          "n_evictions": 365,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.871667,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 385,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.885143,
+          "rolling_hit_rate": 0.963,
+          "n_evictions": 402,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.895,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 420,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.903111,
+          "rolling_hit_rate": 0.966,
+          "n_evictions": 436,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9102,
+          "rolling_hit_rate": 0.971,
+          "n_evictions": 449,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.916,
+          "rolling_hit_rate": 0.974,
+          "n_evictions": 462,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.920167,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 479,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.92018,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 479,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.04,
+        "stream_time_s": 0.793,
+        "avg_query_time_ms": 0.1321
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 906,
+        "n_active": 857,
+        "n_dead": 49,
+        "n_lookups": 6001,
+        "n_hits": 5522,
+        "n_inserts": 1336,
+        "n_evictions": 479,
+        "n_rebuilds": 2,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "semantic",
+        "memory_mb": 1.95,
+        "avg_lookup_time_ms": 0.0661,
+        "policy_stats": {
+          "n_evictions": 479,
+          "n_recomputes": 10,
+          "avg_eviction_time_ms": 0.5156,
+          "total_eviction_time_s": 0.247,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 0.5,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.926012,
+      "n_hits": 5557,
+      "n_misses": 444,
+      "semantic_coverage_avg_dist": 0.117857,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.588,
+          "rolling_hit_rate": 0.588,
+          "n_evictions": 206,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.733,
+          "rolling_hit_rate": 0.733,
+          "n_evictions": 267,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.793333,
+          "rolling_hit_rate": 0.896,
+          "n_evictions": 310,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.835,
+          "rolling_hit_rate": 0.937,
+          "n_evictions": 330,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.8616,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 346,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.878667,
+          "rolling_hit_rate": 0.966,
+          "n_evictions": 364,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.891143,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 381,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.901,
+          "rolling_hit_rate": 0.968,
+          "n_evictions": 396,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.908667,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 411,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9156,
+          "rolling_hit_rate": 0.974,
+          "n_evictions": 422,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.921636,
+          "rolling_hit_rate": 0.98,
+          "n_evictions": 431,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.926,
+          "rolling_hit_rate": 0.978,
+          "n_evictions": 444,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.926012,
+          "rolling_hit_rate": 0.978,
+          "n_evictions": 444,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.1,
+        "stream_time_s": 1.354,
+        "avg_query_time_ms": 0.2257
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1729,
+        "n_active": 1714,
+        "n_dead": 15,
+        "n_lookups": 6001,
+        "n_hits": 5557,
+        "n_inserts": 2158,
+        "n_evictions": 444,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "semantic",
+        "memory_mb": 3.71,
+        "avg_lookup_time_ms": 0.1188,
+        "policy_stats": {
+          "n_evictions": 444,
+          "n_recomputes": 9,
+          "avg_eviction_time_ms": 1.0306,
+          "total_eviction_time_s": 0.458,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 0.5,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.92018,
+      "n_hits": 5522,
+      "n_misses": 479,
+      "semantic_coverage_avg_dist": 0.106271,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9405,
+          "effective_clusters": 14.72,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3691
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9406,
+          "effective_clusters": 16.13,
+          "old_alpha": 2.3691,
+          "new_alpha": 2.3693
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9394,
+          "effective_clusters": 17.3,
+          "old_alpha": 2.3693,
+          "new_alpha": 2.3667
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9411,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3667,
+          "new_alpha": 2.3704
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9412,
+          "effective_clusters": 16.62,
+          "old_alpha": 2.3704,
+          "new_alpha": 2.3706
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9414,
+          "effective_clusters": 17.73,
+          "old_alpha": 2.3706,
+          "new_alpha": 2.3711
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.941,
+          "effective_clusters": 17.25,
+          "old_alpha": 2.3711,
+          "new_alpha": 2.3702
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9395,
+          "effective_clusters": 15.41,
+          "old_alpha": 2.3702,
+          "new_alpha": 2.3669
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9359,
+          "effective_clusters": 15.75,
+          "old_alpha": 2.3669,
+          "new_alpha": 2.359
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9309,
+          "effective_clusters": 16.07,
+          "old_alpha": 2.359,
+          "new_alpha": 2.348
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.9326,
+          "effective_clusters": 16.56,
+          "old_alpha": 2.348,
+          "new_alpha": 2.3517
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.9311,
+          "effective_clusters": 17.6,
+          "old_alpha": 2.3517,
+          "new_alpha": 2.3484
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 15.81,
+          "old_alpha": 2.3484,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9299,
+          "effective_clusters": 16.11,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3458
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.936,
+          "effective_clusters": 16.02,
+          "old_alpha": 2.3458,
+          "new_alpha": 2.3592
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9363,
+          "effective_clusters": 16.8,
+          "old_alpha": 2.3592,
+          "new_alpha": 2.3599
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9373,
+          "effective_clusters": 16.23,
+          "old_alpha": 2.3599,
+          "new_alpha": 2.3621
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9379,
+          "effective_clusters": 16.2,
+          "old_alpha": 2.3621,
+          "new_alpha": 2.3634
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9365,
+          "effective_clusters": 14.8,
+          "old_alpha": 2.3634,
+          "new_alpha": 2.3603
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.9405,
+          "effective_clusters": 15.84,
+          "old_alpha": 2.3603,
+          "new_alpha": 2.3691
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.9336,
+          "effective_clusters": 16.19,
+          "old_alpha": 2.3691,
+          "new_alpha": 2.3539
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9314,
+          "effective_clusters": 18.03,
+          "old_alpha": 2.3539,
+          "new_alpha": 2.3491
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9309,
+          "effective_clusters": 17.0,
+          "old_alpha": 2.3491,
+          "new_alpha": 2.348
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9336,
+          "effective_clusters": 16.45,
+          "old_alpha": 2.348,
+          "new_alpha": 2.3539
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9393,
+          "effective_clusters": 16.97,
+          "old_alpha": 2.3539,
+          "new_alpha": 2.3665
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9383,
+          "effective_clusters": 16.53,
+          "old_alpha": 2.3665,
+          "new_alpha": 2.3643
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9392,
+          "effective_clusters": 16.98,
+          "old_alpha": 2.3643,
+          "new_alpha": 2.3662
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9376,
+          "effective_clusters": 16.33,
+          "old_alpha": 2.3662,
+          "new_alpha": 2.3627
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3627,
+          "new_alpha": 2.3577
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 15.7,
+          "old_alpha": 2.3577,
+          "new_alpha": 2.3577
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.57,
+          "rolling_hit_rate": 0.57,
+          "n_evictions": 215,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.719,
+          "rolling_hit_rate": 0.719,
+          "n_evictions": 281,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.783333,
+          "rolling_hit_rate": 0.89,
+          "n_evictions": 325,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8255,
+          "rolling_hit_rate": 0.932,
+          "n_evictions": 349,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.854,
+          "rolling_hit_rate": 0.96,
+          "n_evictions": 365,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.871667,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 385,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.885143,
+          "rolling_hit_rate": 0.963,
+          "n_evictions": 402,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.895,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 420,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.903111,
+          "rolling_hit_rate": 0.966,
+          "n_evictions": 436,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9102,
+          "rolling_hit_rate": 0.971,
+          "n_evictions": 449,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.916,
+          "rolling_hit_rate": 0.974,
+          "n_evictions": 462,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.920167,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 479,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.92018,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 479,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.039,
+        "stream_time_s": 1.438,
+        "avg_query_time_ms": 0.2396
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 906,
+        "n_active": 857,
+        "n_dead": 49,
+        "n_lookups": 6001,
+        "n_hits": 5522,
+        "n_inserts": 1336,
+        "n_evictions": 479,
+        "n_rebuilds": 2,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "adaptive",
+        "memory_mb": 1.95,
+        "avg_lookup_time_ms": 0.0666,
+        "policy_stats": {
+          "n_evictions": 479,
+          "n_recomputes": 10,
+          "avg_eviction_time_ms": 0.5183,
+          "total_eviction_time_s": 0.248,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.35766,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9353,
+          "current_alpha": 2.3577,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9405,
+              "effective_clusters": 14.72,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3691
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9406,
+              "effective_clusters": 16.13,
+              "old_alpha": 2.3691,
+              "new_alpha": 2.3693
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9394,
+              "effective_clusters": 17.3,
+              "old_alpha": 2.3693,
+              "new_alpha": 2.3667
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9411,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3667,
+              "new_alpha": 2.3704
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9412,
+              "effective_clusters": 16.62,
+              "old_alpha": 2.3704,
+              "new_alpha": 2.3706
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9414,
+              "effective_clusters": 17.73,
+              "old_alpha": 2.3706,
+              "new_alpha": 2.3711
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.941,
+              "effective_clusters": 17.25,
+              "old_alpha": 2.3711,
+              "new_alpha": 2.3702
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9395,
+              "effective_clusters": 15.41,
+              "old_alpha": 2.3702,
+              "new_alpha": 2.3669
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9359,
+              "effective_clusters": 15.75,
+              "old_alpha": 2.3669,
+              "new_alpha": 2.359
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9309,
+              "effective_clusters": 16.07,
+              "old_alpha": 2.359,
+              "new_alpha": 2.348
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.9326,
+              "effective_clusters": 16.56,
+              "old_alpha": 2.348,
+              "new_alpha": 2.3517
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.9311,
+              "effective_clusters": 17.6,
+              "old_alpha": 2.3517,
+              "new_alpha": 2.3484
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 15.81,
+              "old_alpha": 2.3484,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9299,
+              "effective_clusters": 16.11,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3458
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.936,
+              "effective_clusters": 16.02,
+              "old_alpha": 2.3458,
+              "new_alpha": 2.3592
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9363,
+              "effective_clusters": 16.8,
+              "old_alpha": 2.3592,
+              "new_alpha": 2.3599
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9373,
+              "effective_clusters": 16.23,
+              "old_alpha": 2.3599,
+              "new_alpha": 2.3621
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9379,
+              "effective_clusters": 16.2,
+              "old_alpha": 2.3621,
+              "new_alpha": 2.3634
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9365,
+              "effective_clusters": 14.8,
+              "old_alpha": 2.3634,
+              "new_alpha": 2.3603
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.9405,
+              "effective_clusters": 15.84,
+              "old_alpha": 2.3603,
+              "new_alpha": 2.3691
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.9336,
+              "effective_clusters": 16.19,
+              "old_alpha": 2.3691,
+              "new_alpha": 2.3539
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9314,
+              "effective_clusters": 18.03,
+              "old_alpha": 2.3539,
+              "new_alpha": 2.3491
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9309,
+              "effective_clusters": 17.0,
+              "old_alpha": 2.3491,
+              "new_alpha": 2.348
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9336,
+              "effective_clusters": 16.45,
+              "old_alpha": 2.348,
+              "new_alpha": 2.3539
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9393,
+              "effective_clusters": 16.97,
+              "old_alpha": 2.3539,
+              "new_alpha": 2.3665
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9383,
+              "effective_clusters": 16.53,
+              "old_alpha": 2.3665,
+              "new_alpha": 2.3643
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9392,
+              "effective_clusters": 16.98,
+              "old_alpha": 2.3643,
+              "new_alpha": 2.3662
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9376,
+              "effective_clusters": 16.33,
+              "old_alpha": 2.3662,
+              "new_alpha": 2.3627
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3627,
+              "new_alpha": 2.3577
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 15.7,
+              "old_alpha": 2.3577,
+              "new_alpha": 2.3577
+            }
+          ]
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 0.5,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.926012,
+      "n_hits": 5557,
+      "n_misses": 444,
+      "semantic_coverage_avg_dist": 0.117857,
+      "workload_diversity": {
+        "cluster_entropy": 0.9347,
+        "effective_clusters": 25.17,
+        "avg_pairwise_distance": 1.8693,
+        "raw_entropy": 0.9484,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9405,
+          "effective_clusters": 14.72,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3691
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9406,
+          "effective_clusters": 16.13,
+          "old_alpha": 2.3691,
+          "new_alpha": 2.3693
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9394,
+          "effective_clusters": 17.3,
+          "old_alpha": 2.3693,
+          "new_alpha": 2.3667
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9411,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3667,
+          "new_alpha": 2.3704
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9412,
+          "effective_clusters": 16.62,
+          "old_alpha": 2.3704,
+          "new_alpha": 2.3706
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9414,
+          "effective_clusters": 17.73,
+          "old_alpha": 2.3706,
+          "new_alpha": 2.3711
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.941,
+          "effective_clusters": 17.25,
+          "old_alpha": 2.3711,
+          "new_alpha": 2.3702
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9395,
+          "effective_clusters": 15.41,
+          "old_alpha": 2.3702,
+          "new_alpha": 2.3669
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9359,
+          "effective_clusters": 15.75,
+          "old_alpha": 2.3669,
+          "new_alpha": 2.359
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9309,
+          "effective_clusters": 16.07,
+          "old_alpha": 2.359,
+          "new_alpha": 2.348
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.9326,
+          "effective_clusters": 16.56,
+          "old_alpha": 2.348,
+          "new_alpha": 2.3517
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.9311,
+          "effective_clusters": 17.6,
+          "old_alpha": 2.3517,
+          "new_alpha": 2.3484
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 15.81,
+          "old_alpha": 2.3484,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9299,
+          "effective_clusters": 16.11,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3458
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.936,
+          "effective_clusters": 16.02,
+          "old_alpha": 2.3458,
+          "new_alpha": 2.3592
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9363,
+          "effective_clusters": 16.8,
+          "old_alpha": 2.3592,
+          "new_alpha": 2.3599
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9373,
+          "effective_clusters": 16.23,
+          "old_alpha": 2.3599,
+          "new_alpha": 2.3621
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9379,
+          "effective_clusters": 16.2,
+          "old_alpha": 2.3621,
+          "new_alpha": 2.3634
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9365,
+          "effective_clusters": 14.8,
+          "old_alpha": 2.3634,
+          "new_alpha": 2.3603
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.9405,
+          "effective_clusters": 15.84,
+          "old_alpha": 2.3603,
+          "new_alpha": 2.3691
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.9336,
+          "effective_clusters": 16.19,
+          "old_alpha": 2.3691,
+          "new_alpha": 2.3539
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9314,
+          "effective_clusters": 18.03,
+          "old_alpha": 2.3539,
+          "new_alpha": 2.3491
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9309,
+          "effective_clusters": 17.0,
+          "old_alpha": 2.3491,
+          "new_alpha": 2.348
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9336,
+          "effective_clusters": 16.45,
+          "old_alpha": 2.348,
+          "new_alpha": 2.3539
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9393,
+          "effective_clusters": 16.97,
+          "old_alpha": 2.3539,
+          "new_alpha": 2.3665
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9383,
+          "effective_clusters": 16.53,
+          "old_alpha": 2.3665,
+          "new_alpha": 2.3643
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9392,
+          "effective_clusters": 16.98,
+          "old_alpha": 2.3643,
+          "new_alpha": 2.3662
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9376,
+          "effective_clusters": 16.33,
+          "old_alpha": 2.3662,
+          "new_alpha": 2.3627
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3627,
+          "new_alpha": 2.3577
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 15.7,
+          "old_alpha": 2.3577,
+          "new_alpha": 2.3577
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.588,
+          "rolling_hit_rate": 0.588,
+          "n_evictions": 206,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.733,
+          "rolling_hit_rate": 0.733,
+          "n_evictions": 267,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.793333,
+          "rolling_hit_rate": 0.896,
+          "n_evictions": 310,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.835,
+          "rolling_hit_rate": 0.937,
+          "n_evictions": 330,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.8616,
+          "rolling_hit_rate": 0.964,
+          "n_evictions": 346,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.878667,
+          "rolling_hit_rate": 0.966,
+          "n_evictions": 364,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.891143,
+          "rolling_hit_rate": 0.965,
+          "n_evictions": 381,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.901,
+          "rolling_hit_rate": 0.968,
+          "n_evictions": 396,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.908667,
+          "rolling_hit_rate": 0.97,
+          "n_evictions": 411,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9156,
+          "rolling_hit_rate": 0.974,
+          "n_evictions": 422,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.921636,
+          "rolling_hit_rate": 0.98,
+          "n_evictions": 431,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.926,
+          "rolling_hit_rate": 0.978,
+          "n_evictions": 444,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.926012,
+          "rolling_hit_rate": 0.978,
+          "n_evictions": 444,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.098,
+        "stream_time_s": 1.992,
+        "avg_query_time_ms": 0.3319
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1729,
+        "n_active": 1714,
+        "n_dead": 15,
+        "n_lookups": 6001,
+        "n_hits": 5557,
+        "n_inserts": 2158,
+        "n_evictions": 444,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "adaptive",
+        "memory_mb": 3.71,
+        "avg_lookup_time_ms": 0.1218,
+        "policy_stats": {
+          "n_evictions": 444,
+          "n_recomputes": 9,
+          "avg_eviction_time_ms": 1.057,
+          "total_eviction_time_s": 0.469,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.35766,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9353,
+          "current_alpha": 2.3577,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9405,
+              "effective_clusters": 14.72,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3691
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9406,
+              "effective_clusters": 16.13,
+              "old_alpha": 2.3691,
+              "new_alpha": 2.3693
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9394,
+              "effective_clusters": 17.3,
+              "old_alpha": 2.3693,
+              "new_alpha": 2.3667
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9411,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3667,
+              "new_alpha": 2.3704
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9412,
+              "effective_clusters": 16.62,
+              "old_alpha": 2.3704,
+              "new_alpha": 2.3706
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9414,
+              "effective_clusters": 17.73,
+              "old_alpha": 2.3706,
+              "new_alpha": 2.3711
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.941,
+              "effective_clusters": 17.25,
+              "old_alpha": 2.3711,
+              "new_alpha": 2.3702
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9395,
+              "effective_clusters": 15.41,
+              "old_alpha": 2.3702,
+              "new_alpha": 2.3669
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9359,
+              "effective_clusters": 15.75,
+              "old_alpha": 2.3669,
+              "new_alpha": 2.359
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9309,
+              "effective_clusters": 16.07,
+              "old_alpha": 2.359,
+              "new_alpha": 2.348
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.9326,
+              "effective_clusters": 16.56,
+              "old_alpha": 2.348,
+              "new_alpha": 2.3517
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.9311,
+              "effective_clusters": 17.6,
+              "old_alpha": 2.3517,
+              "new_alpha": 2.3484
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 15.81,
+              "old_alpha": 2.3484,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9299,
+              "effective_clusters": 16.11,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3458
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.936,
+              "effective_clusters": 16.02,
+              "old_alpha": 2.3458,
+              "new_alpha": 2.3592
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9363,
+              "effective_clusters": 16.8,
+              "old_alpha": 2.3592,
+              "new_alpha": 2.3599
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9373,
+              "effective_clusters": 16.23,
+              "old_alpha": 2.3599,
+              "new_alpha": 2.3621
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9379,
+              "effective_clusters": 16.2,
+              "old_alpha": 2.3621,
+              "new_alpha": 2.3634
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9365,
+              "effective_clusters": 14.8,
+              "old_alpha": 2.3634,
+              "new_alpha": 2.3603
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.9405,
+              "effective_clusters": 15.84,
+              "old_alpha": 2.3603,
+              "new_alpha": 2.3691
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.9336,
+              "effective_clusters": 16.19,
+              "old_alpha": 2.3691,
+              "new_alpha": 2.3539
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9314,
+              "effective_clusters": 18.03,
+              "old_alpha": 2.3539,
+              "new_alpha": 2.3491
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9309,
+              "effective_clusters": 17.0,
+              "old_alpha": 2.3491,
+              "new_alpha": 2.348
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9336,
+              "effective_clusters": 16.45,
+              "old_alpha": 2.348,
+              "new_alpha": 2.3539
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9393,
+              "effective_clusters": 16.97,
+              "old_alpha": 2.3539,
+              "new_alpha": 2.3665
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9383,
+              "effective_clusters": 16.53,
+              "old_alpha": 2.3665,
+              "new_alpha": 2.3643
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9392,
+              "effective_clusters": 16.98,
+              "old_alpha": 2.3643,
+              "new_alpha": 2.3662
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9376,
+              "effective_clusters": 16.33,
+              "old_alpha": 2.3662,
+              "new_alpha": 2.3627
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3627,
+              "new_alpha": 2.3577
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 15.7,
+              "old_alpha": 2.3577,
+              "new_alpha": 2.3577
+            }
+          ]
+        }
+      }
+    },
+    {
+      "policy": "lru",
+      "gamma": 1.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.952841,
+      "n_hits": 5718,
+      "n_misses": 283,
+      "semantic_coverage_avg_dist": 0.078899,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.634,
+          "rolling_hit_rate": 0.634,
+          "n_evictions": 183,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.788,
+          "rolling_hit_rate": 0.788,
+          "n_evictions": 212,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.848667,
+          "rolling_hit_rate": 0.956,
+          "n_evictions": 227,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8815,
+          "rolling_hit_rate": 0.975,
+          "n_evictions": 237,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.9032,
+          "rolling_hit_rate": 0.985,
+          "n_evictions": 242,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.916667,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 250,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.926857,
+          "rolling_hit_rate": 0.986,
+          "n_evictions": 256,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.935,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 260,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.940444,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 268,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9456,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 272,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.949636,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 277,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.952833,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 283,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.952841,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 283,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.039,
+        "stream_time_s": 0.44,
+        "avg_query_time_ms": 0.0733
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 925,
+        "n_active": 857,
+        "n_dead": 68,
+        "n_lookups": 6001,
+        "n_hits": 5718,
+        "n_inserts": 1140,
+        "n_evictions": 283,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "lru",
+        "memory_mb": 1.99,
+        "avg_lookup_time_ms": 0.0596
+      }
+    },
+    {
+      "policy": "lru",
+      "gamma": 1.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.955007,
+      "n_hits": 5731,
+      "n_misses": 270,
+      "semantic_coverage_avg_dist": 0.081639,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.644,
+          "rolling_hit_rate": 0.644,
+          "n_evictions": 178,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.796,
+          "rolling_hit_rate": 0.796,
+          "n_evictions": 204,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.854,
+          "rolling_hit_rate": 0.959,
+          "n_evictions": 219,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.885,
+          "rolling_hit_rate": 0.974,
+          "n_evictions": 230,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.906,
+          "rolling_hit_rate": 0.984,
+          "n_evictions": 235,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.919333,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 242,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.929143,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 248,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.937,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 252,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.942444,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 259,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9476,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 262,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.951636,
+          "rolling_hit_rate": 0.993,
+          "n_evictions": 266,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.955,
+          "rolling_hit_rate": 0.992,
+          "n_evictions": 270,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.955007,
+          "rolling_hit_rate": 0.992,
+          "n_evictions": 270,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.098,
+        "stream_time_s": 0.682,
+        "avg_query_time_ms": 0.1137
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1984,
+        "n_active": 1714,
+        "n_dead": 270,
+        "n_lookups": 6001,
+        "n_hits": 5731,
+        "n_inserts": 1984,
+        "n_evictions": 270,
+        "n_rebuilds": 0,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "lru",
+        "memory_mb": 4.26,
+        "avg_lookup_time_ms": 0.1053
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 1.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.952175,
+      "n_hits": 5714,
+      "n_misses": 287,
+      "semantic_coverage_avg_dist": 0.074825,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.63,
+          "rolling_hit_rate": 0.63,
+          "n_evictions": 185,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.786,
+          "rolling_hit_rate": 0.786,
+          "n_evictions": 214,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.846667,
+          "rolling_hit_rate": 0.955,
+          "n_evictions": 230,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8795,
+          "rolling_hit_rate": 0.973,
+          "n_evictions": 241,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.9016,
+          "rolling_hit_rate": 0.984,
+          "n_evictions": 246,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.915333,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 254,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.925714,
+          "rolling_hit_rate": 0.986,
+          "n_evictions": 260,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.934,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 264,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.939556,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 272,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9448,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 276,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.948909,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 281,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.952167,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 287,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.952175,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 287,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.042,
+        "stream_time_s": 0.602,
+        "avg_query_time_ms": 0.1003
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 929,
+        "n_active": 857,
+        "n_dead": 72,
+        "n_lookups": 6001,
+        "n_hits": 5714,
+        "n_inserts": 1144,
+        "n_evictions": 287,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "semantic",
+        "memory_mb": 2.0,
+        "avg_lookup_time_ms": 0.0601,
+        "policy_stats": {
+          "n_evictions": 287,
+          "n_recomputes": 6,
+          "avg_eviction_time_ms": 0.5165,
+          "total_eviction_time_s": 0.148,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "semantic",
+      "gamma": 1.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.954174,
+      "n_hits": 5726,
+      "n_misses": 275,
+      "semantic_coverage_avg_dist": 0.077123,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.64,
+          "rolling_hit_rate": 0.64,
+          "n_evictions": 180,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.794,
+          "rolling_hit_rate": 0.794,
+          "n_evictions": 206,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.852,
+          "rolling_hit_rate": 0.958,
+          "n_evictions": 222,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.883,
+          "rolling_hit_rate": 0.972,
+          "n_evictions": 234,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.9044,
+          "rolling_hit_rate": 0.983,
+          "n_evictions": 239,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.918,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 246,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.928,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 252,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.93625,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 255,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.941778,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 262,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9468,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 266,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.950909,
+          "rolling_hit_rate": 0.992,
+          "n_evictions": 270,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.954167,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 275,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.954174,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 275,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.099,
+        "stream_time_s": 0.968,
+        "avg_query_time_ms": 0.1613
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1989,
+        "n_active": 1714,
+        "n_dead": 275,
+        "n_lookups": 6001,
+        "n_hits": 5726,
+        "n_inserts": 1989,
+        "n_evictions": 275,
+        "n_rebuilds": 0,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "semantic",
+        "memory_mb": 4.27,
+        "avg_lookup_time_ms": 0.1048,
+        "policy_stats": {
+          "n_evictions": 275,
+          "n_recomputes": 5,
+          "avg_eviction_time_ms": 1.0137,
+          "total_eviction_time_s": 0.279,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 1.0,
+          "beta": 1.0
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 1.0,
+      "cache_size_pct": 0.1,
+      "max_cache_size": 857,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.952175,
+      "n_hits": 5714,
+      "n_misses": 287,
+      "semantic_coverage_avg_dist": 0.074825,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9338,
+          "effective_clusters": 15.97,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3544
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9313,
+          "effective_clusters": 16.03,
+          "old_alpha": 2.3544,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9312,
+          "effective_clusters": 15.38,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3486
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9298,
+          "effective_clusters": 17.94,
+          "old_alpha": 2.3486,
+          "new_alpha": 2.3456
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 17.04,
+          "old_alpha": 2.3456,
+          "new_alpha": 2.3577
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.9322,
+          "effective_clusters": 17.44,
+          "old_alpha": 2.3577,
+          "new_alpha": 2.3508
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 16.38,
+          "old_alpha": 2.3508,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9326,
+          "effective_clusters": 15.79,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3517
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9283,
+          "effective_clusters": 16.25,
+          "old_alpha": 2.3517,
+          "new_alpha": 2.3423
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.928,
+          "effective_clusters": 16.94,
+          "old_alpha": 2.3423,
+          "new_alpha": 2.3416
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.93,
+          "effective_clusters": 15.05,
+          "old_alpha": 2.3416,
+          "new_alpha": 2.346
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9248,
+          "effective_clusters": 16.39,
+          "old_alpha": 2.346,
+          "new_alpha": 2.3346
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9227,
+          "effective_clusters": 16.72,
+          "old_alpha": 2.3346,
+          "new_alpha": 2.3299
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.9259,
+          "effective_clusters": 16.06,
+          "old_alpha": 2.3299,
+          "new_alpha": 2.337
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9319,
+          "effective_clusters": 17.1,
+          "old_alpha": 2.337,
+          "new_alpha": 2.3502
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9289,
+          "effective_clusters": 15.89,
+          "old_alpha": 2.3502,
+          "new_alpha": 2.3436
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9296,
+          "effective_clusters": 15.87,
+          "old_alpha": 2.3436,
+          "new_alpha": 2.3451
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9338,
+          "effective_clusters": 17.26,
+          "old_alpha": 2.3451,
+          "new_alpha": 2.3544
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.934,
+          "effective_clusters": 17.53,
+          "old_alpha": 2.3544,
+          "new_alpha": 2.3548
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.9329,
+          "effective_clusters": 15.18,
+          "old_alpha": 2.3548,
+          "new_alpha": 2.3524
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9325,
+          "effective_clusters": 13.44,
+          "old_alpha": 2.3524,
+          "new_alpha": 2.3515
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9286,
+          "effective_clusters": 15.25,
+          "old_alpha": 2.3515,
+          "new_alpha": 2.3429
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9287,
+          "effective_clusters": 17.23,
+          "old_alpha": 2.3429,
+          "new_alpha": 2.3431
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9259,
+          "effective_clusters": 16.43,
+          "old_alpha": 2.3431,
+          "new_alpha": 2.337
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 16.57,
+          "old_alpha": 2.337,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9335,
+          "effective_clusters": 15.68,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3537
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9302,
+          "effective_clusters": 15.96,
+          "old_alpha": 2.3537,
+          "new_alpha": 2.3464
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 15.32,
+          "old_alpha": 2.3464,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9307,
+          "effective_clusters": 16.25,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3475
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.63,
+          "rolling_hit_rate": 0.63,
+          "n_evictions": 185,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.786,
+          "rolling_hit_rate": 0.786,
+          "n_evictions": 214,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.846667,
+          "rolling_hit_rate": 0.955,
+          "n_evictions": 230,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.8795,
+          "rolling_hit_rate": 0.973,
+          "n_evictions": 241,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.9016,
+          "rolling_hit_rate": 0.984,
+          "n_evictions": 246,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.915333,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 254,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.925714,
+          "rolling_hit_rate": 0.986,
+          "n_evictions": 260,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.934,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 264,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.939556,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 272,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9448,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 276,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.948909,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 281,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.952167,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 287,
+          "cache_size": 857
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.952175,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 287,
+          "cache_size": 857
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.04,
+        "stream_time_s": 1.252,
+        "avg_query_time_ms": 0.2086
+      },
+      "cache_stats": {
+        "size": 857,
+        "total_entries": 929,
+        "n_active": 857,
+        "n_dead": 72,
+        "n_lookups": 6001,
+        "n_hits": 5714,
+        "n_inserts": 1144,
+        "n_evictions": 287,
+        "n_rebuilds": 1,
+        "index_type": "hnsw",
+        "max_size": 857,
+        "eviction_policy": "adaptive",
+        "memory_mb": 2.0,
+        "avg_lookup_time_ms": 0.0603,
+        "policy_stats": {
+          "n_evictions": 287,
+          "n_recomputes": 6,
+          "avg_eviction_time_ms": 0.5138,
+          "total_eviction_time_s": 0.147,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.34754,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9307,
+          "current_alpha": 2.3475,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9338,
+              "effective_clusters": 15.97,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3544
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9313,
+              "effective_clusters": 16.03,
+              "old_alpha": 2.3544,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9312,
+              "effective_clusters": 15.38,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3486
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9298,
+              "effective_clusters": 17.94,
+              "old_alpha": 2.3486,
+              "new_alpha": 2.3456
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 17.04,
+              "old_alpha": 2.3456,
+              "new_alpha": 2.3577
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.9322,
+              "effective_clusters": 17.44,
+              "old_alpha": 2.3577,
+              "new_alpha": 2.3508
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 16.38,
+              "old_alpha": 2.3508,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9326,
+              "effective_clusters": 15.79,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3517
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9283,
+              "effective_clusters": 16.25,
+              "old_alpha": 2.3517,
+              "new_alpha": 2.3423
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.928,
+              "effective_clusters": 16.94,
+              "old_alpha": 2.3423,
+              "new_alpha": 2.3416
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.93,
+              "effective_clusters": 15.05,
+              "old_alpha": 2.3416,
+              "new_alpha": 2.346
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9248,
+              "effective_clusters": 16.39,
+              "old_alpha": 2.346,
+              "new_alpha": 2.3346
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9227,
+              "effective_clusters": 16.72,
+              "old_alpha": 2.3346,
+              "new_alpha": 2.3299
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.9259,
+              "effective_clusters": 16.06,
+              "old_alpha": 2.3299,
+              "new_alpha": 2.337
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9319,
+              "effective_clusters": 17.1,
+              "old_alpha": 2.337,
+              "new_alpha": 2.3502
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9289,
+              "effective_clusters": 15.89,
+              "old_alpha": 2.3502,
+              "new_alpha": 2.3436
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9296,
+              "effective_clusters": 15.87,
+              "old_alpha": 2.3436,
+              "new_alpha": 2.3451
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9338,
+              "effective_clusters": 17.26,
+              "old_alpha": 2.3451,
+              "new_alpha": 2.3544
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.934,
+              "effective_clusters": 17.53,
+              "old_alpha": 2.3544,
+              "new_alpha": 2.3548
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.9329,
+              "effective_clusters": 15.18,
+              "old_alpha": 2.3548,
+              "new_alpha": 2.3524
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9325,
+              "effective_clusters": 13.44,
+              "old_alpha": 2.3524,
+              "new_alpha": 2.3515
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9286,
+              "effective_clusters": 15.25,
+              "old_alpha": 2.3515,
+              "new_alpha": 2.3429
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9287,
+              "effective_clusters": 17.23,
+              "old_alpha": 2.3429,
+              "new_alpha": 2.3431
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9259,
+              "effective_clusters": 16.43,
+              "old_alpha": 2.3431,
+              "new_alpha": 2.337
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 16.57,
+              "old_alpha": 2.337,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9335,
+              "effective_clusters": 15.68,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3537
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9302,
+              "effective_clusters": 15.96,
+              "old_alpha": 2.3537,
+              "new_alpha": 2.3464
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 15.32,
+              "old_alpha": 2.3464,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9307,
+              "effective_clusters": 16.25,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3475
+            }
+          ]
+        }
+      }
+    },
+    {
+      "policy": "adaptive",
+      "gamma": 1.0,
+      "cache_size_pct": 0.2,
+      "max_cache_size": 1714,
+      "seed": 42,
+      "n_stream": 6001,
+      "final_hit_rate": 0.954174,
+      "n_hits": 5726,
+      "n_misses": 275,
+      "semantic_coverage_avg_dist": 0.077123,
+      "workload_diversity": {
+        "cluster_entropy": 0.9309,
+        "effective_clusters": 26.22,
+        "avg_pairwise_distance": 1.8618,
+        "raw_entropy": 0.9604,
+        "n_clusters_used": 30,
+        "n_queries": 6001
+      },
+      "alpha_history": [
+        {
+          "adaptation_step": 1,
+          "n_queries_seen": 200,
+          "diversity": 0.9338,
+          "effective_clusters": 15.97,
+          "old_alpha": 1.0,
+          "new_alpha": 2.3544
+        },
+        {
+          "adaptation_step": 2,
+          "n_queries_seen": 400,
+          "diversity": 0.9313,
+          "effective_clusters": 16.03,
+          "old_alpha": 2.3544,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 3,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 16.79,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 4,
+          "n_queries_seen": 500,
+          "diversity": 0.9312,
+          "effective_clusters": 15.38,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3486
+        },
+        {
+          "adaptation_step": 5,
+          "n_queries_seen": 500,
+          "diversity": 0.9298,
+          "effective_clusters": 17.94,
+          "old_alpha": 2.3486,
+          "new_alpha": 2.3456
+        },
+        {
+          "adaptation_step": 6,
+          "n_queries_seen": 500,
+          "diversity": 0.9353,
+          "effective_clusters": 17.04,
+          "old_alpha": 2.3456,
+          "new_alpha": 2.3577
+        },
+        {
+          "adaptation_step": 7,
+          "n_queries_seen": 500,
+          "diversity": 0.9322,
+          "effective_clusters": 17.44,
+          "old_alpha": 2.3577,
+          "new_alpha": 2.3508
+        },
+        {
+          "adaptation_step": 8,
+          "n_queries_seen": 500,
+          "diversity": 0.9313,
+          "effective_clusters": 16.38,
+          "old_alpha": 2.3508,
+          "new_alpha": 2.3489
+        },
+        {
+          "adaptation_step": 9,
+          "n_queries_seen": 500,
+          "diversity": 0.9326,
+          "effective_clusters": 15.79,
+          "old_alpha": 2.3489,
+          "new_alpha": 2.3517
+        },
+        {
+          "adaptation_step": 10,
+          "n_queries_seen": 500,
+          "diversity": 0.9283,
+          "effective_clusters": 16.25,
+          "old_alpha": 2.3517,
+          "new_alpha": 2.3423
+        },
+        {
+          "adaptation_step": 11,
+          "n_queries_seen": 500,
+          "diversity": 0.928,
+          "effective_clusters": 16.94,
+          "old_alpha": 2.3423,
+          "new_alpha": 2.3416
+        },
+        {
+          "adaptation_step": 12,
+          "n_queries_seen": 500,
+          "diversity": 0.93,
+          "effective_clusters": 15.05,
+          "old_alpha": 2.3416,
+          "new_alpha": 2.346
+        },
+        {
+          "adaptation_step": 13,
+          "n_queries_seen": 500,
+          "diversity": 0.9248,
+          "effective_clusters": 16.39,
+          "old_alpha": 2.346,
+          "new_alpha": 2.3346
+        },
+        {
+          "adaptation_step": 14,
+          "n_queries_seen": 500,
+          "diversity": 0.9227,
+          "effective_clusters": 16.72,
+          "old_alpha": 2.3346,
+          "new_alpha": 2.3299
+        },
+        {
+          "adaptation_step": 15,
+          "n_queries_seen": 500,
+          "diversity": 0.9259,
+          "effective_clusters": 16.06,
+          "old_alpha": 2.3299,
+          "new_alpha": 2.337
+        },
+        {
+          "adaptation_step": 16,
+          "n_queries_seen": 500,
+          "diversity": 0.9319,
+          "effective_clusters": 17.1,
+          "old_alpha": 2.337,
+          "new_alpha": 2.3502
+        },
+        {
+          "adaptation_step": 17,
+          "n_queries_seen": 500,
+          "diversity": 0.9289,
+          "effective_clusters": 15.89,
+          "old_alpha": 2.3502,
+          "new_alpha": 2.3436
+        },
+        {
+          "adaptation_step": 18,
+          "n_queries_seen": 500,
+          "diversity": 0.9296,
+          "effective_clusters": 15.87,
+          "old_alpha": 2.3436,
+          "new_alpha": 2.3451
+        },
+        {
+          "adaptation_step": 19,
+          "n_queries_seen": 500,
+          "diversity": 0.9338,
+          "effective_clusters": 17.26,
+          "old_alpha": 2.3451,
+          "new_alpha": 2.3544
+        },
+        {
+          "adaptation_step": 20,
+          "n_queries_seen": 500,
+          "diversity": 0.934,
+          "effective_clusters": 17.53,
+          "old_alpha": 2.3544,
+          "new_alpha": 2.3548
+        },
+        {
+          "adaptation_step": 21,
+          "n_queries_seen": 500,
+          "diversity": 0.9329,
+          "effective_clusters": 15.18,
+          "old_alpha": 2.3548,
+          "new_alpha": 2.3524
+        },
+        {
+          "adaptation_step": 22,
+          "n_queries_seen": 500,
+          "diversity": 0.9325,
+          "effective_clusters": 13.44,
+          "old_alpha": 2.3524,
+          "new_alpha": 2.3515
+        },
+        {
+          "adaptation_step": 23,
+          "n_queries_seen": 500,
+          "diversity": 0.9286,
+          "effective_clusters": 15.25,
+          "old_alpha": 2.3515,
+          "new_alpha": 2.3429
+        },
+        {
+          "adaptation_step": 24,
+          "n_queries_seen": 500,
+          "diversity": 0.9287,
+          "effective_clusters": 17.23,
+          "old_alpha": 2.3429,
+          "new_alpha": 2.3431
+        },
+        {
+          "adaptation_step": 25,
+          "n_queries_seen": 500,
+          "diversity": 0.9259,
+          "effective_clusters": 16.43,
+          "old_alpha": 2.3431,
+          "new_alpha": 2.337
+        },
+        {
+          "adaptation_step": 26,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 16.57,
+          "old_alpha": 2.337,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 27,
+          "n_queries_seen": 500,
+          "diversity": 0.9335,
+          "effective_clusters": 15.68,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3537
+        },
+        {
+          "adaptation_step": 28,
+          "n_queries_seen": 500,
+          "diversity": 0.9302,
+          "effective_clusters": 15.96,
+          "old_alpha": 2.3537,
+          "new_alpha": 2.3464
+        },
+        {
+          "adaptation_step": 29,
+          "n_queries_seen": 500,
+          "diversity": 0.9308,
+          "effective_clusters": 15.32,
+          "old_alpha": 2.3464,
+          "new_alpha": 2.3478
+        },
+        {
+          "adaptation_step": 30,
+          "n_queries_seen": 500,
+          "diversity": 0.9307,
+          "effective_clusters": 16.25,
+          "old_alpha": 2.3478,
+          "new_alpha": 2.3475
+        }
+      ],
+      "cumulative_hit_rates": [
+        {
+          "query_idx": 500,
+          "cumulative_hit_rate": 0.64,
+          "rolling_hit_rate": 0.64,
+          "n_evictions": 180,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1000,
+          "cumulative_hit_rate": 0.794,
+          "rolling_hit_rate": 0.794,
+          "n_evictions": 206,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 1500,
+          "cumulative_hit_rate": 0.852,
+          "rolling_hit_rate": 0.958,
+          "n_evictions": 222,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2000,
+          "cumulative_hit_rate": 0.883,
+          "rolling_hit_rate": 0.972,
+          "n_evictions": 234,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 2500,
+          "cumulative_hit_rate": 0.9044,
+          "rolling_hit_rate": 0.983,
+          "n_evictions": 239,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3000,
+          "cumulative_hit_rate": 0.918,
+          "rolling_hit_rate": 0.988,
+          "n_evictions": 246,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 3500,
+          "cumulative_hit_rate": 0.928,
+          "rolling_hit_rate": 0.987,
+          "n_evictions": 252,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4000,
+          "cumulative_hit_rate": 0.93625,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 255,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 4500,
+          "cumulative_hit_rate": 0.941778,
+          "rolling_hit_rate": 0.99,
+          "n_evictions": 262,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5000,
+          "cumulative_hit_rate": 0.9468,
+          "rolling_hit_rate": 0.989,
+          "n_evictions": 266,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 5500,
+          "cumulative_hit_rate": 0.950909,
+          "rolling_hit_rate": 0.992,
+          "n_evictions": 270,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6000,
+          "cumulative_hit_rate": 0.954167,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 275,
+          "cache_size": 1714
+        },
+        {
+          "query_idx": 6001,
+          "cumulative_hit_rate": 0.954174,
+          "rolling_hit_rate": 0.991,
+          "n_evictions": 275,
+          "cache_size": 1714
+        }
+      ],
+      "timing": {
+        "build_time_s": 0.099,
+        "stream_time_s": 1.605,
+        "avg_query_time_ms": 0.2674
+      },
+      "cache_stats": {
+        "size": 1714,
+        "total_entries": 1989,
+        "n_active": 1714,
+        "n_dead": 275,
+        "n_lookups": 6001,
+        "n_hits": 5726,
+        "n_inserts": 1989,
+        "n_evictions": 275,
+        "n_rebuilds": 0,
+        "index_type": "hnsw",
+        "max_size": 1714,
+        "eviction_policy": "adaptive",
+        "memory_mb": 4.27,
+        "avg_lookup_time_ms": 0.1065,
+        "policy_stats": {
+          "n_evictions": 275,
+          "n_recomputes": 5,
+          "avg_eviction_time_ms": 1.025,
+          "total_eviction_time_s": 0.282,
+          "similarity_threshold": 0.3,
+          "recompute_interval": 50,
+          "alpha": 2.34754,
+          "beta": 1.0,
+          "n_adaptations": 30,
+          "current_diversity": 0.9307,
+          "current_alpha": 2.3475,
+          "alpha_min": 0.3,
+          "alpha_max": 2.5,
+          "adaptation_window": 500,
+          "adaptation_interval": 200,
+          "alpha_history": [
+            {
+              "adaptation_step": 1,
+              "n_queries_seen": 200,
+              "diversity": 0.9338,
+              "effective_clusters": 15.97,
+              "old_alpha": 1.0,
+              "new_alpha": 2.3544
+            },
+            {
+              "adaptation_step": 2,
+              "n_queries_seen": 400,
+              "diversity": 0.9313,
+              "effective_clusters": 16.03,
+              "old_alpha": 2.3544,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 3,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 16.79,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 4,
+              "n_queries_seen": 500,
+              "diversity": 0.9312,
+              "effective_clusters": 15.38,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3486
+            },
+            {
+              "adaptation_step": 5,
+              "n_queries_seen": 500,
+              "diversity": 0.9298,
+              "effective_clusters": 17.94,
+              "old_alpha": 2.3486,
+              "new_alpha": 2.3456
+            },
+            {
+              "adaptation_step": 6,
+              "n_queries_seen": 500,
+              "diversity": 0.9353,
+              "effective_clusters": 17.04,
+              "old_alpha": 2.3456,
+              "new_alpha": 2.3577
+            },
+            {
+              "adaptation_step": 7,
+              "n_queries_seen": 500,
+              "diversity": 0.9322,
+              "effective_clusters": 17.44,
+              "old_alpha": 2.3577,
+              "new_alpha": 2.3508
+            },
+            {
+              "adaptation_step": 8,
+              "n_queries_seen": 500,
+              "diversity": 0.9313,
+              "effective_clusters": 16.38,
+              "old_alpha": 2.3508,
+              "new_alpha": 2.3489
+            },
+            {
+              "adaptation_step": 9,
+              "n_queries_seen": 500,
+              "diversity": 0.9326,
+              "effective_clusters": 15.79,
+              "old_alpha": 2.3489,
+              "new_alpha": 2.3517
+            },
+            {
+              "adaptation_step": 10,
+              "n_queries_seen": 500,
+              "diversity": 0.9283,
+              "effective_clusters": 16.25,
+              "old_alpha": 2.3517,
+              "new_alpha": 2.3423
+            },
+            {
+              "adaptation_step": 11,
+              "n_queries_seen": 500,
+              "diversity": 0.928,
+              "effective_clusters": 16.94,
+              "old_alpha": 2.3423,
+              "new_alpha": 2.3416
+            },
+            {
+              "adaptation_step": 12,
+              "n_queries_seen": 500,
+              "diversity": 0.93,
+              "effective_clusters": 15.05,
+              "old_alpha": 2.3416,
+              "new_alpha": 2.346
+            },
+            {
+              "adaptation_step": 13,
+              "n_queries_seen": 500,
+              "diversity": 0.9248,
+              "effective_clusters": 16.39,
+              "old_alpha": 2.346,
+              "new_alpha": 2.3346
+            },
+            {
+              "adaptation_step": 14,
+              "n_queries_seen": 500,
+              "diversity": 0.9227,
+              "effective_clusters": 16.72,
+              "old_alpha": 2.3346,
+              "new_alpha": 2.3299
+            },
+            {
+              "adaptation_step": 15,
+              "n_queries_seen": 500,
+              "diversity": 0.9259,
+              "effective_clusters": 16.06,
+              "old_alpha": 2.3299,
+              "new_alpha": 2.337
+            },
+            {
+              "adaptation_step": 16,
+              "n_queries_seen": 500,
+              "diversity": 0.9319,
+              "effective_clusters": 17.1,
+              "old_alpha": 2.337,
+              "new_alpha": 2.3502
+            },
+            {
+              "adaptation_step": 17,
+              "n_queries_seen": 500,
+              "diversity": 0.9289,
+              "effective_clusters": 15.89,
+              "old_alpha": 2.3502,
+              "new_alpha": 2.3436
+            },
+            {
+              "adaptation_step": 18,
+              "n_queries_seen": 500,
+              "diversity": 0.9296,
+              "effective_clusters": 15.87,
+              "old_alpha": 2.3436,
+              "new_alpha": 2.3451
+            },
+            {
+              "adaptation_step": 19,
+              "n_queries_seen": 500,
+              "diversity": 0.9338,
+              "effective_clusters": 17.26,
+              "old_alpha": 2.3451,
+              "new_alpha": 2.3544
+            },
+            {
+              "adaptation_step": 20,
+              "n_queries_seen": 500,
+              "diversity": 0.934,
+              "effective_clusters": 17.53,
+              "old_alpha": 2.3544,
+              "new_alpha": 2.3548
+            },
+            {
+              "adaptation_step": 21,
+              "n_queries_seen": 500,
+              "diversity": 0.9329,
+              "effective_clusters": 15.18,
+              "old_alpha": 2.3548,
+              "new_alpha": 2.3524
+            },
+            {
+              "adaptation_step": 22,
+              "n_queries_seen": 500,
+              "diversity": 0.9325,
+              "effective_clusters": 13.44,
+              "old_alpha": 2.3524,
+              "new_alpha": 2.3515
+            },
+            {
+              "adaptation_step": 23,
+              "n_queries_seen": 500,
+              "diversity": 0.9286,
+              "effective_clusters": 15.25,
+              "old_alpha": 2.3515,
+              "new_alpha": 2.3429
+            },
+            {
+              "adaptation_step": 24,
+              "n_queries_seen": 500,
+              "diversity": 0.9287,
+              "effective_clusters": 17.23,
+              "old_alpha": 2.3429,
+              "new_alpha": 2.3431
+            },
+            {
+              "adaptation_step": 25,
+              "n_queries_seen": 500,
+              "diversity": 0.9259,
+              "effective_clusters": 16.43,
+              "old_alpha": 2.3431,
+              "new_alpha": 2.337
+            },
+            {
+              "adaptation_step": 26,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 16.57,
+              "old_alpha": 2.337,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 27,
+              "n_queries_seen": 500,
+              "diversity": 0.9335,
+              "effective_clusters": 15.68,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3537
+            },
+            {
+              "adaptation_step": 28,
+              "n_queries_seen": 500,
+              "diversity": 0.9302,
+              "effective_clusters": 15.96,
+              "old_alpha": 2.3537,
+              "new_alpha": 2.3464
+            },
+            {
+              "adaptation_step": 29,
+              "n_queries_seen": 500,
+              "diversity": 0.9308,
+              "effective_clusters": 15.32,
+              "old_alpha": 2.3464,
+              "new_alpha": 2.3478
+            },
+            {
+              "adaptation_step": 30,
+              "n_queries_seen": 500,
+              "diversity": 0.9307,
+              "effective_clusters": 16.25,
+              "old_alpha": 2.3478,
+              "new_alpha": 2.3475
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "aggregated": {
+    "0.00": {
+      "lru": {
+        "0.10": {
+          "hit_rate_mean": 0.31978,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.774047,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.38127,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.576163,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        }
+      },
+      "semantic": {
+        "0.10": {
+          "hit_rate_mean": 0.283619,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.805062,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.345942,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.655174,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        }
+      },
+      "adaptive": {
+        "0.10": {
+          "hit_rate_mean": 0.283619,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.805062,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.345942,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.654107,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9324,
+          "n_seeds": 1
+        }
+      }
+    },
+    "0.50": {
+      "lru": {
+        "0.10": {
+          "hit_rate_mean": 0.921513,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.111749,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.926346,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.119924,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        }
+      },
+      "semantic": {
+        "0.10": {
+          "hit_rate_mean": 0.92018,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.106271,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.926012,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.117857,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        }
+      },
+      "adaptive": {
+        "0.10": {
+          "hit_rate_mean": 0.92018,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.106271,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.926012,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.117857,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9347,
+          "n_seeds": 1
+        }
+      }
+    },
+    "1.00": {
+      "lru": {
+        "0.10": {
+          "hit_rate_mean": 0.952841,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.078899,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.955007,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.081639,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        }
+      },
+      "semantic": {
+        "0.10": {
+          "hit_rate_mean": 0.952175,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.074825,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.954174,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.077123,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        }
+      },
+      "adaptive": {
+        "0.10": {
+          "hit_rate_mean": 0.952175,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.074825,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        },
+        "0.20": {
+          "hit_rate_mean": 0.954174,
+          "hit_rate_std": 0.0,
+          "coverage_mean": 0.077123,
+          "coverage_std": 0.0,
+          "diversity_mean": 0.9309,
+          "n_seeds": 1
+        }
+      }
+    }
+  },
+  "config": {
+    "policies": [
+      "lru",
+      "semantic",
+      "adaptive"
+    ],
+    "cache_sizes_pct": [
+      0.1,
+      0.2
+    ],
+    "gamma_values": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "seeds": [
+      42
+    ],
+    "n_queries": 8572
+  },
+  "total_time_s": 50.4
+}
